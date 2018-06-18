@@ -5,38 +5,29 @@ import org.telegram.telegrambots.exceptions.TelegramApiException;
 
 public class IngloriousBastardBot extends TelegramLongPollingBot
 {
+    IBGameMaster gameMaster = IBGameMaster.getInstance();
 
     public void onUpdateReceived(Update update)
     {
         if (update.hasMessage() && update.getMessage().hasText())
         {
             String receivedMessage = update.getMessage().getText();
-            String responceString;
+            String responceString = "";
 
-            switch(receivedMessage)
+            if (receivedMessage.startsWith("/"))
             {
-                case "/start":
-                    responceString = "start";
-                    break;
-                case "/help":
-                    responceString = "help";
-                    break;
-                default:
-                    responceString = "def";
-                    break;
+                responceString = HandleCommand(receivedMessage);
 
-
-            }
-
-            SendMessage message = new SendMessage()
-                    .setChatId(update.getMessage().getChatId())
-                    .setText(responceString);
-            try
-            {
-                execute(message);
-            } catch (TelegramApiException e)
-            {
-                e.printStackTrace();
+                SendMessage message = new SendMessage()
+                        .setChatId(update.getMessage().getChatId())
+                        .setText(responceString);
+                try
+                {
+                    execute(message);
+                } catch (TelegramApiException e)
+                {
+                    e.printStackTrace();
+                }
             }
 
         }
@@ -50,5 +41,29 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
     public String getBotToken()
     {
         return "581126969:AAEGSMNLhPt_qx-1hCTMHiyqJwjDHUax04g";
+    }
+
+    private String HandleCommand(String str)
+    {
+        String responceString;
+        switch(str)
+        {
+            case "/start":
+                responceString = "start";
+                break;
+            case "/help":
+                responceString = "help";
+                break;
+            case "/init":
+                int room = gameMaster.newRoom();
+                responceString = String.valueOf(room);
+                break;
+            default:
+                responceString = "unrecognized command";
+                break;
+
+        }
+
+        return responceString;
     }
 }

@@ -1,5 +1,4 @@
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class IBGameMaster
 {
@@ -15,9 +14,20 @@ public class IBGameMaster
         rooms = new HashMap();
     }
 
-    private Map rooms;
+    private Map<Integer, List> rooms;
 
-    //new room
+    public int newRoom()
+    {
+        int roomNumber;
+        do {
+            roomNumber = Randomizer.getRandomRoomNumber();
+        } while (rooms.keySet().contains(roomNumber));
+
+        rooms.put(roomNumber, new ArrayList());
+
+        System.out.println("new room " + roomNumber);
+        return roomNumber;
+    }
 
     //add player
 
