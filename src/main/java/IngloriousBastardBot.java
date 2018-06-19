@@ -14,6 +14,8 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
         gameMaster = IBGameMaster.getInstance();
     }
 
+    //TODO check nulls, user data. refactor
+    //TODO split to handleCommands() amd handleMessages()
     public void onUpdateReceived(Update update)
     {
         if (update.hasMessage() && update.getMessage().hasText())
@@ -25,7 +27,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
 
             if (receivedMessage.startsWith("/"))
             {
-                switch(receivedMessage)
+                switch(receivedMessage) //TODO add /stats command
                 {
                     case "/start":
                         gameMaster.addPlayer(new IBPlayer(senderId));
@@ -94,7 +96,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
         }
     }
 
-    void sendMsg(long chatId, String msg)
+    private void sendMsg(long chatId, String msg)
     {
         SendMessage message = new SendMessage()
                 .setChatId(chatId)
@@ -118,33 +120,4 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
         return "581126969:AAEGSMNLhPt_qx-1hCTMHiyqJwjDHUax04g";
     }
 
-//    private String HandleCommand(String str)
-//    {
-//        String responceString;
-//        switch(str)
-//        {
-//            case "/start":
-//                gameMaster.addPlayer(new IBPlayer());
-//                responceString = "welcome!";
-//                break;
-//            case "/help":
-//                responceString = "help";
-//                break;
-//            case "/init":
-//                int room = gameMaster.newRoom();
-//                responceString = String.valueOf(room);
-//                break;
-//            default:
-//                responceString = "unrecognized command";
-//                break;
-//
-//        }
-//
-//        return responceString;
-//    }
-
-//    private String HandleMessage(String str)
-//    {
-//
-//    }
 }

@@ -1,5 +1,13 @@
 import java.util.*;
 
+/**
+ *
+ * room admin workflow: /init -> initGame() -> returns room id -> admin enter character ->
+ *      admin wait for all players ready and type /go -> randomize roles and send broadcast
+ *
+ * regular player workflow: /join -> enter room number -> enter character -> wait till broadcast sent
+ *
+ */
 public class IBGameMaster
 {
     private static IBGameMaster ourInstance = new IBGameMaster();
@@ -13,6 +21,10 @@ public class IBGameMaster
     private Map<Integer, IBPlayer> players;     //player id - key, player obj - value
     private Map<Integer, Integer> roomCreators; //admin id - key, room id - value
 
+    //TODO add method to remove player from room when he enter new one
+    //TODO add google images search
+    //TODO add more text replies
+
     private IBGameMaster()
     {
         rooms = new HashMap<>();
@@ -20,6 +32,11 @@ public class IBGameMaster
         roomCreators = new HashMap<>();
     }
 
+    /**
+     * create new room and add initiator in it
+     *
+     * @return room number
+     */
     public int initGame(int initiatorId)
     {
         int roomNumber = newRoom();
@@ -56,6 +73,12 @@ public class IBGameMaster
         return players.get(id);
     }
 
+    /**
+     * returns list of players in room by creator request
+     * used in broadcast messages
+     *
+     * @see /go in commands parsing
+     */
     public List<IBPlayer> getPlayersByRoomCreator(int id)
     {
         int room = roomCreators.get(id);
@@ -69,6 +92,11 @@ public class IBGameMaster
         return roomCreators.containsKey(id);
     }
 
+    /**
+     * generate unique room id
+     *
+     * //TODO add empty rooms removing
+     */
     private int newRoom()
     {
         int roomNumber;
@@ -82,6 +110,11 @@ public class IBGameMaster
         return roomNumber;
     }
 
+    /**
+     * check is player exist, create if not
+     *
+     * it possible if players avoid calling /start method
+     */
     public void addPlayerIfNull(int id)
     {
         IBPlayer p = players.get(id);
@@ -91,12 +124,16 @@ public class IBGameMaster
         }
     }
 
+    /**
+     * @param roomAdminId id of room admin
+     *                    needs to select room for randomizing
+     */
     public void randomizeCharacters(int roomAdminId)
     {
         int roomId = roomCreators.get(roomAdminId);
         List<IBPlayer> players = rooms.get(roomId);
         int lastIndex = players.size()-1;
-        String firstCharacterBkp = new String(players.get(0).getCharacter());
+        String firstCharacterBkp = players.get(0).getCharacter();
         for (int i = 0; i < lastIndex; i++)
         {
             players.get(i).setCharacter(players.get(i+1).getCharacter());

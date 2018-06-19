@@ -4,6 +4,7 @@ public class IBPlayer
     private String character;
     private Status status;
 
+    //TODO add player name from tg
     public IBPlayer(int id)
     {
         this.id = id;
