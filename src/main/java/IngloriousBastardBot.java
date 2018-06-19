@@ -3,9 +3,7 @@ import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class IngloriousBastardBot extends TelegramLongPollingBot
 {
@@ -52,6 +50,10 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                             for (IBPlayer p : players)
                             {
                                 responceString = responceString + " " + p.toString() + "\n";
+                                if (p.getId() != senderId) //to avoid sending duplicate for admin
+                                {
+                                    sendMsg(p.getId(), responceString);
+                                }
                             }
                         }
                         else {
@@ -86,17 +88,22 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
 
             if (responceString.length() > 0)
             {
-                SendMessage message = new SendMessage()
-                        .setChatId(update.getMessage().getChatId())
-                        .setText(responceString);
-                try
-                {
-                    execute(message);
-                } catch (TelegramApiException e)
-                {
-                    e.printStackTrace();
-                }
+                sendMsg(update.getMessage().getChatId(), responceString);
             }
+        }
+    }
+
+    void sendMsg(long chatId, String msg)
+    {
+        SendMessage message = new SendMessage()
+                .setChatId(chatId)
+                .setText(msg);
+        try
+        {
+            execute(message);
+        } catch (TelegramApiException e)
+        {
+            e.printStackTrace();
         }
     }
 
