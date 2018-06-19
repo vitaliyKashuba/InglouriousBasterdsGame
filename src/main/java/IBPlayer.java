@@ -1,18 +1,25 @@
 public class IBPlayer
 {
-    private String id;
+    private int id;
     private String character;
+    Status status;
 
-    public IBPlayer(String id, String character) {
+    public IBPlayer(int id)
+    {
         this.id = id;
-        this.character = character;
+        this.status = Status.NONE;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
     public String getCharacter() {
         return character;
+    }
+
+    enum Status
+    {
+        NONE, INIT, JOIN, READY, INGAME
     }
 }
