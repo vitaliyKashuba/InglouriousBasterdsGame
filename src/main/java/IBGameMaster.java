@@ -18,6 +18,41 @@ public class IBGameMaster
     private Map<Integer, List<IBPlayer>> rooms;
     private Map<Integer, IBPlayer> players;
 
+    public int initGame(int initiatorId)
+    {
+        int roomNumber = newRoom();
+
+        addPlayerIfNull(initiatorId);
+        enterRoom(initiatorId, roomNumber);
+
+        return roomNumber;
+    }
+
+    public void changeStatus(int playerId, IBPlayer.Status status)
+    {
+        players.get(playerId).setStatus(status);
+    }
+
+    public void enterRoom(int playerId, int roomId)
+    {
+        rooms.get(roomId).add(players.get(playerId));
+    }
+
+    public void setCharacter(int playerId, String character)
+    {
+        players.get(playerId).setCharacter(character);
+    }
+
+    public void addPlayer(IBPlayer p)
+    {
+        players.put(p.getId(), p);
+    }
+
+    public IBPlayer getPlayer(int id)
+    {
+        return players.get(id);
+    }
+
     private int newRoom()
     {
         int roomNumber;
@@ -31,28 +66,13 @@ public class IBGameMaster
         return roomNumber;
     }
 
-    public int initGame(int initiatorId)
+    public void addPlayerIfNull(int id)
     {
-        int roomNumber = newRoom();
-
-        rooms.get(roomNumber).add(players.get(initiatorId));
-
-        return roomNumber;
+        IBPlayer p = players.get(id);
+        if (p == null)
+        {
+            addPlayer(new IBPlayer(id));
+        }
     }
 
-    public Map<Integer, IBPlayer> getPlayers()
-    {
-        return players;
-    }
-
-    public void addPlayer(IBPlayer p)
-    {
-        players.put(p.getId(), p);
-    }
-
-    //add player
-
-    //randomize
-
-    //return vals
 }

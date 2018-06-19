@@ -2,7 +2,7 @@ public class IBPlayer
 {
     private int id;
     private String character;
-    Status status;
+    private Status status;
 
     public IBPlayer(int id)
     {
@@ -18,8 +18,20 @@ public class IBPlayer
         return character;
     }
 
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public void setCharacter(String character) {
+        this.character = character;
+    }
+
     enum Status
     {
-        NONE, INIT, JOIN, READY, INGAME
+        NONE, JOINREQUEST, JOINED, READY, INGAME
     }
 }

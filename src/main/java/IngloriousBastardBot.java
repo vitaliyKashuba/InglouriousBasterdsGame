@@ -12,7 +12,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
         if (update.hasMessage() && update.getMessage().hasText())
         {
             String receivedMessage = update.getMessage().getText();
-            String responceString = "";
+            String responceString = " ";
 
             int senderId = update.getMessage().getFrom().getId();
 
@@ -26,10 +26,13 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         break;
                     case "/init":
                         int room = gameMaster.initGame(senderId);
+                        gameMaster.changeStatus(senderId, IBPlayer.Status.JOINED);
                         responceString = String.valueOf(room);
                         break;
                     case "/join":
-                        responceString = "join";
+                        gameMaster.addPlayerIfNull(senderId);
+                        gameMaster.changeStatus(senderId, IBPlayer.Status.JOINREQUEST);
+                        responceString = "enter room number";
                         break;
                     case "/help":
                         responceString = "help";
@@ -40,19 +43,36 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
 
                 }
 
-                SendMessage message = new SendMessage()
-                        .setChatId(update.getMessage().getChatId())
-                        .setText(responceString);
-                try
-                {
-                    execute(message);
-                } catch (TelegramApiException e)
-                {
-                    e.printStackTrace();
-                }
             } else
             {
-                //TODO parse message
+                IBPlayer player = gameMaster.getPlayer(senderId);
+                switch (player.getStatus())
+                {
+                    case NONE:
+                        responceString = "use commands /";
+                        break;
+                    case JOINREQUEST:
+                        gameMaster.enterRoom(senderId, Integer.parseInt(receivedMessage));
+                        gameMaster.changeStatus(senderId, IBPlayer.Status.JOINED);
+                        responceString = "enter character";
+                        break;
+                    case JOINED:
+                        gameMaster.setCharacter(senderId, receivedMessage);
+                        gameMaster.changeStatus(senderId, IBPlayer.Status.READY);
+                        responceString = "waiting for party ready";
+                        break;
+                }
+            }
+
+            SendMessage message = new SendMessage()
+                    .setChatId(update.getMessage().getChatId())
+                    .setText(responceString);
+            try
+            {
+                execute(message);
+            } catch (TelegramApiException e)
+            {
+                e.printStackTrace();
             }
 
         }
