@@ -3,16 +3,25 @@ import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class IngloriousBastardBot extends TelegramLongPollingBot
 {
-    private IBGameMaster gameMaster = IBGameMaster.getInstance();
+    private IBGameMaster gameMaster;
+
+    public IngloriousBastardBot()
+    {
+        gameMaster = IBGameMaster.getInstance();
+    }
 
     public void onUpdateReceived(Update update)
     {
         if (update.hasMessage() && update.getMessage().hasText())
         {
             String receivedMessage = update.getMessage().getText();
-            String responceString = " ";
+            String responceString = "";
 
             int senderId = update.getMessage().getFrom().getId();
 
@@ -27,7 +36,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                     case "/init":
                         int room = gameMaster.initGame(senderId);
                         gameMaster.changeStatus(senderId, IBPlayer.Status.JOINED);
-                        responceString = String.valueOf(room);
+                        responceString = "Room " + String.valueOf(room) + " created!\nEnter character";
                         break;
                     case "/join":
                         gameMaster.addPlayerIfNull(senderId);
@@ -37,10 +46,21 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                     case "/help":
                         responceString = "help";
                         break;
+                    case "/go":
+                        if (gameMaster.isAdmin(senderId)) {
+                            List<IBPlayer> players = gameMaster.getPlayersByRoomCreator(senderId);
+                            for (IBPlayer p : players)
+                            {
+                                responceString = responceString + " " + p.toString() + "\n";
+                            }
+                        }
+                        else {
+                            responceString = "only room creators allows run this command";
+                        }
+                        break;
                     default:
                         responceString = "unrecognized command";
                         break;
-
                 }
 
             } else
@@ -64,17 +84,19 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                 }
             }
 
-            SendMessage message = new SendMessage()
-                    .setChatId(update.getMessage().getChatId())
-                    .setText(responceString);
-            try
+            if (responceString.length() > 0)
             {
-                execute(message);
-            } catch (TelegramApiException e)
-            {
-                e.printStackTrace();
+                SendMessage message = new SendMessage()
+                        .setChatId(update.getMessage().getChatId())
+                        .setText(responceString);
+                try
+                {
+                    execute(message);
+                } catch (TelegramApiException e)
+                {
+                    e.printStackTrace();
+                }
             }
-
         }
     }
 

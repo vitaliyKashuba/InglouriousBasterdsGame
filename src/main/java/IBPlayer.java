@@ -34,4 +34,13 @@ public class IBPlayer
     {
         NONE, JOINREQUEST, JOINED, READY, INGAME
     }
+
+    @Override
+    public String toString() {
+        return "IBPlayer{" +
+                "id=" + id +
+                ", character='" + character + '\'' +
+                ", status=" + status +
+                '}';
+    }
 }

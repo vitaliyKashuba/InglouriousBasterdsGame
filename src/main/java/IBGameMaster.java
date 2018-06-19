@@ -9,14 +9,16 @@ public class IBGameMaster
         return ourInstance;
     }
 
+    private Map<Integer, List<IBPlayer>> rooms; //room id - key, list of players - value
+    private Map<Integer, IBPlayer> players;     //player id - key, player obj - value
+    private Map<Integer, Integer> roomCreators; //admin id - key, room id - value
+
     private IBGameMaster()
     {
-        rooms = new HashMap<Integer, List<IBPlayer>>();
+        rooms = new HashMap<>();
         players = new HashMap<>();
+        roomCreators = new HashMap<>();
     }
-
-    private Map<Integer, List<IBPlayer>> rooms;
-    private Map<Integer, IBPlayer> players;
 
     public int initGame(int initiatorId)
     {
@@ -24,6 +26,7 @@ public class IBGameMaster
 
         addPlayerIfNull(initiatorId);
         enterRoom(initiatorId, roomNumber);
+        roomCreators.put(initiatorId, roomNumber);
 
         return roomNumber;
     }
@@ -53,6 +56,19 @@ public class IBGameMaster
         return players.get(id);
     }
 
+    public List<IBPlayer> getPlayersByRoomCreator(int id)
+    {
+        int room = roomCreators.get(id);
+        List players = rooms.get(room);
+
+        return players;
+    }
+
+    public boolean isAdmin(int id)
+    {
+        return roomCreators.containsKey(id);
+    }
+
     private int newRoom()
     {
         int roomNumber;
@@ -60,7 +76,7 @@ public class IBGameMaster
             roomNumber = Randomizer.getRandomRoomNumber();
         } while (rooms.keySet().contains(roomNumber));
 
-        rooms.put(roomNumber, new ArrayList<IBPlayer>());
+        rooms.put(roomNumber, new ArrayList<>());
 
         System.out.println("new room " + roomNumber);
         return roomNumber;
