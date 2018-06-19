@@ -91,4 +91,17 @@ public class IBGameMaster
         }
     }
 
+    public void randomizeCharacters(int roomAdminId)
+    {
+        int roomId = roomCreators.get(roomAdminId);
+        List<IBPlayer> players = rooms.get(roomId);
+        int lastIndex = players.size()-1;
+        String firstCharacterBkp = new String(players.get(0).getCharacter());
+        for (int i = 0; i < lastIndex; i++)
+        {
+            players.get(i).setCharacter(players.get(i+1).getCharacter());
+        }
+        players.get(lastIndex).setCharacter(firstCharacterBkp);
+    }
+
 }

@@ -45,16 +45,17 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         responceString = "help";
                         break;
                     case "/go":
-                        if (gameMaster.isAdmin(senderId)) {
+                        if (gameMaster.isAdmin(senderId))
+                        {
+                            gameMaster.randomizeCharacters(senderId);
                             List<IBPlayer> players = gameMaster.getPlayersByRoomCreator(senderId);
                             for (IBPlayer p : players)
                             {
-                                responceString = responceString + " " + p.toString() + "\n";
-                                if (p.getId() != senderId) //to avoid sending duplicate for admin
-                                {
-                                    sendMsg(p.getId(), responceString);
-                                }
+                                responceString = p.getCharacter();
+                                sendMsg(p.getId(), responceString);
                             }
+
+                            return;
                         }
                         else {
                             responceString = "only room creators allows run this command";
