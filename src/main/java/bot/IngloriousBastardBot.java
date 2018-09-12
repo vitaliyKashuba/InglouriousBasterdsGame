@@ -4,6 +4,7 @@ import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import util.AppUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -12,11 +13,12 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
 {
     private IBGameMaster gameMaster;
     private Map<String, String> env;
+    private static String botToken;
 
     public IngloriousBastardBot()
     {
         gameMaster = IBGameMaster.getInstance();
-        env = System.getenv();
+        botToken = AppUtil.getEnvironmentVariable("TOKEN");
     }
 
     //TODO check nulls, user data. refactor
@@ -122,7 +124,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
 
     public String getBotToken()
     {
-        return env.get("TOKEN");
+        return botToken;
     }
 
 }
