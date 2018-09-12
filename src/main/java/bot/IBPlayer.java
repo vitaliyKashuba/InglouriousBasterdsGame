@@ -1,3 +1,5 @@
+package bot;
+
 public class IBPlayer
 {
     private int id;
@@ -38,7 +40,7 @@ public class IBPlayer
 
     @Override
     public String toString() {
-        return "IBPlayer{" +
+        return "bot.IBPlayer{" +
                 "id=" + id +
                 ", character='" + character + '\'' +
                 ", status=" + status +
