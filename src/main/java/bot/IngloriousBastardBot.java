@@ -1,10 +1,13 @@
 package bot;
 
 import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import util.AppUtil;
+import util.GoogleSearchAPIUtil;
+import util.Randomizer;
 
 import java.util.List;
 import java.util.Map;
@@ -60,8 +63,12 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                             List<IBPlayer> players = gameMaster.getPlayersByRoomCreator(senderId);
                             for (IBPlayer p : players)
                             {
-                                responceString = p.getCharacter();
-                                sendMsg(p.getId(), responceString);
+//                                responceString = p.getCharacter();
+//                                sendMsg(p.getId(), responceString);
+                                String ch = p.getCharacter();
+                                List<String> images = GoogleSearchAPIUtil.searchForImages(ch);
+                                String img = images.get(Randomizer.getRandomIndex(images.size()));
+                                sendImageFromUrl(p.getId(), img, ch);
                             }
 
                             return;
@@ -69,6 +76,14 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         else {
                             responceString = "only room creators allows run this command";
                         }
+                        break;
+                    case "/debug":
+                        List<String> images = GoogleSearchAPIUtil.searchForImages("Darth Vader");
+
+                        String img = images.get(Randomizer.getRandomIndex(images.size()));
+
+                        sendImageFromUrl(update.getMessage().getChatId(), img, "vader");
+
                         break;
                     default:
                         responceString = "unrecognized command";
@@ -111,6 +126,23 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
         try
         {
             execute(message);
+        } catch (TelegramApiException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendImageFromUrl(long chatId, String imgUrl, String caption) {
+        SendPhoto sendPhotoRequest = new SendPhoto()
+                .setChatId(chatId)
+                .setPhoto(imgUrl);
+        if (caption != null)
+        {
+            sendPhotoRequest.setCaption(caption);
+        }
+        try
+        {
+            sendPhoto(sendPhotoRequest);
         } catch (TelegramApiException e)
         {
             e.printStackTrace();

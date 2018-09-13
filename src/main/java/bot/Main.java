@@ -17,24 +17,24 @@ public class Main
 {
     public static void main(String args[]) throws IOException
     {
-//        ApiContextInitializer.init();
-//
-//        TelegramBotsApi botsApi = new TelegramBotsApi();
-//
-//        try
-//        {
-//            botsApi.registerBot(new IngloriousBastardBot());
-//        } catch (TelegramApiException e)
-//        {
-//            e.printStackTrace();
-//        }
+        ApiContextInitializer.init();
 
-        List<String> images = GoogleSearchAPIUtil.searchForImages("darth vader");
+        TelegramBotsApi botsApi = new TelegramBotsApi();
 
-        for (String img : images)
+        try
         {
-            System.out.println(img);
+            botsApi.registerBot(new IngloriousBastardBot());
+        } catch (TelegramApiException e)
+        {
+            e.printStackTrace();
         }
+
+//        List<String> images = GoogleSearchAPIUtil.searchForImages("darth vader");
+//
+//        for (String img : images)
+//        {
+//            System.out.println(img);
+//        }
 
     }
 }

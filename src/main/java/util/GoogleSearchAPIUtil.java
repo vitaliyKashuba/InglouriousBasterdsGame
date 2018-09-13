@@ -29,7 +29,7 @@ public class GoogleSearchAPIUtil
 
     static String makeRequest(String query)
     {
-        return HttpRequest.get(API_URL, true, 'q', "darth vader").body();
+        return HttpRequest.get(API_URL, true, 'q', query).body();
     }
 
     @SneakyThrows   //TODO handle exception ?

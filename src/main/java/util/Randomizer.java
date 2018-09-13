@@ -14,4 +14,9 @@ public class Randomizer
     {
         return random.nextInt(100);
     }
+
+    public static int getRandomIndex(int upperBound)
+    {
+        return random.nextInt(upperBound);
+    }
 }
