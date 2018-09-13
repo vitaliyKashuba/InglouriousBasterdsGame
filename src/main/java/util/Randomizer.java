@@ -1,4 +1,4 @@
-package bot;
+package util;
 
 import java.util.Random;
 
