@@ -41,11 +41,11 @@ public class IBGameMaster
      *
      * @return room number
      */
-    public int initGame(int initiatorId)
+    public int initGame(int initiatorId, String initiatorName)
     {
         int roomNumber = newRoom();
 
-        addPlayerIfNull(initiatorId);
+        addPlayerIfNull(initiatorId, initiatorName);
         enterRoom(initiatorId, roomNumber);
         roomCreators.put(initiatorId, roomNumber);
 
@@ -119,12 +119,12 @@ public class IBGameMaster
      *
      * it possible if players avoid calling /start method
      */
-    public void addPlayerIfNull(int id)
+    public void addPlayerIfNull(int id, String name)
     {
         IBPlayer p = players.get(id);
         if (p == null)
         {
-            addPlayer(new IBPlayer(id));
+            addPlayer(new IBPlayer(id, name));
         }
     }
 

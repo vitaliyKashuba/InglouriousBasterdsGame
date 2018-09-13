@@ -1,49 +1,28 @@
 package bot;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@ToString
+@Getter
 public class IBPlayer
 {
     private int id;
-    private String character;
-    private Status status;
+    @Setter private String character;
+    @Setter private Status status;
+    private String name;
 
-    //TODO add player name from tg
-    public IBPlayer(int id)
+    public IBPlayer(int id, String name)
     {
         this.id = id;
         this.status = Status.NONE;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getCharacter() {
-        return character;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    public void setCharacter(String character) {
-        this.character = character;
+        this.name = name;
     }
 
     enum Status
     {
         NONE, JOINREQUEST, JOINED, READY, INGAME
-    }
-
-    @Override
-    public String toString() {
-        return "bot.IBPlayer{" +
-                "id=" + id +
-                ", character='" + character + '\'' +
-                ", status=" + status +
-                '}';
     }
 }

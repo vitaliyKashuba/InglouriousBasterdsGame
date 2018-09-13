@@ -2,13 +2,17 @@ package bot;
 
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.api.objects.Contact;
 import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.objects.User;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import util.AppUtil;
 import util.GoogleSearchAPIUtil;
 import util.Randomizer;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,23 +37,25 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
             String receivedMessage = update.getMessage().getText();
             String responceString = "";
 
-            int senderId = update.getMessage().getFrom().getId();
+            User sender = update.getMessage().getFrom();
+            int senderId = sender.getId();
+            String senderName = sender.getFirstName() + " " + sender.getLastName();
 
             if (receivedMessage.startsWith("/"))
             {
                 switch(receivedMessage) //TODO add /stats command
                 {
                     case "/start":
-                        gameMaster.addPlayer(new IBPlayer(senderId));
+                        gameMaster.addPlayer(new IBPlayer(senderId, senderName));
                         responceString = "welcome!";
                         break;
                     case "/init":
-                        int room = gameMaster.initGame(senderId);
+                        int room = gameMaster.initGame(senderId, senderName);
                         gameMaster.changeStatus(senderId, IBPlayer.Status.JOINED);
                         responceString = "Room " + String.valueOf(room) + " created!\nEnter character";
                         break;
                     case "/join":
-                        gameMaster.addPlayerIfNull(senderId);
+                        gameMaster.addPlayerIfNull(senderId, senderName);
                         gameMaster.changeStatus(senderId, IBPlayer.Status.JOINREQUEST);
                         responceString = "enter room number";
                         break;
@@ -78,12 +84,20 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         }
                         break;
                     case "/debug":
-                        List<String> images = GoogleSearchAPIUtil.searchForImages("Darth Vader");
-
-                        String img = images.get(Randomizer.getRandomIndex(images.size()));
-
-                        sendImageFromUrl(update.getMessage().getChatId(), img, "vader");
-
+                        gameMaster.randomizeCharacters(senderId);
+                        List<IBPlayer> players = gameMaster.getPlayersByRoomCreator(senderId);
+                        for (IBPlayer p : players)
+                        {
+                            Map<String,String> teammates = new HashMap<>();
+                            for (IBPlayer pl : players)
+                            {
+                                if(pl.getId() != p.getId())
+                                {
+                                    teammates.put(pl.getName(), pl.getCharacter());
+                                }
+                            }
+                            sendMsg(p.getId(), teammates.toString());
+                        }
                         break;
                     default:
                         responceString = "unrecognized command";
