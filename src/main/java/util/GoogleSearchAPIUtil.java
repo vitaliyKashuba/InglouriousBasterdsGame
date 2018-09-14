@@ -43,8 +43,13 @@ public class GoogleSearchAPIUtil
         return images;
     }
 
-    public static List<String> searchForImages(String request)
+    /**
+     * @return random image found in google by request
+     */
+    public static String findImage(String request)
     {
-        return getImagesFromResponse(makeRequest(request));
+        List<String> images = getImagesFromResponse(makeRequest(request));
+//        return images.get(Randomizer.getRandomIndex(images.size()));
+        return Randomizer.getRandomElement(images);
     }
 }

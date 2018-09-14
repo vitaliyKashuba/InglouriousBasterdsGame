@@ -23,4 +23,19 @@ public class TgUtil
 
         return inlineKeyboardMarkup;
     }
+
+    public static InlineKeyboardMarkup getRandomCharacterButtonKeyboardMarkup()
+    {
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+
+        List<InlineKeyboardButton> keyboardButtonsRow1 = new ArrayList<>();
+        keyboardButtonsRow1.add(new InlineKeyboardButton().setText("Set random character").setCallbackData("random"));
+
+        List<List<InlineKeyboardButton>> rowList= new ArrayList<>();
+        rowList.add(keyboardButtonsRow1);
+
+        inlineKeyboardMarkup.setKeyboard(rowList);
+
+        return inlineKeyboardMarkup;
+    }
 }

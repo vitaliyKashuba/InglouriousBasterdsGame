@@ -57,51 +57,18 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                     case "/join":
                         gameMaster.addPlayerIfNull(senderId, senderName);
                         gameMaster.changeStatus(senderId, IBPlayer.Status.JOINREQUEST);
+                        gameMaster.removeOldRoomIfExist(senderId);
                         responceString = "enter room number";
                         break;
                     case "/help":
                         responceString = "help";
                         break;
-//                    case "/go":
-//                        if (gameMaster.isAdmin(senderId))
-//                        {
-//                            gameMaster.randomizeCharacters(senderId);
-//                            List<IBPlayer> players = gameMaster.getPlayersByRoomCreator(senderId);
-//                            for (IBPlayer p : players)
-//                            {
-////                                responceString = p.getCharacter();
-////                                sendMsg(p.getId(), responceString);
-//                                String ch = p.getCharacter();
-//                                List<String> images = GoogleSearchAPIUtil.searchForImages(ch);
-//                                String img = images.get(Randomizer.getRandomIndex(images.size()));
-//                                sendImageFromUrl(p.getId(), img, ch);
-//                            }
-//
-//                            return;
-//                        }
-//                        else {
-//                            responceString = "only room creators allows run this command";
-//                        }
-//                        break;
-//                    case "/go2":
-//                        gameMaster.randomizeCharacters(senderId);
-//                        List<IBPlayer> players = gameMaster.getPlayersByRoomCreator(senderId);
-//                        for (IBPlayer p : players)
-//                        {
-//                            Map<String,String> teammates = new HashMap<>();
-//                            for (IBPlayer pl : players)
-//                            {
-//                                if(pl.getId() != p.getId())
-//                                {
-//                                    teammates.put(pl.getName(), pl.getCharacter());
-//                                }
-//                            }
-//                            sendMsg(p.getId(), teammates.toString());
-//                        }
-//                        break;
                     case "/debug":
-                        responceString = "select mode";
-                        inlineKeyboardMarkup = TgUtil.getStartGameKeyboardMarkup();
+                        responceString = Randomizer.getRandomCharacter();
+//                        inlineKeyboardMarkup = TgUtil.getStartGameKeyboardMarkup();
+//                        String img = GoogleSearchAPIUtil.findImage(responceString);
+//                        sendImageFromUrl(update.getMessage().getChatId(), img, responceString);
+//                        return;
                         break;
                     default:
                         responceString = "unrecognized command";
@@ -117,7 +84,18 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         responceString = "use commands /";
                         break;
                     case JOINREQUEST:
-                        gameMaster.enterRoom(senderId, Integer.parseInt(receivedMessage));
+                        try
+                        {
+                            gameMaster.enterRoom(senderId, Integer.parseInt(receivedMessage));
+                        } catch (NumberFormatException e)
+                        {
+                            responceString = "Enter valid room number";
+                            break;
+                        } catch (IllegalArgumentException e)
+                        {
+                            responceString = "Room not exist";
+                            break;
+                        }
                         gameMaster.changeStatus(senderId, IBPlayer.Status.JOINED);
                         responceString = "enter character";
                         break;
@@ -159,8 +137,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         for (IBPlayer p : players)
                         {
                             String ch = p.getCharacter();
-                            List<String> images = GoogleSearchAPIUtil.searchForImages(p.getCharacter());
-                            String img = images.get(Randomizer.getRandomIndex(images.size()));
+                            String img = GoogleSearchAPIUtil.findImage(p.getCharacter());
                             sendImageFromUrl(p.getId(), img, ch);
                         }
                         return;
@@ -186,17 +163,6 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
             }
         }
     }
-
-//    private void tryToExecute(SendMessage message)
-//    {
-//        try
-//        {
-//            execute(message);
-//        } catch (TelegramApiException e)
-//        {
-//            e.printStackTrace();
-//        }
-//    }
 
     private void sendMsg(long chatId, String msg)
     {

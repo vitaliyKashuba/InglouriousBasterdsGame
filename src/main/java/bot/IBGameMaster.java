@@ -55,11 +55,12 @@ public class IBGameMaster
      *
      * @param playerId id of new rood admin
      */
-    private void removeOldRoomIfExist(int playerId)
+    public void removeOldRoomIfExist(int playerId)
     {
         if (roomCreators.containsKey(playerId))
         {
             rooms.remove(roomCreators.get(playerId));
+            roomCreators.remove(playerId);
         }
     }
 
@@ -70,6 +71,10 @@ public class IBGameMaster
 
     public void enterRoom(int playerId, int roomId)
     {
+        if (!rooms.containsKey(roomId))
+        {
+            throw new IllegalArgumentException("no such room");
+        }
         rooms.get(roomId).add(players.get(playerId));
     }
 
@@ -97,9 +102,8 @@ public class IBGameMaster
     public List<IBPlayer> getPlayersByRoomCreator(int id)
     {
         int room = roomCreators.get(id);
-        List players = rooms.get(room);
 
-        return players;
+        return rooms.get(room);
     }
 
     public boolean isAdmin(int id)
