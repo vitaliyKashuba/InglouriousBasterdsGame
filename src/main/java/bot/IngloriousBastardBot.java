@@ -5,6 +5,8 @@ import org.telegram.telegrambots.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.api.objects.Contact;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.api.objects.User;
+import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import util.AppUtil;
@@ -19,7 +21,6 @@ import java.util.Map;
 public class IngloriousBastardBot extends TelegramLongPollingBot
 {
     private IBGameMaster gameMaster;
-    private Map<String, String> env;
     private static String botToken;
 
     public IngloriousBastardBot()
@@ -83,7 +84,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                             responceString = "only room creators allows run this command";
                         }
                         break;
-                    case "/debug":
+                    case "/go2":
                         gameMaster.randomizeCharacters(senderId);
                         List<IBPlayer> players = gameMaster.getPlayersByRoomCreator(senderId);
                         for (IBPlayer p : players)
@@ -97,6 +98,30 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                                 }
                             }
                             sendMsg(p.getId(), teammates.toString());
+                        }
+                        break;
+
+                    case "/debug":
+                        InlineKeyboardMarkup inlineKeyboardMarkup =new InlineKeyboardMarkup();
+
+                        InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
+                        inlineKeyboardButton.setText("Тык");
+                        inlineKeyboardButton.setCallbackData("start1");
+
+                        List<InlineKeyboardButton> keyboardButtonsRow1 = new ArrayList<>();
+                        keyboardButtonsRow1.add(inlineKeyboardButton);
+
+                        List<List<InlineKeyboardButton>> rowList= new ArrayList<>();
+                        rowList.add(keyboardButtonsRow1);
+
+                        inlineKeyboardMarkup.setKeyboard(rowList);
+
+                        SendMessage message = new SendMessage().setChatId(update.getMessage().getChatId()).setText("Пример")
+                                                                .setReplyMarkup(inlineKeyboardMarkup);
+                        try {
+                            execute(message);
+                        } catch (TelegramApiException e) {
+                            e.printStackTrace();
                         }
                         break;
                     default:
@@ -128,6 +153,44 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
             if (responceString.length() > 0)
             {
                 sendMsg(update.getMessage().getChatId(), responceString);
+            }
+        } else {
+            if (update.hasCallbackQuery())
+            {
+                int senderId = update.getCallbackQuery().getFrom().getId();
+                switch(update.getCallbackQuery().getData())
+                {
+                    case "start1":
+//                        if (gameMaster.isAdmin(senderId))
+//                        {
+//                            gameMaster.randomizeCharacters(senderId);
+//                            List<IBPlayer> players = gameMaster.getPlayersByRoomCreator(senderId);
+//                            for (IBPlayer p : players)
+//                            {
+//                                String ch = p.getCharacter();
+//                                List<String> images = GoogleSearchAPIUtil.searchForImages(ch);
+//                                String img = images.get(Randomizer.getRandomIndex(images.size()));
+//                                sendImageFromUrl(p.getId(), img, ch);
+//                            }
+//
+//                            return;
+//                        }
+//                        else {
+//                            System.out.println("error");
+
+                        try {
+                            execute(new SendMessage().setText(
+                                    update.getCallbackQuery().getData())
+                                    .setChatId(update.getCallbackQuery().getMessage().getChatId()));
+                        } catch (TelegramApiException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    default:
+                        System.out.println("default switch");
+                        break;
+
+                }
             }
         }
     }

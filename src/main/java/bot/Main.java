@@ -2,6 +2,8 @@ package bot;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.javafaker.Faker;
+import com.github.javafaker.Superhero;
 import com.github.kevinsawicki.http.HttpRequest;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;
@@ -29,11 +31,16 @@ public class Main
             e.printStackTrace();
         }
 
-//        List<String> images = GoogleSearchAPIUtil.searchForImages("darth vader");
+
+//        faker.lordOfTheRings().character();
+//        faker.harryPotter().character()
+//        faker.hobbit().character()
 //
-//        for (String img : images)
+//        Faker faker = new Faker();
+//        for (int i = 0; i < 25; i++)
 //        {
-//            System.out.println(img);
+////            Superhero s = faker.superhero();
+//            System.out.println(faker.);
 //        }
 
     }
