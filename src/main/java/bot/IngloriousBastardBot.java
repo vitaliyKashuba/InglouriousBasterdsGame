@@ -2,18 +2,16 @@ package bot;
 
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.methods.send.SendPhoto;
-import org.telegram.telegrambots.api.objects.Contact;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.api.objects.User;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import util.AppUtil;
 import util.GoogleSearchAPIUtil;
 import util.Randomizer;
+import util.TgUtil;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +34,9 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
         if (update.hasMessage() && update.getMessage().hasText())
         {
             String receivedMessage = update.getMessage().getText();
+
             String responceString = "";
+            InlineKeyboardMarkup inlineKeyboardMarkup = null;
 
             User sender = update.getMessage().getFrom();
             int senderId = sender.getId();
@@ -63,66 +63,46 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                     case "/help":
                         responceString = "help";
                         break;
-                    case "/go":
-                        if (gameMaster.isAdmin(senderId))
-                        {
-                            gameMaster.randomizeCharacters(senderId);
-                            List<IBPlayer> players = gameMaster.getPlayersByRoomCreator(senderId);
-                            for (IBPlayer p : players)
-                            {
-//                                responceString = p.getCharacter();
-//                                sendMsg(p.getId(), responceString);
-                                String ch = p.getCharacter();
-                                List<String> images = GoogleSearchAPIUtil.searchForImages(ch);
-                                String img = images.get(Randomizer.getRandomIndex(images.size()));
-                                sendImageFromUrl(p.getId(), img, ch);
-                            }
-
-                            return;
-                        }
-                        else {
-                            responceString = "only room creators allows run this command";
-                        }
-                        break;
-                    case "/go2":
-                        gameMaster.randomizeCharacters(senderId);
-                        List<IBPlayer> players = gameMaster.getPlayersByRoomCreator(senderId);
-                        for (IBPlayer p : players)
-                        {
-                            Map<String,String> teammates = new HashMap<>();
-                            for (IBPlayer pl : players)
-                            {
-                                if(pl.getId() != p.getId())
-                                {
-                                    teammates.put(pl.getName(), pl.getCharacter());
-                                }
-                            }
-                            sendMsg(p.getId(), teammates.toString());
-                        }
-                        break;
-
+//                    case "/go":
+//                        if (gameMaster.isAdmin(senderId))
+//                        {
+//                            gameMaster.randomizeCharacters(senderId);
+//                            List<IBPlayer> players = gameMaster.getPlayersByRoomCreator(senderId);
+//                            for (IBPlayer p : players)
+//                            {
+////                                responceString = p.getCharacter();
+////                                sendMsg(p.getId(), responceString);
+//                                String ch = p.getCharacter();
+//                                List<String> images = GoogleSearchAPIUtil.searchForImages(ch);
+//                                String img = images.get(Randomizer.getRandomIndex(images.size()));
+//                                sendImageFromUrl(p.getId(), img, ch);
+//                            }
+//
+//                            return;
+//                        }
+//                        else {
+//                            responceString = "only room creators allows run this command";
+//                        }
+//                        break;
+//                    case "/go2":
+//                        gameMaster.randomizeCharacters(senderId);
+//                        List<IBPlayer> players = gameMaster.getPlayersByRoomCreator(senderId);
+//                        for (IBPlayer p : players)
+//                        {
+//                            Map<String,String> teammates = new HashMap<>();
+//                            for (IBPlayer pl : players)
+//                            {
+//                                if(pl.getId() != p.getId())
+//                                {
+//                                    teammates.put(pl.getName(), pl.getCharacter());
+//                                }
+//                            }
+//                            sendMsg(p.getId(), teammates.toString());
+//                        }
+//                        break;
                     case "/debug":
-                        InlineKeyboardMarkup inlineKeyboardMarkup =new InlineKeyboardMarkup();
-
-                        InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
-                        inlineKeyboardButton.setText("Тык");
-                        inlineKeyboardButton.setCallbackData("start1");
-
-                        List<InlineKeyboardButton> keyboardButtonsRow1 = new ArrayList<>();
-                        keyboardButtonsRow1.add(inlineKeyboardButton);
-
-                        List<List<InlineKeyboardButton>> rowList= new ArrayList<>();
-                        rowList.add(keyboardButtonsRow1);
-
-                        inlineKeyboardMarkup.setKeyboard(rowList);
-
-                        SendMessage message = new SendMessage().setChatId(update.getMessage().getChatId()).setText("Пример")
-                                                                .setReplyMarkup(inlineKeyboardMarkup);
-                        try {
-                            execute(message);
-                        } catch (TelegramApiException e) {
-                            e.printStackTrace();
-                        }
+                        responceString = "select mode";
+                        inlineKeyboardMarkup = TgUtil.getStartGameKeyboardMarkup();
                         break;
                     default:
                         responceString = "unrecognized command";
@@ -146,14 +126,21 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         gameMaster.setCharacter(senderId, receivedMessage);
                         gameMaster.changeStatus(senderId, IBPlayer.Status.READY);
                         responceString = "waiting for party ready";
+                        if (gameMaster.isAdmin(senderId))
+                        {
+                            int adminRoomId = gameMaster.getAdminRoomId(senderId);
+                            responceString += ("\nSelect mode to start game for room " + String.valueOf(adminRoomId));
+                            inlineKeyboardMarkup = TgUtil.getStartGameKeyboardMarkup();
+                        }
                         break;
                 }
             }
 
             if (responceString.length() > 0)
             {
-                sendMsg(update.getMessage().getChatId(), responceString);
+                sendMsg(update.getMessage().getChatId(), responceString, inlineKeyboardMarkup);
             }
+
         } else {
             if (update.hasCallbackQuery())
             {
@@ -161,29 +148,38 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                 switch(update.getCallbackQuery().getData())
                 {
                     case "start1":
-//                        if (gameMaster.isAdmin(senderId))
-//                        {
-//                            gameMaster.randomizeCharacters(senderId);
-//                            List<IBPlayer> players = gameMaster.getPlayersByRoomCreator(senderId);
-//                            for (IBPlayer p : players)
-//                            {
-//                                String ch = p.getCharacter();
-//                                List<String> images = GoogleSearchAPIUtil.searchForImages(ch);
-//                                String img = images.get(Randomizer.getRandomIndex(images.size()));
-//                                sendImageFromUrl(p.getId(), img, ch);
-//                            }
-//
-//                            return;
-//                        }
-//                        else {
-//                            System.out.println("error");
+                        if (gameMaster.isAdmin(senderId))
+                        {
+                            gameMaster.randomizeCharacters(senderId);
+                            List<IBPlayer> players = gameMaster.getPlayersByRoomCreator(senderId);
+                            for (IBPlayer p : players)
+                            {
+                                String ch = p.getCharacter();
+                                List<String> images = GoogleSearchAPIUtil.searchForImages(ch);
+                                String img = images.get(Randomizer.getRandomIndex(images.size()));
+                                sendImageFromUrl(p.getId(), img, ch);
+                            }
 
-                        try {
-                            execute(new SendMessage().setText(
-                                    update.getCallbackQuery().getData())
-                                    .setChatId(update.getCallbackQuery().getMessage().getChatId()));
-                        } catch (TelegramApiException e) {
-                            e.printStackTrace();
+                            return;
+                        }
+                        else {
+                            System.out.println("error");
+                        }
+                        break;
+                    case "start2":
+                        gameMaster.randomizeCharacters(senderId);
+                        List<IBPlayer> players = gameMaster.getPlayersByRoomCreator(senderId);
+                        for (IBPlayer p : players)
+                        {
+                            Map<String,String> teammates = new HashMap<>();
+                            for (IBPlayer pl : players)
+                            {
+                                if(pl.getId() != p.getId())
+                                {
+                                    teammates.put(pl.getName(), pl.getCharacter());
+                                }
+                            }
+                            sendMsg(p.getId(), teammates.toString());
                         }
                         break;
                     default:
@@ -195,11 +191,33 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
         }
     }
 
+//    private void tryToExecute(SendMessage message)
+//    {
+//        try
+//        {
+//            execute(message);
+//        } catch (TelegramApiException e)
+//        {
+//            e.printStackTrace();
+//        }
+//    }
+
     private void sendMsg(long chatId, String msg)
+    {
+        sendMsg(chatId, msg, null);
+    }
+
+    private void sendMsg(long chatId, String msg, InlineKeyboardMarkup mk)
     {
         SendMessage message = new SendMessage()
                 .setChatId(chatId)
                 .setText(msg);
+
+        if (mk != null)
+        {
+            message.setReplyMarkup(mk);
+        }
+
         try
         {
             execute(message);
@@ -209,7 +227,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
         }
     }
 
-    public void sendImageFromUrl(long chatId, String imgUrl, String caption) {
+    private void sendImageFromUrl(long chatId, String imgUrl, String caption) {
         SendPhoto sendPhotoRequest = new SendPhoto()
                 .setChatId(chatId)
                 .setPhoto(imgUrl);

@@ -47,9 +47,24 @@ public class IBGameMaster
 
         addPlayerIfNull(initiatorId, initiatorName);
         enterRoom(initiatorId, roomNumber);
+
+        removeOldRoomIfExist(initiatorId);
         roomCreators.put(initiatorId, roomNumber);
 
         return roomNumber;
+    }
+
+    /**
+     * remove old admins room
+     *
+     * @param playerId id of new rood admin
+     */
+    private void removeOldRoomIfExist(int playerId)
+    {
+        if (roomCreators.containsKey(playerId))
+        {
+            rooms.remove(roomCreators.get(playerId));
+        }
     }
 
     public void changeStatus(int playerId, IBPlayer.Status status)
@@ -94,6 +109,14 @@ public class IBGameMaster
     public boolean isAdmin(int id)
     {
         return roomCreators.containsKey(id);
+    }
+
+    /**
+     * @return id of current room created by user
+     */
+    public int getAdminRoomId(int adminId)
+    {
+        return roomCreators.get(adminId);
     }
 
     /**
