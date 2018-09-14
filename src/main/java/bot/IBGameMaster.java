@@ -1,5 +1,7 @@
 package bot;
 
+import util.Randomizer;
+
 import java.util.*;
 
 /**
@@ -23,10 +25,6 @@ public class IBGameMaster
     private Map<Integer, IBPlayer> players;     //player id - key, player obj - value
     private Map<Integer, Integer> roomCreators; //admin id - key, room id - value
 
-    //TODO add method to remove player from room when he enter new one
-    //TODO add google images search
-    //TODO add more text replies
-
     private IBGameMaster()
     {
         rooms = new HashMap<>();
@@ -39,15 +37,31 @@ public class IBGameMaster
      *
      * @return room number
      */
-    public int initGame(int initiatorId)
+    public int initGame(int initiatorId, String initiatorName)
     {
         int roomNumber = newRoom();
 
-        addPlayerIfNull(initiatorId);
+        addPlayerIfNull(initiatorId, initiatorName);
         enterRoom(initiatorId, roomNumber);
+
+        removeOldRoomIfExist(initiatorId);
         roomCreators.put(initiatorId, roomNumber);
 
         return roomNumber;
+    }
+
+    /**
+     * remove old admins room
+     *
+     * @param playerId id of new rood admin
+     */
+    public void removeOldRoomIfExist(int playerId)
+    {
+        if (roomCreators.containsKey(playerId))
+        {
+            rooms.remove(roomCreators.get(playerId));
+            roomCreators.remove(playerId);
+        }
     }
 
     public void changeStatus(int playerId, IBPlayer.Status status)
@@ -57,6 +71,10 @@ public class IBGameMaster
 
     public void enterRoom(int playerId, int roomId)
     {
+        if (!rooms.containsKey(roomId))
+        {
+            throw new IllegalArgumentException("no such room");
+        }
         rooms.get(roomId).add(players.get(playerId));
     }
 
@@ -84,14 +102,21 @@ public class IBGameMaster
     public List<IBPlayer> getPlayersByRoomCreator(int id)
     {
         int room = roomCreators.get(id);
-        List players = rooms.get(room);
 
-        return players;
+        return rooms.get(room);
     }
 
     public boolean isAdmin(int id)
     {
         return roomCreators.containsKey(id);
+    }
+
+    /**
+     * @return id of current room created by user
+     */
+    public int getAdminRoomId(int adminId)
+    {
+        return roomCreators.get(adminId);
     }
 
     /**
@@ -117,12 +142,12 @@ public class IBGameMaster
      *
      * it possible if players avoid calling /start method
      */
-    public void addPlayerIfNull(int id)
+    public void addPlayerIfNull(int id, String name)
     {
         IBPlayer p = players.get(id);
         if (p == null)
         {
-            addPlayer(new IBPlayer(id));
+            addPlayer(new IBPlayer(id, name));
         }
     }
 
