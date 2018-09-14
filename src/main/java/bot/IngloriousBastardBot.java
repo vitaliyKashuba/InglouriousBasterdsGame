@@ -28,7 +28,6 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
     }
 
     //TODO check nulls, user data. refactor
-    //TODO split to handleCommands() amd handleMessages()
     public void onUpdateReceived(Update update)
     {
         if (update.hasMessage() && update.getMessage().hasText())
@@ -145,30 +144,27 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
             if (update.hasCallbackQuery())
             {
                 int senderId = update.getCallbackQuery().getFrom().getId();
-                switch(update.getCallbackQuery().getData())
+                String callback = update.getCallbackQuery().getData();
+                List<IBPlayer> players = null;
+
+                if(callback.startsWith("start"))
+                {
+                    gameMaster.randomizeCharacters(senderId);
+                    players = gameMaster.getPlayersByRoomCreator(senderId);
+                }
+
+                switch(callback)
                 {
                     case "start1":
-                        if (gameMaster.isAdmin(senderId))
+                        for (IBPlayer p : players)
                         {
-                            gameMaster.randomizeCharacters(senderId);
-                            List<IBPlayer> players = gameMaster.getPlayersByRoomCreator(senderId);
-                            for (IBPlayer p : players)
-                            {
-                                String ch = p.getCharacter();
-                                List<String> images = GoogleSearchAPIUtil.searchForImages(ch);
-                                String img = images.get(Randomizer.getRandomIndex(images.size()));
-                                sendImageFromUrl(p.getId(), img, ch);
-                            }
-
-                            return;
+                            String ch = p.getCharacter();
+                            List<String> images = GoogleSearchAPIUtil.searchForImages(p.getCharacter());
+                            String img = images.get(Randomizer.getRandomIndex(images.size()));
+                            sendImageFromUrl(p.getId(), img, ch);
                         }
-                        else {
-                            System.out.println("error");
-                        }
-                        break;
+                        return;
                     case "start2":
-                        gameMaster.randomizeCharacters(senderId);
-                        List<IBPlayer> players = gameMaster.getPlayersByRoomCreator(senderId);
                         for (IBPlayer p : players)
                         {
                             Map<String,String> teammates = new HashMap<>();
@@ -181,7 +177,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                             }
                             sendMsg(p.getId(), teammates.toString());
                         }
-                        break;
+                        return;
                     default:
                         System.out.println("default switch");
                         break;

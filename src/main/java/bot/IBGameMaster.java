@@ -25,10 +25,6 @@ public class IBGameMaster
     private Map<Integer, IBPlayer> players;     //player id - key, player obj - value
     private Map<Integer, Integer> roomCreators; //admin id - key, room id - value
 
-    //TODO add method to remove player from room when he enter new one
-    //TODO add google images search
-    //TODO add more text replies
-
     private IBGameMaster()
     {
         rooms = new HashMap<>();

@@ -19,21 +19,15 @@ public class GoogleSearchAPIUtil
         GOOGLE_API_KEY = AppUtil.getEnvironmentVariable("GOOGLE_API_KEY");
         CSE_ID = AppUtil.getEnvironmentVariable("CSE_ID");
         API_URL = "https://www.googleapis.com/customsearch/v1?key=" + GOOGLE_API_KEY + "&cx=" + CSE_ID + "&searchType=image";
-//        API_URL = "https://www.googleapis.com/customsearch/v1?key=" + GOOGLE_API_KEY + "&cx=" + CSE_ID + "&searchType=image&q=";
     }
 
-    public static String getApiUrl()
-    {
-        return API_URL;
-    }
-
-    static String makeRequest(String query)
+    private static String makeRequest(String query)
     {
         return HttpRequest.get(API_URL, true, 'q', query).body();
     }
 
     @SneakyThrows   //TODO handle exception ?
-    static List<String> getImagesFromResponse(String json)
+    private static List<String> getImagesFromResponse(String json)
     {
         ObjectMapper objectMapper = new ObjectMapper();
         List<String> images = new ArrayList<>();
