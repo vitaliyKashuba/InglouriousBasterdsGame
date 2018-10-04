@@ -1,5 +1,9 @@
 package util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
+
 import java.util.Map;
 
 public class AppUtil
@@ -19,6 +23,13 @@ public class AppUtil
             throw new IllegalArgumentException("no such variable");
         }
         return variable;
+    }
+
+    @SneakyThrows   // probably impossible to catch JsonProcessingException while converting to json
+    public static String toJson(Object o)
+    {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.writeValueAsString(o);
     }
 
 }

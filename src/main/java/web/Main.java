@@ -10,7 +10,6 @@ import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
-@RestController
 @SpringBootApplication
 public class Main
 {
@@ -30,10 +29,5 @@ public class Main
         {
             e.printStackTrace();
         }
-    }
-
-    @RequestMapping("/")
-    String index() {
-        return "hello world";
     }
 }
