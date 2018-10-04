@@ -29,6 +29,7 @@ public class Main
         } catch (TelegramApiException e)
         {
             e.printStackTrace();
+            System.out.println("error2");
         }
 
 

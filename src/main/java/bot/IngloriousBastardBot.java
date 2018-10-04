@@ -65,6 +65,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         break;
                     case "/debug":
                         responceString = Randomizer.getRandomCharacter();
+                        System.out.println("/debug");
 //                        inlineKeyboardMarkup = TgUtil.getStartGameKeyboardMarkup();
 //                        String img = GoogleSearchAPIUtil.findImage(responceString);
 //                        sendImageFromUrl(update.getMessage().getChatId(), img, responceString);
