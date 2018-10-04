@@ -34,7 +34,11 @@
             <artifactId>spring-boot-devtools</artifactId>
             <scope>runtime</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+            <version>1.5.2.RELEASE</version>
+        </dependency>
         <!-- = = = = = = = = = = = = = = telegram dep here-tG -->
         <dependency>
             <groupId>org.telegram</groupId>
