@@ -1,6 +1,7 @@
 package web;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -24,11 +25,11 @@ public class WebSocketController
         this.template = template;
     }
 
-    @MessageMapping("/message")
-    @SendTo("/topic/reply")
-    public String processMessageBroadcas(@Payload String message) throws Exception {
+    @MessageMapping("/message/{id}")
+    @SendTo("/topic/reply/{id}")
+    public String processMessageBroadcas(@Payload String message, @DestinationVariable int id) throws Exception {
 //        String name = new Gson().fromJson(message, Map.class).get("name").toString();
-        System.out.println("/message" + message);
+        System.out.println("/message" + message + " " + id);
         return "hello world";
     }
 
