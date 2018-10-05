@@ -1,0 +1,16 @@
+
+<div class = "center" id="name-input-wrapper">
+  <mz-input-container>
+    <input mz-input
+           [label]="'Name'"
+           id="name-input"
+           type="email"
+           [(ngModel)]="name"
+           (keyup)="onInputKeyUp()">
+  </mz-input-container>
+  <button mz-button class="center scale-transition scale-out" #enterButton>
+    button
+  </button>
+
+</div>
+
