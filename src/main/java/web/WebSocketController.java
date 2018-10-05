@@ -3,6 +3,8 @@ package web;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
@@ -19,25 +21,24 @@ public class WebSocketController
 
     @Autowired
     WebSocketController(SimpMessagingTemplate template){
-        System.out.println("autowiring");
         this.template = template;
     }
 
-    @MessageMapping("/send/message")
-    public void onReceivedMesage(String message){
-        System.out.println("onRecievedMesage");
-        this.template.convertAndSend("/chat",  new SimpleDateFormat("HH:mm:ss").format(new Date())+"- "+message);
-
-//        this.template.convertAndSend("12345");
+    @MessageMapping("/message")
+    @SendTo("/topic/reply")
+    public String processMessageBroadcas(@Payload String message) throws Exception {
+//        String name = new Gson().fromJson(message, Map.class).get("name").toString();
+        System.out.println("/message" + message);
+        return "hello world";
     }
 
-//    @MessageMapping("/send/message")
-//    @SendToUser("/queue/reply")
-//    public String processMessageFromClient( @Payload String message,Principal principal) throws Exception
-//    {
-//        System.out.println(message);
-//        System.out.println(principal);
-//        return "123";
-//    }
+    @MessageMapping("/private_message")
+    @SendToUser("/topic/reply")
+    public String processMessagePrivate(@Payload String message) throws Exception {
+//        String name = new Gson().fromJson(message, Map.class).get("name").toString();
+        System.out.println("private" + message);
+        template.convertAndSend("/topic/reply", "broadcast part");
+        return "hello private world";
+    }
 
 }
