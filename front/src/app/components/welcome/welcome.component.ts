@@ -1,5 +1,6 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {log} from 'util';
+import {JqueryUtilService} from '../../services/jquery-util.service';
 
 @Component({
   selector: 'app-welcome',
@@ -8,32 +9,34 @@ import {log} from 'util';
 })
 export class WelcomeComponent implements OnInit {
 
-  @ViewChild('enterButton') enterButton: ElementRef;
-
   name: string;
+  nameEntered: boolean;
+  nameInputButtonId = 'enterButton';
+  startButtonsRowId = 'sbRowId';
+  enterRoomId = 'enterRoomId';
 
-  constructor() { }
+  constructor(private jq: JqueryUtilService) { }
 
   ngOnInit() {
   }
 
   onInputKeyUp() {
-    log(this.name);
-    if (this.name.length < 4) {
-      this.scaleIn(this.enterButton);
+    this.nameEntered = false;
+    if (this.name.length < 3) {
+      this.jq.scaleOut(this.nameInputButtonId);
     } else {
-      this.scaleOut(this.enterButton);
+      this.jq.scaleIn(this.nameInputButtonId);
     }
   }
 
-  scaleIn(element: ElementRef) {
-    element.nativeElement.classList.remove('scale-in');
-    element.nativeElement.classList.add('scale-out');
+  onNameInputButtonClick() {
+    this.nameEntered = true;
+    this.jq.scaleOut(this.nameInputButtonId);
+    this.jq.scaleIn(this.startButtonsRowId);
   }
 
-  scaleOut(element: ElementRef) {
-    element.nativeElement.classList.remove('scale-out');
-    element.nativeElement.classList.add('scale-in');
+  onJoinClick() {
+    this.jq.scaleIn(this.enterRoomId);
   }
 
 }
