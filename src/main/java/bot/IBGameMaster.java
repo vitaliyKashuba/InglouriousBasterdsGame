@@ -168,12 +168,13 @@ public class IBGameMaster
         players.get(lastIndex).setCharacter(firstCharacterBkp);
     }
 
-    /**
-     * test for web api
-     */
+    /**test for web api*/
     public List<IBPlayer> getRoom(int id)
     {
         return rooms.get(id);
     }
+
+    /**test for web api*/
+    public Collection<IBPlayer> getPlayers() {return players.values();}
 
 }

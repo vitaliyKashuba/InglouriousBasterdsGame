@@ -1,6 +1,7 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {log} from 'util';
 import {JqueryUtilService} from '../../services/jquery-util.service';
+import {HttpRequesterService} from '../../services/http-requester.service';
 
 @Component({
   selector: 'app-welcome',
@@ -10,12 +11,16 @@ import {JqueryUtilService} from '../../services/jquery-util.service';
 export class WelcomeComponent implements OnInit {
 
   name: string;
+  roomId: number;
+
   nameEntered: boolean;
+
   nameInputButtonId = 'enterButton';
   startButtonsRowId = 'sbRowId';
   enterRoomId = 'enterRoomId';
 
-  constructor(private jq: JqueryUtilService) { }
+  constructor(private jq: JqueryUtilService,
+              private requester: HttpRequesterService) { }
 
   ngOnInit() {
   }
@@ -37,6 +42,13 @@ export class WelcomeComponent implements OnInit {
 
   onJoinClick() {
     this.jq.scaleIn(this.enterRoomId);
+  }
+
+  onMakeJoinRequestClick() {  // TODO hanle responses, loading animations
+    this.requester.joinRequest(this.roomId, this.name).subscribe(
+      data => log('success ' + data),
+      error => log('error ' + error)
+    );
   }
 
 }

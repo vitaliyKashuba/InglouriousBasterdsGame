@@ -1,6 +1,5 @@
 package bot;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -21,7 +20,7 @@ public class IBPlayer
         this.name = name;
     }
 
-    enum Status
+    public enum Status
     {
         NONE, JOINREQUEST, JOINED, READY, INGAME
     }

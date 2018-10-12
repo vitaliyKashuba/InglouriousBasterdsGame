@@ -1,26 +1,68 @@
 package web;
 
 import bot.IBGameMaster;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import bot.IBPlayer;
+import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import util.AppUtil;
+import util.Randomizer;
 
 import java.util.List;
 
 @RestController
 public class RESTController
 {
+    IBGameMaster gameMaster = IBGameMaster.getInstance();
+
     @RequestMapping("/")
     public String index() {
         return "hello world";
     }
 
+    /**test*/
     @RequestMapping("room/{id}")
     public String getRoom(@PathVariable int id)
     {
-        IBGameMaster gameMaster = IBGameMaster.getInstance();
+//        IBGameMaster gameMaster = IBGameMaster.getInstance();
         List players = gameMaster.getRoom(id);
         return AppUtil.toJson(players);
+    }
+
+    /**test*/
+    @RequestMapping("players")
+    public String getPlayers()
+    {
+        return AppUtil.toJson(gameMaster.getPlayers());
+    }
+
+
+    @CrossOrigin
+    @RequestMapping(value = "join/{roomId}", method = RequestMethod.POST)
+    public ResponseEntity join(@PathVariable int roomId, @RequestBody String data)
+    {
+        JSONObject jsonObject = new JSONObject(data);
+        String playerName = jsonObject.getString("name");
+        int playerId = Randomizer.getRandomPlayerId();
+
+        System.out.println(playerId + " " + playerName);
+        gameMaster.addPlayer(new IBPlayer(playerId, playerName));
+
+//        gameMaster.changeStatus(playerId, IBPlayer.Status.JOINREQUEST);                                               // useless in web api ?
+//        gameMaster.removeOldRoomIfExist(playerId);                                                                    // useless in web api ?
+
+        try
+        {
+            gameMaster.enterRoom(playerId, roomId);
+        } catch (NumberFormatException e)
+        {
+            return new ResponseEntity<>("Enter valid room number", HttpStatus.BAD_REQUEST);
+        } catch (IllegalArgumentException e)
+        {
+            return new ResponseEntity<>("Room not exist", HttpStatus.BAD_REQUEST);
+        }
+
+        return AppUtil.responce200OK();
     }
 }

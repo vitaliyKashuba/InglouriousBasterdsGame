@@ -39,6 +39,14 @@ public class Randomizer
         ch.add(faker.lebowski().character() + " (Big Lebowski)");
 
         return getRandomElement(ch);
+    }
 
+    /**
+     * @return random id for non-tg players
+     *          id's like 10000xxxx
+     */
+    public static int getRandomPlayerId()
+    {
+        return 100000000 + random.nextInt(9999);
     }
 }

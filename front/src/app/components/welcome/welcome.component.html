@@ -1,3 +1,4 @@
+12345
 <div class = "center" id="name-input-wrapper">
   <div *ngIf="!nameEntered">
     <mz-input-container>
@@ -37,12 +38,13 @@
             <input mz-input class="col m9"
                    [label]="'room id'"
                    id="room-input"
-                   type="number">
+                   type="number"
+                   [(ngModel)]="roomId">
             <div class="col m3">
               <button mz-button id="start-button"
                       [float]="true"
                       [flat]="true"
-                      [large]="true">
+                      [large]="true" (click)="onMakeJoinRequestClick()">
                 <i mz-icon-mdi id="start-icon"
                    [icon]="'arrow-right-bold'">
                 </i>
@@ -55,13 +57,3 @@
   </div>
 </div>
 
-
-<!--<div>-->
-  <!--<mz-input-container class = "row">-->
-    <!--<input mz-input class="col m6"-->
-           <!--[label]="'room id'"-->
-           <!--id="room-input"-->
-           <!--type="number">-->
-    <!--<button mz-button class="col m6">go</button>-->
-  <!--</mz-input-container>-->
-<!--</div>-->

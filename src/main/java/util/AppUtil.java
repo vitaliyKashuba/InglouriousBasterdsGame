@@ -3,6 +3,8 @@ package util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.util.Map;
 
@@ -30,6 +32,11 @@ public class AppUtil
     {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.writeValueAsString(o);
+    }
+
+    public static ResponseEntity responce200OK()
+    {
+        return new ResponseEntity(HttpStatus.OK);
     }
 
 }
