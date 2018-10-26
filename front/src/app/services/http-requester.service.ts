@@ -11,7 +11,11 @@ export class HttpRequesterService {
   constructor(private http: HttpClient) { }
 
   joinRequest(roomId: number, playerName: string) {
-    const body ={name: playerName};
+    const body = {name: playerName};
     return this.http.post(this.url + 'join/' + roomId, body);
+  }
+
+  sendCharacter(character: string) {
+    // return this.http.post(this.url + 'join/' + roomId, body);
   }
 }

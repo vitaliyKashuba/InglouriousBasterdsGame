@@ -1,4 +1,3 @@
-12345
 <div class = "center" id="name-input-wrapper">
   <div *ngIf="!nameEntered">
     <mz-input-container>
@@ -32,14 +31,13 @@
     </div>
     <div class="row">
       <div class="col m6 offset-m6 scale-transition scale-out" [id]="enterRoomId">
-      <!--<div class="col m6 offset-m6 scale-transition" [id]="enterRoodId">-->
         <div class="init-start-button">
           <mz-input-container class = "row">
             <input mz-input class="col m9"
                    [label]="'room id'"
                    id="room-input"
                    type="number"
-                   [(ngModel)]="roomId">
+                   [(ngModel)]="roomInput">
             <div class="col m3">
               <button mz-button id="start-button"
                       [float]="true"

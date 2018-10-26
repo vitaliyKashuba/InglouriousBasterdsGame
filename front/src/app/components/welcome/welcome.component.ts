@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Input, OnInit, Output, ViewChild, EventEmitter} from '@angular/core';
 import {log} from 'util';
 import {JqueryUtilService} from '../../services/jquery-util.service';
 import {HttpRequesterService} from '../../services/http-requester.service';
@@ -10,8 +10,10 @@ import {HttpRequesterService} from '../../services/http-requester.service';
 })
 export class WelcomeComponent implements OnInit {
 
+  @Output() roomIdEmitter = new EventEmitter<number>();
+
   name: string;
-  roomId: number;
+  roomInput: number;
 
   nameEntered: boolean;
 
@@ -45,10 +47,19 @@ export class WelcomeComponent implements OnInit {
   }
 
   onMakeJoinRequestClick() {  // TODO hanle responses, loading animations
-    this.requester.joinRequest(this.roomId, this.name).subscribe(
-      data => log('success ' + data),
-      error => log('error ' + error)
+    this.requester.joinRequest(this.roomInput, this.name).subscribe(
+      data => this.successJoinHandler(data),
+      error => this.errorHandler(error)
     );
+  }
+
+  successJoinHandler(data: any) {
+    log('success ' + data);
+    this.roomIdEmitter.emit(this.roomInput);
+  }
+
+  errorHandler(error: any) {
+    log('error ' + error);
   }
 
 }
