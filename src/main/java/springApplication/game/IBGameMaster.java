@@ -27,13 +27,6 @@ public class IBGameMaster
         CLASSIC, LIST   // TODO change to more obvious enum ?
     }
 
-//    private static IBGameMaster ourInstance = new IBGameMaster();
-
-//    public static IBGameMaster getInstance()
-//    {
-//        return ourInstance;
-//    }
-
     @Autowired
     private MessageSender messageSender;
 
@@ -175,7 +168,7 @@ public class IBGameMaster
      *
      *    return room id  //TODO fix it
      */
-    public int randomizeCharacters(int roomAdminId)
+    public void randomizeCharacters(int roomAdminId)
     {
         int roomId = roomCreators.get(roomAdminId);
         List<IBPlayer> players = rooms.get(roomId);
@@ -186,13 +179,16 @@ public class IBGameMaster
             players.get(i).setCharacter(players.get(i+1).getCharacter());
         }
         players.get(lastIndex).setCharacter(firstCharacterBkp);
-
-        return roomId;
     }
 
-    public void startGame(int roomId)
+    public int getroomIdByAdminId(int adminId)
     {
-        messageSender.sendBroadcast("broadcast", roomId);
+        return roomCreators.get(adminId);
+    }
+
+    public void startGame(int roomId)   // TODO send messages to start from here
+    {
+        messageSender.sendBroadcast("game started!!!", roomId);
     }
 
     /**test for springApplication.web api*/

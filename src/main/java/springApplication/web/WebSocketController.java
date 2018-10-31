@@ -13,20 +13,8 @@ import springApplication.game.MessageSender;
 @Controller
 public class WebSocketController
 {
-//    @Autowired
-//    private SimpMessagingTemplate template;
-
-//    @Autowired
-//    WebSocketController(SimpMessagingTemplate template){
-//        this.template = template;
-//    }
-
     @Autowired
     MessageSender ms;
-
-    WebSocketController() {
-        System.out.println("ws constructed");
-    }
 
     @MessageMapping("/message/{id}")
     @SendTo("/topic/reply/{id}")

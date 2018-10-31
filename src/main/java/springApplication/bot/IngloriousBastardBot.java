@@ -29,21 +29,12 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
     @Autowired
     private IBGameMaster gameMaster;
 
-//    @Value("${bot.token}")
     private String botToken;
-
-//    @Value("${bot.username}")
-//    private String username;
 
     IngloriousBastardBot()
     {
         botToken = AppUtil.getEnvironmentVariable("TOKEN");
     }
-
-//    @PostConstruct
-//    public void start() {
-//        System.out.println("username: " + username + " token: " + botToken);
-//    }
 
     //TODO check nulls, user data. refactor
     @Override
@@ -126,7 +117,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         if (gameMaster.isAdmin(senderId))
                         {
                             int adminRoomId = gameMaster.getAdminRoomId(senderId);
-                            responceString += ("\nSelect mode to start springApplication.game for room " + String.valueOf(adminRoomId));
+                            responceString += ("\nSelect mode to start game for room " + String.valueOf(adminRoomId));
                             inlineKeyboardMarkup = TgUtil.getStartGameKeyboardMarkup();
                         }
                         break;
@@ -145,11 +136,12 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                 String callback = update.getCallbackQuery().getData();
                 List<IBPlayer> players = null;
 
-                if(callback.startsWith("start"))
+                if(callback.startsWith("start"))                // TODO move message sending logic to message sender
                 {
-                    int roomId = gameMaster.randomizeCharacters(senderId);
+                    gameMaster.randomizeCharacters(senderId);
                     players = gameMaster.getPlayersByRoomCreator(senderId);
 
+                    int roomId = gameMaster.getroomIdByAdminId(senderId);
                     gameMaster.startGame(roomId);
                 }
 

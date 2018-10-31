@@ -10,17 +10,6 @@ public class MessageSender
     @Autowired
     private SimpMessagingTemplate template;
 
-//    private static MessageSender ourInstance = new MessageSender();
-
-    public MessageSender() {
-        System.out.println("constructed");
-    }
-
-//    public static MessageSender getInstance()
-//    {
-//        return ourInstance;
-//    }
-
     public void sendBroadcast(String message, int roomId)
     {
         template.convertAndSend("/topic/reply/" + roomId, message);
