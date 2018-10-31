@@ -11,6 +11,7 @@ import {HttpRequesterService} from '../../services/http-requester.service';
 export class WelcomeComponent implements OnInit {
 
   @Output() roomIdEmitter = new EventEmitter<number>();
+  @Output() playerIdEmitter = new EventEmitter<number>();
 
   name: string;
   roomInput: number;
@@ -54,7 +55,9 @@ export class WelcomeComponent implements OnInit {
   }
 
   successJoinHandler(data: any) {
-    log('success ' + data);
+    log('success');
+    log(data.id);
+    this.playerIdEmitter.emit(data.id);
     this.roomIdEmitter.emit(this.roomInput);
   }
 

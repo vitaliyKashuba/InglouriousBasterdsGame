@@ -1,12 +1,16 @@
 <div *ngIf="!room">
-  <app-welcome (roomIdEmitter)="setRoomId($event)"></app-welcome>
+  <app-welcome (roomIdEmitter)="setRoomId($event)"
+               (playerIdEmitter)="setPlayerId($event)">
+  </app-welcome>
 </div>
 
 <div class="row"  *ngIf="room">
   <div class="col m4">
-    <app-characters></app-characters>
+    <app-characters [playerId]="playerId">
+    </app-characters>
   </div>
   <div class="col m8">
-    <app-chat [roomId]="room"></app-chat>
+    <app-chat [roomId]="room">
+    </app-chat>
   </div>
 </div>

@@ -90,4 +90,5 @@ export class ChatComponent implements OnInit {
     console.log('send name: ' + data);
     this.ws.send('/app/private_message', {}, data);
   }
+
 }

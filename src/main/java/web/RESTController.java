@@ -9,12 +9,13 @@ import org.springframework.web.bind.annotation.*;
 import util.AppUtil;
 import util.Randomizer;
 
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
 public class RESTController
 {
-    IBGameMaster gameMaster = IBGameMaster.getInstance();
+    private IBGameMaster gameMaster = IBGameMaster.getInstance();
 
     @RequestMapping("/")
     public String index() {
@@ -26,7 +27,7 @@ public class RESTController
     public String getRoom(@PathVariable int id)
     {
 //        IBGameMaster gameMaster = IBGameMaster.getInstance();
-        List players = gameMaster.getRoom(id);
+        List<IBPlayer> players = gameMaster.getRoom(id);
         return AppUtil.toJson(players);
     }
 
@@ -62,6 +63,25 @@ public class RESTController
         {
             return new ResponseEntity<>("Room not exist", HttpStatus.BAD_REQUEST);
         }
+
+//        return AppUtil.responce200OK();
+        HashMap<String, Integer> resp = new HashMap<>();
+        resp.put("id", playerId);
+        return new ResponseEntity<>(AppUtil.toJson(resp),HttpStatus.OK);
+    }
+
+    @CrossOrigin
+    @RequestMapping(value = "setCharacter", method = RequestMethod.POST)
+    public ResponseEntity setCharacter(@RequestBody String data)
+    {
+        JSONObject jsonObject = new JSONObject(data);
+        String character = jsonObject.getString("character");
+        int playerId = jsonObject.getInt("id");
+
+        System.out.println(playerId + " " + character);
+
+        gameMaster.setCharacter(playerId, character);
+//        gameMaster.changeStatus(playerId, IBPlayer.Status.READY);                                               // useless in web api ?
 
         return AppUtil.responce200OK();
     }
