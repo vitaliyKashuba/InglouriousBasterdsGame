@@ -1,5 +1,7 @@
-package bot;
+package springApplication.game;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import util.Randomizer;
 
 import java.util.*;
@@ -12,14 +14,28 @@ import java.util.*;
  * regular player workflow: /join -> enter room number -> enter character -> wait till broadcast sent
  *
  */
+@Component
 public class IBGameMaster
 {
-    private static IBGameMaster ourInstance = new IBGameMaster();
-
-    public static IBGameMaster getInstance()
+    /**
+     * classic mode - download picture of character, send to player his own character to recognize
+     *
+     * list - send to player list of his teammates and their characters
+     */
+    public enum GameMode
     {
-        return ourInstance;
+        CLASSIC, LIST   // TODO change to more obvious enum ?
     }
+
+//    private static IBGameMaster ourInstance = new IBGameMaster();
+
+//    public static IBGameMaster getInstance()
+//    {
+//        return ourInstance;
+//    }
+
+    @Autowired
+    private MessageSender messageSender;
 
     private Map<Integer, List<IBPlayer>> rooms; //room id - key, list of players - value
     private Map<Integer, IBPlayer> players;     //player id - key, player obj - value
@@ -27,6 +43,8 @@ public class IBGameMaster
 
     private IBGameMaster()
     {
+//        messageSender = MessageSender.getInstance();
+
         rooms = new HashMap<>();
         players = new HashMap<>();
         roomCreators = new HashMap<>();
@@ -154,8 +172,10 @@ public class IBGameMaster
     /**
      * @param roomAdminId id of room admin
      *                    needs to select room for randomizing
+     *
+     *    return room id  //TODO fix it
      */
-    public void randomizeCharacters(int roomAdminId)
+    public int randomizeCharacters(int roomAdminId)
     {
         int roomId = roomCreators.get(roomAdminId);
         List<IBPlayer> players = rooms.get(roomId);
@@ -166,15 +186,22 @@ public class IBGameMaster
             players.get(i).setCharacter(players.get(i+1).getCharacter());
         }
         players.get(lastIndex).setCharacter(firstCharacterBkp);
+
+        return roomId;
     }
 
-    /**test for web api*/
+    public void startGame(int roomId)
+    {
+        messageSender.sendBroadcast("broadcast", roomId);
+    }
+
+    /**test for springApplication.web api*/
     public List<IBPlayer> getRoom(int id)
     {
         return rooms.get(id);
     }
 
-    /**test for web api*/
+    /**test for springApplication.web api*/
     public Collection<IBPlayer> getPlayers() {return players.values();}
 
 }

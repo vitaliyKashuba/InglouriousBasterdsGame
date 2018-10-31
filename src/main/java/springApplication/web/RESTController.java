@@ -1,7 +1,8 @@
-package web;
+package springApplication.web;
 
-import bot.IBGameMaster;
-import bot.IBPlayer;
+import org.springframework.beans.factory.annotation.Autowired;
+import springApplication.game.IBGameMaster;
+import springApplication.game.IBPlayer;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,8 @@ import java.util.List;
 @RestController
 public class RESTController
 {
-    private IBGameMaster gameMaster = IBGameMaster.getInstance();
+    @Autowired
+    private IBGameMaster gameMaster; // = IBGameMaster.getInstance();
 
     @RequestMapping("/")
     public String index() {
@@ -50,8 +52,8 @@ public class RESTController
         System.out.println(playerId + " " + playerName);
         gameMaster.addPlayer(new IBPlayer(playerId, playerName));
 
-//        gameMaster.changeStatus(playerId, IBPlayer.Status.JOINREQUEST);                                               // useless in web api ?
-//        gameMaster.removeOldRoomIfExist(playerId);                                                                    // useless in web api ?
+//        gameMaster.changeStatus(playerId, IBPlayer.Status.JOINREQUEST);                                               // useless in springApplication.web api ?
+//        gameMaster.removeOldRoomIfExist(playerId);                                                                    // useless in springApplication.web api ?
 
         try
         {
@@ -81,7 +83,7 @@ public class RESTController
         System.out.println(playerId + " " + character);
 
         gameMaster.setCharacter(playerId, character);
-//        gameMaster.changeStatus(playerId, IBPlayer.Status.READY);                                               // useless in web api ?
+//        gameMaster.changeStatus(playerId, IBPlayer.Status.READY);                                               // useless in springApplication.web api ?
 
         return AppUtil.responce200OK();
     }

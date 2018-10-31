@@ -1,4 +1,4 @@
-package bot;
+package springApplication.game;
 
 import lombok.Getter;
 import lombok.Setter;
