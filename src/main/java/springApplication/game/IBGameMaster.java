@@ -2,6 +2,7 @@ package springApplication.game;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import util.GoogleSearchAPIUtil;
 import util.Randomizer;
 
 import java.util.*;
@@ -52,7 +53,7 @@ public class IBGameMaster
     {
         int roomNumber = newRoom();
 
-        addPlayerIfNull(initiatorId, initiatorName);
+        addPlayerIfNull(initiatorId, initiatorName);          // TODO check if possible to init game with player is null ? remove useless addIfNull method call
         enterRoom(initiatorId, roomNumber);
 
         removeOldRoomIfExist(initiatorId);
@@ -158,7 +159,7 @@ public class IBGameMaster
         IBPlayer p = players.get(id);
         if (p == null)
         {
-            addPlayer(new IBPlayer(id, name));
+            addPlayer(new IBPlayer(id, name, IBPlayer.ClientType.TELEGRAM));                                            // TODO fix possible bug if this ever called from web api
         }
     }
 
@@ -181,13 +182,46 @@ public class IBGameMaster
         players.get(lastIndex).setCharacter(firstCharacterBkp);
     }
 
-    public int getroomIdByAdminId(int adminId)
+    public int getRoomIdByAdminId(int adminId)
     {
         return roomCreators.get(adminId);
     }
 
-    public void startGame(int roomId)   // TODO send messages to start from here
+    public void startGame(int adminId, GameMode mode)   // TODO send messages to start from here
     {
+        randomizeCharacters(adminId);
+
+        int roomId = getRoomIdByAdminId(adminId);
+        List<IBPlayer> players = rooms.get(roomId);
+
+        switch (mode)
+        {
+            case CLASSIC:
+                for (IBPlayer p : players)
+                {
+                    String ch = p.getCharacter();
+                    String img = GoogleSearchAPIUtil.findImage(p.getCharacter());
+//                  sendImageFromUrl(p.getId(), img, ch);       // TODO what should be sent to web api ?  // TODO remake to telegram bots  v 4.1
+                }
+//                return;
+                break;
+            case LIST:
+                for (IBPlayer p : players)
+                {
+                    Map<String,String> teammates = new HashMap<>();
+                    for (IBPlayer pl : players)
+                    {
+                        if(pl.getId() != p.getId())
+                        {
+                            teammates.put(pl.getName(), pl.getCharacter());
+                        }
+                    }
+//                    sendMsg(p.getId(), teammates.toString());     // TODO send message here
+                    messageSender.sendMesageToUser(p, teammates.toString());
+                }
+                break;
+        }
+
         messageSender.sendBroadcast("game started!!!", roomId);
     }
 

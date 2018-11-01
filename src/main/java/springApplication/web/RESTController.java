@@ -50,7 +50,7 @@ public class RESTController
         int playerId = Randomizer.getRandomPlayerId();
 
         System.out.println(playerId + " " + playerName);
-        gameMaster.addPlayer(new IBPlayer(playerId, playerName));
+        gameMaster.addPlayer(new IBPlayer(playerId, playerName, IBPlayer.ClientType.WEB));
 
 //        gameMaster.changeStatus(playerId, IBPlayer.Status.JOINREQUEST);                                               // useless in springApplication.web api ?
 //        gameMaster.removeOldRoomIfExist(playerId);                                                                    // useless in springApplication.web api ?

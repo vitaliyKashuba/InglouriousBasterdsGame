@@ -56,7 +56,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                 switch(receivedMessage) //TODO add /stats command
                 {
                     case "/start":
-                        gameMaster.addPlayer(new IBPlayer(senderId, senderName));
+                        gameMaster.addPlayer(new IBPlayer(senderId, senderName, IBPlayer.ClientType.TELEGRAM));
                         responceString = "welcome!";
                         break;
                     case "/init":
@@ -134,40 +134,41 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
             {
                 int senderId = update.getCallbackQuery().getFrom().getId();
                 String callback = update.getCallbackQuery().getData();
-                List<IBPlayer> players = null;
+//                List<IBPlayer> players = null;
 
-                if(callback.startsWith("start"))                // TODO move message sending logic to message sender
-                {
-                    gameMaster.randomizeCharacters(senderId);
-                    players = gameMaster.getPlayersByRoomCreator(senderId);
+//                if(callback.startsWith("start"))                // TODO move message sending logic to message sender
+//                {
+//                    gameMaster.randomizeCharacters(senderId);
+//                    players = gameMaster.getPlayersByRoomCreator(senderId);
 
-                    int roomId = gameMaster.getroomIdByAdminId(senderId);
-                    gameMaster.startGame(roomId);
-                }
+//                    int roomId = gameMaster.getroomIdByAdminId(senderId);
+//                }
 
                 switch(callback)
                 {
                     case "start1":
-                        for (IBPlayer p : players)
-                        {
-                            String ch = p.getCharacter();
-                            String img = GoogleSearchAPIUtil.findImage(p.getCharacter());
-//                            sendImageFromUrl(p.getId(), img, ch);                                                       // TODO remake to telegram bots  v 4.1
-                        }
+                        gameMaster.startGame(senderId, IBGameMaster.GameMode.CLASSIC);
+//                        for (IBPlayer p : players)
+//                        {
+//                            String ch = p.getCharacter();
+//                            String img = GoogleSearchAPIUtil.findImage(p.getCharacter());
+////                            sendImageFromUrl(p.getId(), img, ch);                                                       // TODO remake to telegram bots  v 4.1
+//                        }
                         return;
                     case "start2":
-                        for (IBPlayer p : players)
-                        {
-                            Map<String,String> teammates = new HashMap<>();
-                            for (IBPlayer pl : players)
-                            {
-                                if(pl.getId() != p.getId())
-                                {
-                                    teammates.put(pl.getName(), pl.getCharacter());
-                                }
-                            }
-                            sendMsg(p.getId(), teammates.toString());
-                        }
+                        gameMaster.startGame(senderId, IBGameMaster.GameMode.LIST);
+//                        for (IBPlayer p : players)
+//                        {
+//                            Map<String,String> teammates = new HashMap<>();
+//                            for (IBPlayer pl : players)
+//                            {
+//                                if(pl.getId() != p.getId())
+//                                {
+//                                    teammates.put(pl.getName(), pl.getCharacter());
+//                                }
+//                            }
+//                            sendMsg(p.getId(), teammates.toString());
+//                        }
                         return;
                     default:
                         System.out.println("default switch");
@@ -178,12 +179,12 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
         }
     }
 
-    private void sendMsg(long chatId, String msg)
+    public void sendMsg(long chatId, String msg)
     {
         sendMsg(chatId, msg, null);
     }
 
-    private void sendMsg(long chatId, String msg, InlineKeyboardMarkup mk)
+    public void sendMsg(long chatId, String msg, InlineKeyboardMarkup mk)
     {
         SendMessage message = new SendMessage()
                 .setChatId(chatId)

@@ -31,6 +31,7 @@ public class WebSocketController
         System.out.println("private" + message);
 //        template.convertAndSend("/topic/reply", "broadcast part");
 
+
 //        MessageSender ms = new MessageSender();
 //        ms.sendBroadcast("123");
 
