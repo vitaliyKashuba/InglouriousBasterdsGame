@@ -14,6 +14,7 @@ public class WebSocketConfiguration extends AbstractWebSocketMessageBrokerConfig
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/socket")
                 .setAllowedOrigins("*")
+                .setHandshakeHandler(new CustomHandshakeHandler())
                 .withSockJS();
     }
 

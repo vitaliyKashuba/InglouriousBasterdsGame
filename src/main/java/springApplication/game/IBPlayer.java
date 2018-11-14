@@ -10,7 +10,7 @@ public class IBPlayer
 {
     public enum Status
     {
-        NONE, JOINREQUEST, JOINED, READY, INGAME
+        NONE, JOINREQUEST, JOINED, READY
     }
 
     public enum ClientType
@@ -21,6 +21,7 @@ public class IBPlayer
     private int id;
     @Setter private String character;
     @Setter private Status status;
+    @Setter private String webPrincipal;
     private String name;
     private ClientType clientType;
 

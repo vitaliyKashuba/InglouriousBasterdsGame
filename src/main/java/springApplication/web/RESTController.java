@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import util.AppUtil;
 import util.Randomizer;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 
@@ -66,7 +67,6 @@ public class RESTController
             return new ResponseEntity<>("Room not exist", HttpStatus.BAD_REQUEST);
         }
 
-//        return AppUtil.responce200OK();
         HashMap<String, Integer> resp = new HashMap<>();
         resp.put("id", playerId);
         return new ResponseEntity<>(AppUtil.toJson(resp),HttpStatus.OK);

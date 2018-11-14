@@ -42,6 +42,8 @@ public class IBGameMaster
         rooms = new HashMap<>();
         players = new HashMap<>();
         roomCreators = new HashMap<>();
+
+        rooms.put(1,new ArrayList<>()); // for tests
     }
 
     /**
