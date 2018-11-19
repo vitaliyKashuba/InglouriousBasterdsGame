@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {log} from 'util';
 import {HttpRequesterService} from '../../services/http-requester.service';
+import {Teammate} from '../../model/teammate';
 
 @Component({
   selector: 'app-characters',
@@ -10,6 +11,7 @@ import {HttpRequesterService} from '../../services/http-requester.service';
 export class CharactersComponent implements OnInit {
 
   @Input() playerId: number;
+  @Input() teammates: Teammate[];
 
   character: string;
 

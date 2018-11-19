@@ -1,8 +1,9 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {log} from 'util';
 import { Injectable } from '@angular/core';
 import * as Stomp from 'stompjs';
 import * as SockJS from 'sockjs-client';
+import {Teammate} from '../../model/teammate';
 
 @Component({
   selector: 'app-chat',
@@ -13,6 +14,8 @@ export class ChatComponent implements OnInit {
 
   @Input() roomId: number;
   @Input() playerId: number;
+
+  @Output() setTeammatesEmitter = new EventEmitter<any>();
 
   private serverUrl = 'http://localhost:5000/socket';
 
@@ -46,6 +49,9 @@ export class ChatComponent implements OnInit {
         // that.showGreeting(message.body);
       });
       that.ws.subscribe('/user/topic/reply', function(message) {
+        if (message.body.startsWith('teammates')) {
+          that.setPlayers(message.body.substring(9));
+        }
         // console.log('private' + message);
         // that.showGreeting(message.body);
       });
@@ -70,6 +76,25 @@ export class ChatComponent implements OnInit {
     this.disabled = connected;
     // this.showConversation = connected;
     // this.greetings = [];
+  }
+
+  setPlayers(players: string) {
+    log('setting players');
+    const m = new Map<string, string>();
+    m.set('wer', 'rwrew');
+    const data = JSON.parse(players);
+
+    // log(m);
+    log(data.constructor.name);
+
+    let shit = Object.entries(data);
+
+    log(shit.keys());
+
+    // data.forEach((value: string, key: string) => {
+    //   console.log(key, value);
+    // });
+    this.setTeammatesEmitter.emit(data as Teammate[]);
   }
 
   showGreeting(message) {

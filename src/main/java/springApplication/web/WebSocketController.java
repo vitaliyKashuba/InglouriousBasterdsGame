@@ -34,20 +34,20 @@ public class WebSocketController
 //        System.out.println(sha);
 //        System.out.println(sha.getSessionId());
 //        System.out.println(sha.getSessionAttributes());
-        System.out.println(principal.getName());
-        System.out.println("/message" + message + " " + id);
+//        System.out.println(principal.getName());
+//        System.out.println("/message" + message + " " + id);
         template.convertAndSendToUser(principal.getName(), "/topic/reply", "this shit with send to user works");
-        return "hello world";
+        return message;
     }
 
     @MessageMapping("/private_message")
     @SendToUser("/topic/reply")
     public String processMessagePrivate(Principal principal, @Payload String message) throws Exception {
-        System.out.println(principal.getName());
+//        System.out.println(principal.getName());
 //        String name = new Gson().fromJson(message, Map.class).get("name").toString();
-        System.out.println("private" + message);
+//        System.out.println("private" + message);
 //        template.convertAndSend("/topic/reply", "broadcast part");
-        template.convertAndSendToUser(principal.getName(), "/topic/reply", "this shit with send to user works in private msgs");
+//        template.convertAndSendToUser(principal.getName(), "/topic/reply", "this shit with send to user works in private msgs");
         /////////////////////////////// tests
 
         if (message.startsWith("setPrincipal"))
@@ -55,6 +55,7 @@ public class WebSocketController
             int playerId = Integer.parseInt(message.split(":")[1]);
             System.out.println("set principal to " + playerId);
             gameMaster.getPlayer(playerId).setWebPrincipal(principal.getName());
+            return "principal setted!";
         }
 
         return "hello private world";

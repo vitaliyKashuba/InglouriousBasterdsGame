@@ -4,6 +4,11 @@
          type="text"
          [(ngModel)]="character">
 </mz-input-container>
+<div *ngIf="teammates">
+  <div *ngFor="let p of teammates">
+    {{p.name}} - {{p.character}}
+  </div>
+</div>
 <button mz-button
         (click)="onSendCharacterClick()">
   OK

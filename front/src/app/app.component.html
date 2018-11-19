@@ -6,11 +6,14 @@
 
 <div class="row"  *ngIf="room">
   <div class="col m4">
-    <app-characters [playerId]="playerId">
+    <app-characters [playerId]="playerId"
+                    [teammates]="teammates">
     </app-characters>
   </div>
   <div class="col m8">
-    <app-chat [roomId]="room" [playerId]="playerId">
+    <app-chat [roomId]="room"
+              [playerId]="playerId"
+              (setTeammatesEmitter)="setTeammates($event)">
     </app-chat>
   </div>
 </div>

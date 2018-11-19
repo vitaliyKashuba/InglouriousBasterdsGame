@@ -2,6 +2,7 @@ package springApplication.game;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import util.AppUtil;
 import util.GoogleSearchAPIUtil;
 import util.Randomizer;
 
@@ -169,7 +170,7 @@ public class IBGameMaster
      * @param roomAdminId id of room admin
      *                    needs to select room for randomizing
      *
-     *    return room id  //TODO fix it
+     *    return room id
      */
     public void randomizeCharacters(int roomAdminId)
     {
@@ -189,8 +190,9 @@ public class IBGameMaster
         return roomCreators.get(adminId);
     }
 
-    public void startGame(int adminId, GameMode mode)   // TODO send messages to start from here
+    public void startGame(int adminId, GameMode mode)
     {
+        // TODO remove not-ready players, because they may be disconnected
         randomizeCharacters(adminId);
 
         int roomId = getRoomIdByAdminId(adminId);
@@ -210,15 +212,16 @@ public class IBGameMaster
             case LIST:
                 for (IBPlayer p : players)
                 {
-                    Map<String,String> teammates = new HashMap<>();
+                    List<Teammate> teammates = new ArrayList<>();
                     for (IBPlayer pl : players)
                     {
                         if(pl.getId() != p.getId())
                         {
-                            teammates.put(pl.getName(), pl.getCharacter());
+//                            teammates.put(pl.getName(), pl.getCharacter());
+                            teammates.add(new Teammate(pl.getName(), pl.getCharacter()));
                         }
                     }
-                    messageSender.sendMesageToUser(p, teammates.toString());
+                    messageSender.sendMesageToUser(p, AppUtil.toJson(teammates));
                 }
                 break;
         }
