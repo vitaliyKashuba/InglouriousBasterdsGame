@@ -9,6 +9,7 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
+import springApplication.game.IBGameMaster;
 import springApplication.game.MessageSender;
 
 import java.security.Principal;
@@ -19,6 +20,9 @@ public class WebSocketController
 {
     @Autowired
     MessageSender ms;
+
+    @Autowired
+    IBGameMaster gameMaster;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -46,11 +50,12 @@ public class WebSocketController
         template.convertAndSendToUser(principal.getName(), "/topic/reply", "this shit with send to user works in private msgs");
         /////////////////////////////// tests
 
-        if (message.equals("setPrincipal"))
+        if (message.startsWith("setPrincipal"))
         {
-            System.out.println("set principal");
+            int playerId = Integer.parseInt(message.split(":")[1]);
+            System.out.println("set principal to " + playerId);
+            gameMaster.getPlayer(playerId).setWebPrincipal(principal.getName());
         }
-
 
         return "hello private world";
     }
