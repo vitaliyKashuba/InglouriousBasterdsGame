@@ -1,5 +1,8 @@
-package bot;
+package springApplication.game;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import util.GoogleSearchAPIUtil;
 import util.Randomizer;
 
 import java.util.*;
@@ -12,14 +15,21 @@ import java.util.*;
  * regular player workflow: /join -> enter room number -> enter character -> wait till broadcast sent
  *
  */
+@Component
 public class IBGameMaster
 {
-    private static IBGameMaster ourInstance = new IBGameMaster();
-
-    public static IBGameMaster getInstance()
+    /**
+     * classic mode - download picture of character, send to player his own character to recognize
+     *
+     * list - send to player list of his teammates and their characters
+     */
+    public enum GameMode
     {
-        return ourInstance;
+        CLASSIC, LIST   // TODO change to more obvious enum ?
     }
+
+    @Autowired
+    private MessageSender messageSender;
 
     private Map<Integer, List<IBPlayer>> rooms; //room id - key, list of players - value
     private Map<Integer, IBPlayer> players;     //player id - key, player obj - value
@@ -27,9 +37,13 @@ public class IBGameMaster
 
     private IBGameMaster()
     {
+//        messageSender = MessageSender.getInstance();
+
         rooms = new HashMap<>();
         players = new HashMap<>();
         roomCreators = new HashMap<>();
+
+        rooms.put(1,new ArrayList<>()); // for tests
     }
 
     /**
@@ -41,7 +55,7 @@ public class IBGameMaster
     {
         int roomNumber = newRoom();
 
-        addPlayerIfNull(initiatorId, initiatorName);
+        addPlayerIfNull(initiatorId, initiatorName);          // TODO check if possible to init game with player is null ? remove useless addIfNull method call
         enterRoom(initiatorId, roomNumber);
 
         removeOldRoomIfExist(initiatorId);
@@ -147,13 +161,15 @@ public class IBGameMaster
         IBPlayer p = players.get(id);
         if (p == null)
         {
-            addPlayer(new IBPlayer(id, name));
+            addPlayer(new IBPlayer(id, name, IBPlayer.ClientType.TELEGRAM));                                            // TODO fix possible bug if this ever called from web api
         }
     }
 
     /**
      * @param roomAdminId id of room admin
      *                    needs to select room for randomizing
+     *
+     *    return room id  //TODO fix it
      */
     public void randomizeCharacters(int roomAdminId)
     {
@@ -166,6 +182,48 @@ public class IBGameMaster
             players.get(i).setCharacter(players.get(i+1).getCharacter());
         }
         players.get(lastIndex).setCharacter(firstCharacterBkp);
+    }
+
+    public int getRoomIdByAdminId(int adminId)
+    {
+        return roomCreators.get(adminId);
+    }
+
+    public void startGame(int adminId, GameMode mode)   // TODO send messages to start from here
+    {
+        randomizeCharacters(adminId);
+
+        int roomId = getRoomIdByAdminId(adminId);
+        List<IBPlayer> players = rooms.get(roomId);
+
+        switch (mode)
+        {
+            case CLASSIC:
+                for (IBPlayer p : players)
+                {
+                    String ch = p.getCharacter();
+                    String img = GoogleSearchAPIUtil.findImage(p.getCharacter());
+//                  sendImageFromUrl(p.getId(), img, ch);       // TODO what should be sent to web api ?  // TODO remake to telegram bots  v 4.1
+                }
+//                return;
+                break;
+            case LIST:
+                for (IBPlayer p : players)
+                {
+                    Map<String,String> teammates = new HashMap<>();
+                    for (IBPlayer pl : players)
+                    {
+                        if(pl.getId() != p.getId())
+                        {
+                            teammates.put(pl.getName(), pl.getCharacter());
+                        }
+                    }
+                    messageSender.sendMesageToUser(p, teammates.toString());
+                }
+                break;
+        }
+
+        messageSender.sendBroadcast("game started!!!", roomId);
     }
 
     /**test for web api*/

@@ -39,16 +39,23 @@
             <artifactId>spring-boot-starter-websocket</artifactId>
             <version>1.5.2.RELEASE</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.telegram</groupId>
+            <artifactId>telegrambots-spring-boot-starter</artifactId>
+            <version>4.1</version>
+        </dependency>
+
         <!-- = = = = = = = = = = = = = = telegram dep here-tG -->
         <dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots</artifactId>
-            <version>3.6.1</version>
+            <version>4.1</version>
         </dependency>
         <dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots-abilities</artifactId>
-            <version>3.6.1</version>
+            <version>4.1</version>
         </dependency>
 
         <dependency>
@@ -79,14 +86,6 @@
 
     <build>
         <plugins>
-            <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-compiler-plugin</artifactId>-->
-                <!--<configuration>-->
-                    <!--<source>8</source>-->
-                    <!--<target>8</target>-->
-                <!--</configuration>-->
-            <!--</plugin>-->
 
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -107,29 +106,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <!--<plugin>                                    &lt;!&ndash; for heroku &ndash;&gt;-->
-                <!--<groupId>org.codehaus.mojo</groupId>-->
-                <!--<artifactId>appassembler-maven-plugin</artifactId>-->
-                <!--<version>1.1.1</version>-->
-                <!--<configuration>-->
-                    <!--<assembleDirectory>target</assembleDirectory>-->
-                    <!--<programs>-->
-                        <!--<program>-->
-                            <!--<mainClass>bot.Main</mainClass>-->
-                            <!--<name>telegramBot</name>-->
-                        <!--</program>-->
-                    <!--</programs>-->
-                <!--</configuration>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<phase>package</phase>-->
-                        <!--<goals>-->
-                            <!--<goal>assemble</goal>-->
-                        <!--</goals>-->
-                    <!--</execution>-->
-                <!--</executions>-->
-            <!--</plugin>-->
 
         </plugins>
     </build>

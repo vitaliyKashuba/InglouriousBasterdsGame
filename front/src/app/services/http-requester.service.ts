@@ -15,7 +15,8 @@ export class HttpRequesterService {
     return this.http.post(this.url + 'join/' + roomId, body);
   }
 
-  sendCharacter(character: string) {
-    // return this.http.post(this.url + 'join/' + roomId, body);
+  sendCharacter(playerId: number, character: string) {
+    const body = {id: playerId, character: character};
+    return this.http.post(this.url + 'setCharacter', body);
   }
 }

@@ -1,1 +1,1 @@
-web: java -jar target/InglouriousBasterdsGame-1.0.jar
+springApplication.web: java -jar target/InglouriousBasterdsGame-1.0.jar

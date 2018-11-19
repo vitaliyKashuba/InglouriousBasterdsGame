@@ -7,8 +7,13 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   room: number;
+  playerId: number;
 
   setRoomId(room: number) {
     this.room = room;
+  }
+
+  setPlayerId(id: number) {
+    this.playerId = id;
   }
 }

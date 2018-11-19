@@ -1,4 +1,4 @@
-package web;
+package springApplication.web;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -14,6 +14,7 @@ public class WebSocketConfiguration extends AbstractWebSocketMessageBrokerConfig
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/socket")
                 .setAllowedOrigins("*")
+                .setHandshakeHandler(new CustomHandshakeHandler())
                 .withSockJS();
     }
 

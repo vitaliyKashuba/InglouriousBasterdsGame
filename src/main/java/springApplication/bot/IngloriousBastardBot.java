@@ -1,33 +1,43 @@
-package bot;
+package springApplication.bot;
 
-import org.telegram.telegrambots.api.methods.send.SendMessage;
-import org.telegram.telegrambots.api.methods.send.SendPhoto;
-import org.telegram.telegrambots.api.objects.Update;
-import org.telegram.telegrambots.api.objects.User;
-import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import springApplication.game.IBGameMaster;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.exceptions.TelegramApiException;
+import springApplication.game.IBPlayer;
 import util.AppUtil;
 import util.GoogleSearchAPIUtil;
 import util.Randomizer;
 import util.TgUtil;
 
+
+import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class IngloriousBastardBot extends TelegramLongPollingBot
 {
+    @Autowired
     private IBGameMaster gameMaster;
-    private static String botToken;
 
-    public IngloriousBastardBot()
+    private String botToken;
+
+    IngloriousBastardBot()
     {
-        gameMaster = IBGameMaster.getInstance();
         botToken = AppUtil.getEnvironmentVariable("TOKEN");
     }
 
     //TODO check nulls, user data. refactor
+    @Override
     public void onUpdateReceived(Update update)
     {
         if (update.hasMessage() && update.getMessage().hasText())
@@ -46,7 +56,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                 switch(receivedMessage) //TODO add /stats command
                 {
                     case "/start":
-                        gameMaster.addPlayer(new IBPlayer(senderId, senderName));
+                        gameMaster.addPlayer(new IBPlayer(senderId, senderName, IBPlayer.ClientType.TELEGRAM));
                         responceString = "welcome!";
                         break;
                     case "/init":
@@ -124,37 +134,41 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
             {
                 int senderId = update.getCallbackQuery().getFrom().getId();
                 String callback = update.getCallbackQuery().getData();
-                List<IBPlayer> players = null;
+//                List<IBPlayer> players = null;
 
-                if(callback.startsWith("start"))
-                {
-                    gameMaster.randomizeCharacters(senderId);
-                    players = gameMaster.getPlayersByRoomCreator(senderId);
-                }
+//                if(callback.startsWith("start"))                // TODO move message sending logic to message sender
+//                {
+//                    gameMaster.randomizeCharacters(senderId);
+//                    players = gameMaster.getPlayersByRoomCreator(senderId);
+
+//                    int roomId = gameMaster.getroomIdByAdminId(senderId);
+//                }
 
                 switch(callback)
                 {
                     case "start1":
-                        for (IBPlayer p : players)
-                        {
-                            String ch = p.getCharacter();
-                            String img = GoogleSearchAPIUtil.findImage(p.getCharacter());
-                            sendImageFromUrl(p.getId(), img, ch);
-                        }
+                        gameMaster.startGame(senderId, IBGameMaster.GameMode.CLASSIC);
+//                        for (IBPlayer p : players)
+//                        {
+//                            String ch = p.getCharacter();
+//                            String img = GoogleSearchAPIUtil.findImage(p.getCharacter());
+////                            sendImageFromUrl(p.getId(), img, ch);                                                       // TODO remake to telegram bots  v 4.1
+//                        }
                         return;
                     case "start2":
-                        for (IBPlayer p : players)
-                        {
-                            Map<String,String> teammates = new HashMap<>();
-                            for (IBPlayer pl : players)
-                            {
-                                if(pl.getId() != p.getId())
-                                {
-                                    teammates.put(pl.getName(), pl.getCharacter());
-                                }
-                            }
-                            sendMsg(p.getId(), teammates.toString());
-                        }
+                        gameMaster.startGame(senderId, IBGameMaster.GameMode.LIST);
+//                        for (IBPlayer p : players)
+//                        {
+//                            Map<String,String> teammates = new HashMap<>();
+//                            for (IBPlayer pl : players)
+//                            {
+//                                if(pl.getId() != p.getId())
+//                                {
+//                                    teammates.put(pl.getName(), pl.getCharacter());
+//                                }
+//                            }
+//                            sendMsg(p.getId(), teammates.toString());
+//                        }
                         return;
                     default:
                         System.out.println("default switch");
@@ -165,12 +179,12 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
         }
     }
 
-    private void sendMsg(long chatId, String msg)
+    public void sendMsg(long chatId, String msg)
     {
         sendMsg(chatId, msg, null);
     }
 
-    private void sendMsg(long chatId, String msg, InlineKeyboardMarkup mk)
+    public void sendMsg(long chatId, String msg, InlineKeyboardMarkup mk)
     {
         SendMessage message = new SendMessage()
                 .setChatId(chatId)
@@ -190,28 +204,30 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
         }
     }
 
-    private void sendImageFromUrl(long chatId, String imgUrl, String caption) {
-        SendPhoto sendPhotoRequest = new SendPhoto()
-                .setChatId(chatId)
-                .setPhoto(imgUrl);
-        if (caption != null)
-        {
-            sendPhotoRequest.setCaption(caption);
-        }
-        try
-        {
-            sendPhoto(sendPhotoRequest);
-        } catch (TelegramApiException e)
-        {
-            e.printStackTrace();
-        }
-    }
+//    private void sendImageFromUrl(long chatId, String imgUrl, String caption) {
+//        SendPhoto sendPhotoRequest = new SendPhoto()
+//                .setChatId(chatId)
+//                .setPhoto(imgUrl);
+//        if (caption != null)
+//        {
+//            sendPhotoRequest.setCaption(caption);
+//        }
+//        try
+//        {
+//            sendPhoto(sendPhotoRequest);
+//        } catch (TelegramApiException e)
+//        {
+//            e.printStackTrace();
+//        }
+//    }
 
+    @Override
     public String getBotUsername()
     {
         return "IngloriousBasterdsBot";
     }
 
+    @Override
     public String getBotToken()
     {
         return botToken;

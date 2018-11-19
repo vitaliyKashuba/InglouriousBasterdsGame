@@ -1,7 +1,8 @@
-package web;
+package springApplication.web;
 
-import bot.IBGameMaster;
-import bot.IBPlayer;
+import org.springframework.beans.factory.annotation.Autowired;
+import springApplication.game.IBGameMaster;
+import springApplication.game.IBPlayer;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,12 +10,15 @@ import org.springframework.web.bind.annotation.*;
 import util.AppUtil;
 import util.Randomizer;
 
+import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
 public class RESTController
 {
-    IBGameMaster gameMaster = IBGameMaster.getInstance();
+    @Autowired
+    private IBGameMaster gameMaster; // = IBGameMaster.getInstance();
 
     @RequestMapping("/")
     public String index() {
@@ -26,7 +30,7 @@ public class RESTController
     public String getRoom(@PathVariable int id)
     {
 //        IBGameMaster gameMaster = IBGameMaster.getInstance();
-        List players = gameMaster.getRoom(id);
+        List<IBPlayer> players = gameMaster.getRoom(id);
         return AppUtil.toJson(players);
     }
 
@@ -47,10 +51,10 @@ public class RESTController
         int playerId = Randomizer.getRandomPlayerId();
 
         System.out.println(playerId + " " + playerName);
-        gameMaster.addPlayer(new IBPlayer(playerId, playerName));
+        gameMaster.addPlayer(new IBPlayer(playerId, playerName, IBPlayer.ClientType.WEB));
 
-//        gameMaster.changeStatus(playerId, IBPlayer.Status.JOINREQUEST);                                               // useless in web api ?
-//        gameMaster.removeOldRoomIfExist(playerId);                                                                    // useless in web api ?
+//        gameMaster.changeStatus(playerId, IBPlayer.Status.JOINREQUEST);                                               // useless in springApplication.web api ?
+//        gameMaster.removeOldRoomIfExist(playerId);                                                                    // useless in springApplication.web api ?
 
         try
         {
@@ -62,6 +66,24 @@ public class RESTController
         {
             return new ResponseEntity<>("Room not exist", HttpStatus.BAD_REQUEST);
         }
+
+        HashMap<String, Integer> resp = new HashMap<>();
+        resp.put("id", playerId);
+        return new ResponseEntity<>(AppUtil.toJson(resp),HttpStatus.OK);
+    }
+
+    @CrossOrigin
+    @RequestMapping(value = "setCharacter", method = RequestMethod.POST)
+    public ResponseEntity setCharacter(@RequestBody String data)
+    {
+        JSONObject jsonObject = new JSONObject(data);
+        String character = jsonObject.getString("character");
+        int playerId = jsonObject.getInt("id");
+
+        System.out.println(playerId + " " + character);
+
+        gameMaster.setCharacter(playerId, character);
+//        gameMaster.changeStatus(playerId, IBPlayer.Status.READY);                                               // useless in web api ?
 
         return AppUtil.responce200OK();
     }

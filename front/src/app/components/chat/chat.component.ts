@@ -1,5 +1,4 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {WebSocketService} from '../../services/web-socket.service';
 import {log} from 'util';
 import { Injectable } from '@angular/core';
 import * as Stomp from 'stompjs';
@@ -13,6 +12,7 @@ import * as SockJS from 'sockjs-client';
 export class ChatComponent implements OnInit {
 
   @Input() roomId: number;
+  @Input() playerId: number;
 
   private serverUrl = 'http://localhost:5000/socket';
 
@@ -42,14 +42,17 @@ export class ChatComponent implements OnInit {
         alert('Error ' + message.body);
       });
       that.ws.subscribe('/topic/reply/' + that.roomId, function(message) {
-        console.log('broadcast' + message);
-        that.showGreeting(message.body);
+        // console.log('broadcast' + message);
+        // that.showGreeting(message.body);
       });
       that.ws.subscribe('/user/topic/reply', function(message) {
-        console.log('private' + message);
-        that.showGreeting(message.body);
+        // console.log('private' + message);
+        // that.showGreeting(message.body);
       });
       that.disabled = true;
+
+      that.sendPrivate('setPrincipal:' + that.playerId);
+
     }, function(error) {
       alert('STOMP error ' + error);
     });
@@ -79,15 +82,14 @@ export class ChatComponent implements OnInit {
     const data = JSON.stringify({
       'name' : message
     });
-    console.log('send: ' + data);
+    // console.log('send: ' + data);
     this.ws.send('/app/message/' + this.roomId, {}, data);
   }
 
   sendPrivate(message: string) {
-    const data = JSON.stringify({
-      'name' : message
-    });
-    console.log('send name: ' + data);
-    this.ws.send('/app/private_message', {}, data);
+    // const data = JSON.stringify(message);
+    // console.log('send name: ' + data);
+    this.ws.send('/app/private_message', {}, message);
   }
+
 }
