@@ -218,7 +218,6 @@ public class IBGameMaster
                             teammates.put(pl.getName(), pl.getCharacter());
                         }
                     }
-//                    sendMsg(p.getId(), teammates.toString());     // TODO send message here
                     messageSender.sendMesageToUser(p, teammates.toString());
                 }
                 break;
@@ -227,13 +226,13 @@ public class IBGameMaster
         messageSender.sendBroadcast("game started!!!", roomId);
     }
 
-    /**test for springApplication.web api*/
+    /**test for web api*/
     public List<IBPlayer> getRoom(int id)
     {
         return rooms.get(id);
     }
 
-    /**test for springApplication.web api*/
+    /**test for web api*/
     public Collection<IBPlayer> getPlayers() {return players.values();}
 
 }

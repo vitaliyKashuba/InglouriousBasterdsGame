@@ -27,9 +27,6 @@ public class MessageSender
                 bot.sendMsg(reciever.getId(), message);
                 break;
             case WEB:
-//                template.convertAndSend("/topic/reply/" + roomId, message);
-//                template.convertAndSendToUser();
-                // TODO send to web socket user here
                 template.convertAndSendToUser(reciever.getWebPrincipal(), "/topic/reply", message);
                 break;
         }

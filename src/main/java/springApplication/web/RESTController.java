@@ -83,7 +83,7 @@ public class RESTController
         System.out.println(playerId + " " + character);
 
         gameMaster.setCharacter(playerId, character);
-//        gameMaster.changeStatus(playerId, IBPlayer.Status.READY);                                               // useless in springApplication.web api ?
+//        gameMaster.changeStatus(playerId, IBPlayer.Status.READY);                                               // useless in web api ?
 
         return AppUtil.responce200OK();
     }
