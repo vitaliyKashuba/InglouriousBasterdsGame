@@ -15,7 +15,6 @@ export class JqueryUtilService {
   }
 
   scaleIn(elementId: string) {
-    log('scale out' + elementId);
     $('#' + elementId).addClass('scale-in').removeClass('scale-out');
   }
 }

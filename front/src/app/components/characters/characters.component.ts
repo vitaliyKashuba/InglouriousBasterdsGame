@@ -2,6 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {log} from 'util';
 import {HttpRequesterService} from '../../services/http-requester.service';
 import {Teammate} from '../../model/teammate';
+import {JqueryUtilService} from '../../services/jquery-util.service';
 
 @Component({
   selector: 'app-characters',
@@ -15,9 +16,15 @@ export class CharactersComponent implements OnInit {
 
   character: string;
 
-  constructor(private requester: HttpRequesterService) { }
+  sendFormId = 'sendFormId';
+  // teammatesListId = 'teammatesListId';
+
+  constructor(private requester: HttpRequesterService,
+              private jq: JqueryUtilService) { }
 
   ngOnInit() {
+    this.teammates.push(new Teammate('name', 'character'));
+    this.teammates.push(new Teammate('qwerty', '12345r'));
   }
 
   onSendCharacterClick() {
@@ -29,6 +36,8 @@ export class CharactersComponent implements OnInit {
   }
 
   handleSuccess(data: any) {
+    this.jq.scaleOut(this.sendFormId);
+    // this.jq.scaleIn(this.teammatesListId);
     log(data);
   }
 

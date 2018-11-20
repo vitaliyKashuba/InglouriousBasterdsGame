@@ -193,6 +193,7 @@ public class IBGameMaster
     public void startGame(int adminId, GameMode mode)
     {
         // TODO remove not-ready players, because they may be disconnected
+        // TODO check not null character ?
         randomizeCharacters(adminId);
 
         int roomId = getRoomIdByAdminId(adminId);
@@ -212,16 +213,25 @@ public class IBGameMaster
             case LIST:
                 for (IBPlayer p : players)
                 {
-                    List<Teammate> teammates = new ArrayList<>();
+                    Map<String, String> teammates = new HashMap<>();
                     for (IBPlayer pl : players)
                     {
                         if(pl.getId() != p.getId())
                         {
-//                            teammates.put(pl.getName(), pl.getCharacter());
-                            teammates.add(new Teammate(pl.getName(), pl.getCharacter()));
+                            teammates.put(pl.getName(), pl.getCharacter());
                         }
                     }
-                    messageSender.sendMesageToUser(p, AppUtil.toJson(teammates));
+                    switch(p.getClientType())
+                    {
+                        case TELEGRAM:
+                            String resp = AppUtil.convertTeammatesForTelegram(teammates);
+                            messageSender.sendMesageToUser(p, resp);
+                            break;
+                        case WEB:
+                            List<Teammate> tm = AppUtil.convertTeammatesForWebApi(teammates);
+                            messageSender.sendMesageToUser(p, AppUtil.toJson(tm));
+                            break;
+                    }
                 }
                 break;
         }
