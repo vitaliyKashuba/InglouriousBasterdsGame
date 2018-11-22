@@ -1,8 +1,8 @@
 package springApplication.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import springApplication.game.IBGameMaster;
-import springApplication.game.IBPlayer;
+import springApplication.ibGame.IBGameMaster;
+import springApplication.ibGame.IBPlayer;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import util.AppUtil;
 import util.Randomizer;
 
-import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 

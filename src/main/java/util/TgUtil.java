@@ -4,39 +4,83 @@ package util;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class TgUtil
 {
-    public static InlineKeyboardMarkup getStartGameKeyboardMarkup()
+    /**
+     * markup builder
+     * @param buttonsRows list - rows of keyboard markup
+     *                    map - button text: callback
+     * @return markup
+     */
+    private static InlineKeyboardMarkup buildKeyboardMarkup(List<Map<String,String>> buttonsRows)
     {
         InlineKeyboardMarkup inlineKeyboardMarkup =new InlineKeyboardMarkup();
 
-        List<InlineKeyboardButton> keyboardButtonsRow1 = new ArrayList<>();
-        keyboardButtonsRow1.add(new InlineKeyboardButton().setText("Mode 1").setCallbackData("start1"));
-        keyboardButtonsRow1.add(new InlineKeyboardButton().setText("Mode 2").setCallbackData("start2"));
-
         List<List<InlineKeyboardButton>> rowList= new ArrayList<>();
-        rowList.add(keyboardButtonsRow1);
+
+        for (Map<String, String> buttonRow : buttonsRows)
+        {
+            List<InlineKeyboardButton> row = new ArrayList<>();
+
+            for (String buttonText: buttonRow.keySet())
+            {
+                String buttonCallback = buttonRow.get(buttonText);
+                row.add(new InlineKeyboardButton().setText(buttonText).setCallbackData(buttonCallback));
+            }
+
+            rowList.add(row);
+        }
 
         inlineKeyboardMarkup.setKeyboard(rowList);
 
         return inlineKeyboardMarkup;
     }
 
+    private static InlineKeyboardMarkup buildKeyboardMarkup(Map<String, String> buttons)
+    {
+        List<Map<String,String>> lines = new ArrayList<>();
+        lines.add(buttons);
+        return buildKeyboardMarkup(lines);
+    }
+
+    /**
+     * @return markup for select mode of IB game
+     */
+    public static InlineKeyboardMarkup getStartGameKeyboardMarkup()
+    {
+        return buildKeyboardMarkup(new TreeMap<String, String>()
+        {{
+            put("CLASSIC MODE", "start1");
+            put("LIST MODE", "start2");
+        }});
+    }
+
+    /**
+     * @return markup for game selecting
+     */
+    public static InlineKeyboardMarkup getSelectGameKeyboardMarkup()
+    {
+        List<Map<String,String>> lines = new ArrayList<>();
+        lines.add(new TreeMap<String, String>()
+        {{
+            put("Inglorious basterds", "init_ib");
+        }});
+        lines.add(new TreeMap<String, String>()
+        {{
+            put("Spyfall", "init_spyfall");
+            put("Mafia", "init_mafia");
+        }});
+
+        return buildKeyboardMarkup(lines);
+    }
+
     public static InlineKeyboardMarkup getRandomCharacterButtonKeyboardMarkup()
     {
-        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-
-        List<InlineKeyboardButton> keyboardButtonsRow1 = new ArrayList<>();
-        keyboardButtonsRow1.add(new InlineKeyboardButton().setText("Set random character").setCallbackData("random"));
-
-        List<List<InlineKeyboardButton>> rowList= new ArrayList<>();
-        rowList.add(keyboardButtonsRow1);
-
-        inlineKeyboardMarkup.setKeyboard(rowList);
-
-        return inlineKeyboardMarkup;
+        return buildKeyboardMarkup(new TreeMap<String, String>()
+        {{
+            put("Set random character\"", "random");
+        }});
     }
 }

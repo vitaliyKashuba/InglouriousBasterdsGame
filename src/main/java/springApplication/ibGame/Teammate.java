@@ -1,4 +1,4 @@
-package springApplication.game;
+package springApplication.ibGame;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package springApplication.game;
+package springApplication.ibGame;
 
 import lombok.Getter;
 import lombok.Setter;

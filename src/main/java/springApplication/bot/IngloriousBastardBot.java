@@ -1,27 +1,18 @@
 package springApplication.bot;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import springApplication.game.IBGameMaster;
+import springApplication.ibGame.IBGameMaster;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import springApplication.game.IBPlayer;
+import springApplication.ibGame.IBPlayer;
 import util.AppUtil;
-import util.GoogleSearchAPIUtil;
 import util.Randomizer;
 import util.TgUtil;
-
-
-import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Component
 public class IngloriousBastardBot extends TelegramLongPollingBot
@@ -56,13 +47,12 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                 switch(receivedMessage) //TODO add /stats command
                 {
                     case "/start":
-                        gameMaster.addPlayer(new IBPlayer(senderId, senderName, IBPlayer.ClientType.TELEGRAM));
+//                        gameMaster.addPlayer(new IBPlayer(senderId, senderName, IBPlayer.ClientType.TELEGRAM));
                         responceString = "welcome!";
                         break;
                     case "/init":
-                        int room = gameMaster.initGame(senderId, senderName);
-                        gameMaster.changeStatus(senderId, IBPlayer.Status.JOINED);
-                        responceString = "Room " + String.valueOf(room) + " created!\nEnter character";
+                        responceString = "Select game";
+                        inlineKeyboardMarkup = TgUtil.getSelectGameKeyboardMarkup();
                         break;
                     case "/join":
                         gameMaster.addPlayerIfNull(senderId, senderName);
@@ -74,12 +64,9 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         responceString = "help";
                         break;
                     case "/debug":
-                        responceString = Randomizer.getRandomCharacter();
                         System.out.println("/debug");
-//                        inlineKeyboardMarkup = TgUtil.getStartGameKeyboardMarkup();
-//                        String img = GoogleSearchAPIUtil.findImage(responceString);
-//                        sendImageFromUrl(update.getMessage().getChatId(), img, responceString);
-//                        return;
+                        responceString = "Select game";
+                        inlineKeyboardMarkup = TgUtil.getSelectGameKeyboardMarkup();
                         break;
                     default:
                         responceString = "unrecognized command";
@@ -132,43 +119,24 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
         } else {
             if (update.hasCallbackQuery())
             {
-                int senderId = update.getCallbackQuery().getFrom().getId();
+                User sender = update.getCallbackQuery().getFrom();
+                int senderId = sender.getId();
+                String senderName = sender.getFirstName() + " " + sender.getLastName();
+
                 String callback = update.getCallbackQuery().getData();
-//                List<IBPlayer> players = null;
-
-//                if(callback.startsWith("start"))                // TODO move message sending logic to message sender
-//                {
-//                    gameMaster.randomizeCharacters(senderId);
-//                    players = gameMaster.getPlayersByRoomCreator(senderId);
-
-//                    int roomId = gameMaster.getroomIdByAdminId(senderId);
-//                }
 
                 switch(callback)
                 {
                     case "start1":
                         gameMaster.startGame(senderId, IBGameMaster.GameMode.CLASSIC);
-//                        for (IBPlayer p : players)
-//                        {
-//                            String ch = p.getCharacter();
-//                            String img = GoogleSearchAPIUtil.findImage(p.getCharacter());
-////                            sendImageFromUrl(p.getId(), img, ch);                                                       // TODO remake to telegram bots  v 4.1
-//                        }
                         return;
                     case "start2":
                         gameMaster.startGame(senderId, IBGameMaster.GameMode.LIST);
-//                        for (IBPlayer p : players)
-//                        {
-//                            Map<String,String> teammates = new HashMap<>();
-//                            for (IBPlayer pl : players)
-//                            {
-//                                if(pl.getId() != p.getId())
-//                                {
-//                                    teammates.put(pl.getName(), pl.getCharacter());
-//                                }
-//                            }
-//                            sendMsg(p.getId(), teammates.toString());
-//                        }
+                        return;
+                    case "init_ib":
+                        int room = gameMaster.initGame(senderId, senderName);
+                        gameMaster.changeStatus(senderId, IBPlayer.Status.JOINED);
+                        sendMsg(senderId, "Room " + String.valueOf(room) + " created!\nEnter character");
                         return;
                     default:
                         System.out.println("default switch");

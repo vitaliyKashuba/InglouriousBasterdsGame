@@ -1,7 +1,8 @@
-package springApplication.game;
+package springApplication.ibGame;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import springApplication.game.MessageSender;
 import util.AppUtil;
 import util.GoogleSearchAPIUtil;
 import util.Randomizer;
