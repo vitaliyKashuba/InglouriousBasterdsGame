@@ -1,11 +1,11 @@
 package springApplication.ibGame;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import springApplication.game.MessageSender;
+import springApplication.game.BasicGameMaster;
+import springApplication.game.EGame;
+import springApplication.game.Player;
 import util.AppUtil;
 import util.GoogleSearchAPIUtil;
-import util.Randomizer;
 
 import java.util.*;
 
@@ -18,7 +18,7 @@ import java.util.*;
  *
  */
 @Component
-public class IBGameMaster
+public class IBGameMaster extends BasicGameMaster
 {
     /**
      * classic mode - download picture of character, send to player his own character to recognize
@@ -30,142 +30,41 @@ public class IBGameMaster
         CLASSIC, LIST   // TODO change to more obvious enum ?
     }
 
-    @Autowired
-    private MessageSender messageSender;
-
-    private Map<Integer, List<IBPlayer>> rooms; //room id - key, list of players - value
-    private Map<Integer, IBPlayer> players;     //player id - key, player obj - value
-    private Map<Integer, Integer> roomCreators; //admin id - key, room id - value
-
     private IBGameMaster()
     {
-//        messageSender = MessageSender.getInstance();
-
-        rooms = new HashMap<>();
-        players = new HashMap<>();
-        roomCreators = new HashMap<>();
+        super();
 
         rooms.put(1,new ArrayList<>()); // for tests
     }
 
-    /**
-     * create new room and add initiator in it
-     *
-     * @return room number
-     */
-    public int initGame(int initiatorId, String initiatorName)
-    {
-        int roomNumber = newRoom();
-
-        addPlayerIfNull(initiatorId, initiatorName);          // TODO check if possible to init game with player is null ? remove useless addIfNull method call
-        enterRoom(initiatorId, roomNumber);
-
-        removeOldRoomIfExist(initiatorId);
-        roomCreators.put(initiatorId, roomNumber);
-
-        return roomNumber;
+    @Override
+    protected Player newPlayer(int id, String name) {
+        return new Player(id, name, Player.ClientType.TELEGRAM, EGame.INGLORIOUS_BASTERDS);    // TODO fix possible bug if this ever called from web api
     }
 
-    /**
-     * remove old admins room
-     *
-     * @param playerId id of new rood admin
-     */
-    public void removeOldRoomIfExist(int playerId)
+    public void changeStatus(int playerId, Player.IBStatus status)
     {
-        if (roomCreators.containsKey(playerId))
-        {
-            rooms.remove(roomCreators.get(playerId));
-            roomCreators.remove(playerId);
-        }
-    }
-
-    public void changeStatus(int playerId, IBPlayer.Status status)
-    {
-        players.get(playerId).setStatus(status);
-    }
-
-    public void enterRoom(int playerId, int roomId)
-    {
-        if (!rooms.containsKey(roomId))
-        {
-            throw new IllegalArgumentException("no such room");
-        }
-        rooms.get(roomId).add(players.get(playerId));
+        players.get(playerId).setIbStatus(status);
     }
 
     public void setCharacter(int playerId, String character)
     {
-        players.get(playerId).setCharacter(character);
+        players.get(playerId).setIbCharacter(character);
     }
 
-    public void addPlayer(IBPlayer p)
-    {
-        players.put(p.getId(), p);
-    }
+//    /**
+//     * returns list of players in room by creator request
+//     * used in broadcast messages
+//     *
+//     * @see /go in commands parsing
+//     */
+//    public List<IBPlayer> getPlayersByRoomCreator(int id)
+//    {
+//        int room = roomCreators.get(id);
+//
+//        return rooms.get(room);
+//    }
 
-    public IBPlayer getPlayer(int id)
-    {
-        return players.get(id);
-    }
-
-    /**
-     * returns list of players in room by creator request
-     * used in broadcast messages
-     *
-     * @see /go in commands parsing
-     */
-    public List<IBPlayer> getPlayersByRoomCreator(int id)
-    {
-        int room = roomCreators.get(id);
-
-        return rooms.get(room);
-    }
-
-    public boolean isAdmin(int id)
-    {
-        return roomCreators.containsKey(id);
-    }
-
-    /**
-     * @return id of current room created by user
-     */
-    public int getAdminRoomId(int adminId)
-    {
-        return roomCreators.get(adminId);
-    }
-
-    /**
-     * generate unique room id
-     *
-     * //TODO add empty rooms removing
-     */
-    private int newRoom()
-    {
-        int roomNumber;
-        do {
-            roomNumber = Randomizer.getRandomRoomNumber();
-        } while (rooms.keySet().contains(roomNumber));
-
-        rooms.put(roomNumber, new ArrayList<>());
-
-        System.out.println("new room " + roomNumber);
-        return roomNumber;
-    }
-
-    /**
-     * check is player exist, create if not
-     *
-     * it possible if players avoid calling /start method
-     */
-    public void addPlayerIfNull(int id, String name)
-    {
-        IBPlayer p = players.get(id);
-        if (p == null)
-        {
-            addPlayer(new IBPlayer(id, name, IBPlayer.ClientType.TELEGRAM));                                            // TODO fix possible bug if this ever called from web api
-        }
-    }
 
     /**
      * @param roomAdminId id of room admin
@@ -173,20 +72,20 @@ public class IBGameMaster
      *
      *    return room id
      */
-    public void randomizeCharacters(int roomAdminId)
+    private void randomizeCharacters(int roomAdminId)
     {
         int roomId = roomCreators.get(roomAdminId);
-        List<IBPlayer> players = rooms.get(roomId);
+        List<Player> players = rooms.get(roomId);
         int lastIndex = players.size()-1;
-        String firstCharacterBkp = players.get(0).getCharacter();
+        String firstCharacterBkp = players.get(0).getIbCharacter();
         for (int i = 0; i < lastIndex; i++)
         {
-            players.get(i).setCharacter(players.get(i+1).getCharacter());
+            players.get(i).setIbCharacter(players.get(i+1).getIbCharacter());
         }
-        players.get(lastIndex).setCharacter(firstCharacterBkp);
+        players.get(lastIndex).setIbCharacter(firstCharacterBkp);
     }
 
-    public int getRoomIdByAdminId(int adminId)
+    private int getRoomIdByAdminId(int adminId)
     {
         return roomCreators.get(adminId);
     }
@@ -198,28 +97,28 @@ public class IBGameMaster
         randomizeCharacters(adminId);
 
         int roomId = getRoomIdByAdminId(adminId);
-        List<IBPlayer> players = rooms.get(roomId);
+        List<Player> players = rooms.get(roomId);
 
         switch (mode)
         {
             case CLASSIC:
-                for (IBPlayer p : players)
+                for (Player p : players)
                 {
-                    String ch = p.getCharacter();
-                    String img = GoogleSearchAPIUtil.findImage(p.getCharacter());
+                    String ch = p.getIbCharacter();
+                    String img = GoogleSearchAPIUtil.findImage(p.getIbCharacter());
 //                  sendImageFromUrl(p.getId(), img, ch);       // TODO what should be sent to web api ?  // TODO remake to telegram bots  v 4.1
                 }
 //                return;
                 break;
             case LIST:
-                for (IBPlayer p : players)
+                for (Player p : players)
                 {
                     Map<String, String> teammates = new HashMap<>();
-                    for (IBPlayer pl : players)
+                    for (Player pl : players)
                     {
                         if(pl.getId() != p.getId())
                         {
-                            teammates.put(pl.getName(), pl.getCharacter());
+                            teammates.put(pl.getName(), pl.getIbCharacter());
                         }
                     }
                     switch(p.getClientType())
@@ -241,12 +140,12 @@ public class IBGameMaster
     }
 
     /**test for web api*/
-    public List<IBPlayer> getRoom(int id)
+    public List<Player> getRoom(int id)
     {
         return rooms.get(id);
     }
 
     /**test for web api*/
-    public Collection<IBPlayer> getPlayers() {return players.values();}
+    public Collection<Player> getPlayers() {return players.values();}
 
 }

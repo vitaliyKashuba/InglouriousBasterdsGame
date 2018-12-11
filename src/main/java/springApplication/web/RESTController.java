@@ -1,8 +1,9 @@
 package springApplication.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import springApplication.game.EGame;
+import springApplication.game.Player;
 import springApplication.ibGame.IBGameMaster;
-import springApplication.ibGame.IBPlayer;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class RESTController
     public String getRoom(@PathVariable int id)
     {
 //        IBGameMaster gameMaster = IBGameMaster.getInstance();
-        List<IBPlayer> players = gameMaster.getRoom(id);
+        List<Player> players = gameMaster.getRoom(id);
         return AppUtil.toJson(players);
     }
 
@@ -50,7 +51,7 @@ public class RESTController
         int playerId = Randomizer.getRandomPlayerId();
 
         System.out.println(playerId + " " + playerName);
-        gameMaster.addPlayer(new IBPlayer(playerId, playerName, IBPlayer.ClientType.WEB));
+        gameMaster.addPlayer(new Player(playerId, playerName, Player.ClientType.WEB, EGame.INGLORIOUS_BASTERDS));   // TODO get game type from room keeper
 
 //        gameMaster.changeStatus(playerId, IBPlayer.Status.JOINREQUEST);                                               // useless in springApplication.web api ?
 //        gameMaster.removeOldRoomIfExist(playerId);                                                                    // useless in springApplication.web api ?

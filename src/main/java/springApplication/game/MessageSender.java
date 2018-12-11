@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import springApplication.bot.IngloriousBastardBot;
-import springApplication.ibGame.IBPlayer;
 
 @Service
 public class MessageSender
@@ -20,7 +19,7 @@ public class MessageSender
         template.convertAndSend("/topic/reply/" + roomId, message);
     }
 
-    public void sendMesageToUser(IBPlayer reciever, String message)
+    public void sendMesageToUser(Player reciever, String message)
     {
         switch(reciever.getClientType())
         {
