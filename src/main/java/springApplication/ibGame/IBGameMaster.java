@@ -37,34 +37,10 @@ public class IBGameMaster extends BasicGameMaster
         rooms.put(1,new ArrayList<>()); // for tests
     }
 
-    @Override
-    protected Player newPlayer(int id, String name) {
-        return new Player(id, name, Player.ClientType.TELEGRAM, EGame.INGLORIOUS_BASTERDS);    // TODO fix possible bug if this ever called from web api
-    }
-
-    public void changeStatus(int playerId, Player.IBStatus status)
-    {
-        players.get(playerId).setIbStatus(status);
-    }
-
     public void setCharacter(int playerId, String character)
     {
         players.get(playerId).setIbCharacter(character);
     }
-
-//    /**
-//     * returns list of players in room by creator request
-//     * used in broadcast messages
-//     *
-//     * @see /go in commands parsing
-//     */
-//    public List<IBPlayer> getPlayersByRoomCreator(int id)
-//    {
-//        int room = roomCreators.get(id);
-//
-//        return rooms.get(room);
-//    }
-
 
     /**
      * @param roomAdminId id of room admin

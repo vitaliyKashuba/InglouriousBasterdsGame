@@ -81,14 +81,9 @@ public abstract class BasicGameMaster {
         Player p = players.get(id);
         if (p == null)
         {
-            addPlayer(newPlayer(id, name));
+            addPlayer(new Player(id, name, Player.ClientType.TELEGRAM));
         }
     }
-
-    /**
-     * need to be overrided in game masters to set player type by game master
-     */
-    protected abstract Player newPlayer(int id, String name);
 
     public void enterRoom(int playerId, int roomId)
     {
@@ -134,6 +129,13 @@ public abstract class BasicGameMaster {
     public int getAdminRoomId(int adminId)
     {
         return roomCreators.get(adminId);
+    }
+
+    public void join(int playerId, String playerName, int roomId)
+    {
+        addPlayerIfNull(playerId, playerName);
+        removeOldRoomIfExist(playerId);
+        enterRoom(playerId, roomId);
     }
 
 //    public abstract void startGame();

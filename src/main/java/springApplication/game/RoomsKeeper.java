@@ -1,6 +1,9 @@
 package springApplication.game;
 
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import springApplication.ibGame.IBGameMaster;
 import util.Randomizer;
 
 import java.util.HashMap;
@@ -15,7 +18,10 @@ import java.util.Map;
 public class RoomsKeeper
 {
 
-    private Map<Integer, EGame> rooms;
+    @Autowired
+    private IBGameMaster ibGameMaster;
+
+    private Map<Integer, EGame> rooms;  // key - room id, value - game
 
     RoomsKeeper()
     {
@@ -35,5 +41,14 @@ public class RoomsKeeper
         rooms.put(roomNumber, game);
 
         return roomNumber;
+    }
+
+    public EGame getGameByRoomId(int roomId)
+    {
+        if (!rooms.containsKey(roomId))
+        {
+            throw new IllegalArgumentException("no such room");
+        }
+        return rooms.get(roomId);
     }
 }

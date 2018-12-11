@@ -16,9 +16,4 @@ public class SpyfallGameMaster extends BasicGameMaster
 
         rooms.put(2,new ArrayList<>()); // for tests
     }
-
-    @Override
-    protected Player newPlayer(int id, String name) {
-        return new Player(id, name, Player.ClientType.TELEGRAM, EGame.SPYFALL);
-    }
 }

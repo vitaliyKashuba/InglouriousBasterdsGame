@@ -7,7 +7,9 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import springApplication.game.EGame;
 import springApplication.game.Player;
+import springApplication.game.RoomsKeeper;
 import springApplication.ibGame.IBGameMaster;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import util.AppUtil;
@@ -16,6 +18,12 @@ import util.TgUtil;
 @Component
 public class IngloriousBastardBot extends TelegramLongPollingBot
 {
+    @Autowired
+    private RoomsKeeper roomsKeeper;
+
+    @Autowired
+    private UserStateSaver stateSaver;
+
     @Autowired
     private IBGameMaster ibGameMaster;
 
@@ -54,11 +62,12 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         break;
                     case "/join":
                         //TODO
-                        // get game type from room keeper
                         // add somewhere ?
-                        ibGameMaster.addPlayerIfNull(senderId, senderName);
-                        ibGameMaster.changeStatus(senderId, Player.IBStatus.JOINREQUEST);
-                        ibGameMaster.removeOldRoomIfExist(senderId);
+                        stateSaver.setStatus(senderId, UserStateSaver.Status.JOINREQUEST);
+
+//                        ibGameMaster.addPlayerIfNull(senderId, senderName);
+//                        ibGameMaster.changeStatus(senderId, Player.IBStatus.JOINREQUEST);
+//                        ibGameMaster.removeOldRoomIfExist(senderId);
                         responceString = "enter room number";
                         break;
                     case "/help":
@@ -77,16 +86,25 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
             } else
             {
                 //TODO separate games
-                Player player = ibGameMaster.getPlayer(senderId);
-                switch (player.getIbStatus())
+                switch (stateSaver.getStatus(senderId))
                 {
-                    case NONE:
+                    case NEW_PLAYER:
                         responceString = "use commands /";
                         break;
-                    case JOINREQUEST:   // TODO get game type from room keeper
+                    case JOINREQUEST:
                         try
                         {
-                            ibGameMaster.enterRoom(senderId, Integer.parseInt(receivedMessage));
+                            int roomToJoin = Integer.parseInt(receivedMessage);
+                            switch(roomsKeeper.getGameByRoomId(roomToJoin))
+                            {
+                                case INGLORIOUS_BASTERDS:
+                                    ibGameMaster.join(senderId, senderName, roomToJoin);
+                                    stateSaver.setPlayersGame(senderId, EGame.INGLORIOUS_BASTERDS);
+                                    break;
+                                case SPYFALL:
+                                    // TODO
+                                    break;
+                            }
                         } catch (NumberFormatException e)
                         {
                             responceString = "Enter valid room number";
@@ -96,19 +114,27 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                             responceString = "Room not exist";
                             break;
                         }
-                        ibGameMaster.changeStatus(senderId, Player.IBStatus.JOINED);
+                        stateSaver.setStatus(senderId, UserStateSaver.Status.JOINED);
                         responceString = "enter character";
                         break;
-                    case JOINED:
-                        ibGameMaster.setCharacter(senderId, receivedMessage);
-                        ibGameMaster.changeStatus(senderId, Player.IBStatus.READY);
-                        responceString = "waiting for party ready";
-                        if (ibGameMaster.isAdmin(senderId))
+                    case JOINED:    // TODO get game type from room keeper
+                        switch(stateSaver.getPlayersGame(senderId))
                         {
-                            int adminRoomId = ibGameMaster.getAdminRoomId(senderId);
-                            responceString += ("\nSelect mode to start game for room " + String.valueOf(adminRoomId));
-                            inlineKeyboardMarkup = TgUtil.getStartGameKeyboardMarkup();
+                            case INGLORIOUS_BASTERDS:
+                                ibGameMaster.setCharacter(senderId, receivedMessage);
+                                responceString = "waiting for party ready";
+                                if (ibGameMaster.isAdmin(senderId))
+                                {
+                                    int adminRoomId = ibGameMaster.getAdminRoomId(senderId);
+                                    responceString += ("\nSelect mode to start game for room " + adminRoomId);
+                                    inlineKeyboardMarkup = TgUtil.getStartGameKeyboardMarkup();
+                                }
+                                break;
+                            case SPYFALL:
+                                //TODO
+                                break;
                         }
+                        stateSaver.setStatus(senderId, UserStateSaver.Status.READY);
                         break;
                 }
             }
@@ -137,7 +163,8 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         return;
                     case "init_ib":
                         int room = ibGameMaster.initGame(senderId, senderName);
-                        ibGameMaster.changeStatus(senderId, Player.IBStatus.JOINED);
+                        stateSaver.setPlayersGame(senderId, EGame.INGLORIOUS_BASTERDS);
+                        stateSaver.setStatus(senderId, UserStateSaver.Status.JOINED);
                         sendMsg(senderId, "Room " + room + " created!\nEnter character");
                         return;
                     case "init_spyfall":
