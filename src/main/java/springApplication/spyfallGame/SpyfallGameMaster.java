@@ -14,10 +14,14 @@ import java.util.*;
 @Component
 public class SpyfallGameMaster extends BasicGameMaster
 {
-    private Map<String, List<String>> locationsAndRoles;   // key - location,
+    private Map<String, List<String>> locationsAndRoles;   // key - location, value - roles
+    private Map<Integer, Integer> roomLocationsLimit;// key - room id, value - limit
+
     private SpyfallGameMaster()
     {
         super();
+
+        roomLocationsLimit = new HashMap<>();
 
         rooms.put(2,new ArrayList<>()); // for tests
 
@@ -43,7 +47,19 @@ public class SpyfallGameMaster extends BasicGameMaster
 
         Player spy = Randomizer.getRandomElement(players);
 
-        String location = Randomizer.getRandomElement(locationsAndRoles.keySet());
+        List<String> locations = new ArrayList<>(locationsAndRoles.keySet());
+
+        String location;
+        if (roomLocationsLimit.containsKey(roomId))
+        {
+            Randomizer.shufle(locations);
+            List<String> l = new ArrayList<>(locations);
+            locations = l.subList(0, roomLocationsLimit.get(roomId));
+            location = Randomizer.getRandomElement(l);
+        } else
+        {
+            location = Randomizer.getRandomElement(locations);
+        }
 
         List<String> rls = locationsAndRoles.get(location);
         Randomizer.shufle(rls);
@@ -52,7 +68,7 @@ public class SpyfallGameMaster extends BasicGameMaster
 
         for (Player p : players)    // TODO send img with location ?
         {
-            messageSender.sendMesageToUser(p, Convertor.convertLocationsForTelegram(locationsAndRoles.keySet()));
+            messageSender.sendMesageToUser(p, Convertor.convertLocationsForTelegram(locations));
             if (p.equals(spy))
             {
                 messageSender.sendMesageToUser(p, "SPY");
@@ -68,4 +84,19 @@ public class SpyfallGameMaster extends BasicGameMaster
         }
     }
 
+    public void setLocationsLimit(int adminId, int limit)
+    {
+        if(limit < 5)
+        {
+            throw new IllegalArgumentException("too small limit");
+        }
+
+        if(limit > locationsAndRoles.keySet().size())
+        {
+            limit = locationsAndRoles.keySet().size();
+        }
+
+        int roomId = getRoomIdByAdminId(adminId);
+        roomLocationsLimit.put(roomId, limit);
+    }
 }

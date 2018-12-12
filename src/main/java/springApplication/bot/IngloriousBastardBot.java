@@ -133,9 +133,24 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                             case SPYFALL:
                                 if (spyfallGameMaster.isAdmin(senderId))
                                 {
-                                    // TODO delimit rooms
+                                    try
+                                    {
+                                        int limit = Integer.parseInt(receivedMessage);
+                                        spyfallGameMaster.setLocationsLimit(senderId, limit);
+                                    } catch (NumberFormatException e)
+                                    {
+                                        responceString = "Enter valid number";
+                                        break;
+                                    } catch (IllegalArgumentException e)
+                                    {
+                                        responceString = "limit too small to apply";
+                                        break;
+                                    }
+                                    responceString = "locations limit set";
+                                } else
+                                {
+                                    responceString = "waiting for game start";
                                 }
-                                responceString = "waiting for game start";
                                 break;
                         }
                         stateSaver.setStatus(senderId, UserStateSaver.Status.READY);
@@ -176,7 +191,9 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         room = spyfallGameMaster.initGame(senderId, senderName);
                         stateSaver.setPlayersGame(senderId, EGame.SPYFALL);
                         stateSaver.setStatus(senderId, UserStateSaver.Status.JOINED);
-                        String message = "Room " + room + " created!\nWait for party and press start button to start\n you can delimit locations by entering number";
+                        String message = "Room " + room + " created!\n" +
+                                "Wait for party and press start button to start\n" +
+                                "You can delimit locations by entering number";
                         InlineKeyboardMarkup inlineKeyboardMarkup = TgUtil.getStartSpyfallKeyboardMarkup();
                         sendMsg(senderId, message, inlineKeyboardMarkup);
                         break;
