@@ -82,9 +82,8 @@ public class IBGameMaster extends BasicGameMaster
                 {
                     String ch = p.getIbCharacter();
                     String img = GoogleSearchAPIUtil.findImage(p.getIbCharacter());
-//                  sendImageFromUrl(p.getId(), img, ch);       // TODO what should be sent to web api ?  // TODO remake to telegram bots  v 4.1
+                    messageSender.sendImageFromUrl(p, img, ch);
                 }
-//                return;
                 break;
             case LIST:
                 for (Player p : players)

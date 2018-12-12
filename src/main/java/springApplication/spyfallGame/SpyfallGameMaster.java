@@ -49,25 +49,22 @@ public class SpyfallGameMaster extends BasicGameMaster
         Stack<String> roles = new Stack<>();
         roles.addAll(rls);
 
-        for (Player p : players)
+        for (Player p : players)    // TODO send img with location ?
         {
+            messageSender.sendMesageToUser(p, AppUtil.toJson(locationsAndRoles.keySet()));
             if (p.equals(spy))
             {
-                p.setIbCharacter("SPY");
-                //send msg
+                messageSender.sendMesageToUser(p, "SPY");
             } else
             {
-                if (roles.empty())
+                messageSender.sendMesageToUser(p, "Location:" + location);
+
+                if (!roles.empty())
                 {
-                    p.setIbCharacter("NULL");
-                } else {
-                    p.setIbCharacter(roles.pop());
+                    messageSender.sendMesageToUser(p, "Role:" + roles.pop());
                 }
-                //sen msg
             }
         }
-
-        //send location-roles to players
     }
 
 }

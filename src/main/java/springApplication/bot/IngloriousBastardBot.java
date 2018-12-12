@@ -3,6 +3,7 @@ package springApplication.bot;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -13,6 +14,7 @@ import springApplication.ibGame.IBGameMaster;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import springApplication.spyfallGame.SpyfallGameMaster;
 import util.AppUtil;
+import util.GoogleSearchAPIUtil;
 import util.TgUtil;
 
 @Component
@@ -72,8 +74,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         break;
                     case "/debug":
                         System.out.println("/debug");
-                        responceString = "Select game";
-                        inlineKeyboardMarkup = TgUtil.getSelectGameKeyboardMarkup();
+                        sendImageFromUrl(senderId, GoogleSearchAPIUtil.findImage("darth vader"));
                         break;
                     default:
                         responceString = "unrecognized command";
@@ -82,7 +83,6 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
 
             } else
             {
-                //TODO separate games
                 switch (stateSaver.getStatus(senderId))
                 {
                     case NEW_PLAYER:
@@ -97,10 +97,14 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                                 case INGLORIOUS_BASTERDS:
                                     ibGameMaster.join(senderId, senderName, roomToJoin);
                                     stateSaver.setPlayersGame(senderId, EGame.INGLORIOUS_BASTERDS);
+                                    stateSaver.setStatus(senderId, UserStateSaver.Status.JOINED);
+                                    responceString = "enter character";
                                     break;
                                 case SPYFALL:
                                     spyfallGameMaster.join(senderId, senderName, roomToJoin);
                                     stateSaver.setPlayersGame(senderId, EGame.SPYFALL);
+                                    stateSaver.setStatus(senderId, UserStateSaver.Status.JOINED);
+                                    responceString = "waiting for game start";
                                     break;
                             }
                         } catch (NumberFormatException e)
@@ -112,8 +116,6 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                             responceString = "Room not exist";
                             break;
                         }
-                        stateSaver.setStatus(senderId, UserStateSaver.Status.JOINED);
-                        responceString = "enter character";
                         break;
                     case JOINED:    // TODO get game type from room keeper
                         switch(stateSaver.getPlayersGame(senderId))
@@ -175,7 +177,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         sendMsg(senderId, message, inlineKeyboardMarkup);
                         break;
                     case "start_spyfall":
-                        //TODO start spyfall
+                        spyfallGameMaster.startGame(senderId);
                         break;
                     default:
                         System.out.println("default switch, smth wrong");
@@ -211,22 +213,27 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
         }
     }
 
-//    private void sendImageFromUrl(long chatId, String imgUrl, String caption) {
-//        SendPhoto sendPhotoRequest = new SendPhoto()
-//                .setChatId(chatId)
-//                .setPhoto(imgUrl);
-//        if (caption != null)
-//        {
-//            sendPhotoRequest.setCaption(caption);
-//        }
-//        try
-//        {
-//            sendPhoto(sendPhotoRequest);
-//        } catch (TelegramApiException e)
-//        {
-//            e.printStackTrace();
-//        }
-//    }
+    public void sendImageFromUrl(int chatId, String url)
+    {
+        sendImageFromUrl(chatId, url, null);
+    }
+
+    public void sendImageFromUrl(int chatId, String url, String caption) {
+        SendPhoto sendPhotoRequest = new SendPhoto()
+                .setChatId(String.valueOf(chatId))
+                .setPhoto(url);
+        if (caption != null)
+        {
+            sendPhotoRequest.setCaption(caption);
+        }
+        try
+        {
+            execute(sendPhotoRequest);
+        } catch (TelegramApiException e)
+        {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public String getBotUsername()

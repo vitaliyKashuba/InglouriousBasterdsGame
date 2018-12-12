@@ -32,4 +32,16 @@ public class MessageSender
         }
     }
 
+    public void sendImageFromUrl(Player reciever, String imgUrl, String msg)
+    {
+        switch(reciever.getClientType())
+        {
+            case TELEGRAM:
+                bot.sendImageFromUrl(reciever.getId(), imgUrl, msg);
+                break;
+            case WEB:
+                break;//TODO should be sent to web users?
+        }
+    }
+
 }
