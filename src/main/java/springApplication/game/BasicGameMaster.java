@@ -3,6 +3,7 @@ package springApplication.game;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import springApplication.ibGame.IBGameMaster;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,6 +40,11 @@ public abstract class BasicGameMaster {
         int roomNumber = roomsKeeper.newRoom(game);
         rooms.put(roomNumber, new ArrayList<>());
         return roomNumber;
+    }
+
+    protected int getRoomIdByAdminId(int adminId)
+    {
+        return roomCreators.get(adminId);
     }
 
     /**
@@ -138,5 +144,9 @@ public abstract class BasicGameMaster {
         enterRoom(playerId, roomId);
     }
 
-//    public abstract void startGame();
+    /**
+     * start game for admin's room
+     * @param adminId
+     */
+    public abstract void startGame(int adminId);
 }

@@ -61,11 +61,11 @@ public class IBGameMaster extends BasicGameMaster
         players.get(lastIndex).setIbCharacter(firstCharacterBkp);
     }
 
-    private int getRoomIdByAdminId(int adminId)
+    @Override
+    public void startGame(int adminId)  // probably should never call
     {
-        return roomCreators.get(adminId);
+        startGame(adminId, GameMode.LIST);
     }
-
     public void startGame(int adminId, GameMode mode)
     {
         // TODO remove not-ready players, because they may be disconnected

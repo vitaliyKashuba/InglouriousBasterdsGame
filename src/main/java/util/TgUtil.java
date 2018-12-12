@@ -48,12 +48,23 @@ public class TgUtil
     /**
      * @return markup for select mode of IB game
      */
-    public static InlineKeyboardMarkup getStartGameKeyboardMarkup()
+    public static InlineKeyboardMarkup getStartIBKeyboardMarkup()
     {
         return buildKeyboardMarkup(new TreeMap<String, String>()
         {{
             put("CLASSIC MODE", "start1");
             put("LIST MODE", "start2");
+        }});
+    }
+
+    /**
+     * @return markup to start spyfall game
+     */
+    public static InlineKeyboardMarkup getStartSpyfallKeyboardMarkup()
+    {
+        return buildKeyboardMarkup(new TreeMap<String, String>()
+        {{
+            put("START", "start_spyfall");
         }});
     }
 

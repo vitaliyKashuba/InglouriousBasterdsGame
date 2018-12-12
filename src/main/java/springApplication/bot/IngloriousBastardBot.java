@@ -8,10 +8,10 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import springApplication.game.EGame;
-import springApplication.game.Player;
 import springApplication.game.RoomsKeeper;
 import springApplication.ibGame.IBGameMaster;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import springApplication.spyfallGame.SpyfallGameMaster;
 import util.AppUtil;
 import util.TgUtil;
 
@@ -26,6 +26,9 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
 
     @Autowired
     private IBGameMaster ibGameMaster;
+
+    @Autowired
+    private SpyfallGameMaster spyfallGameMaster;
 
     private String botToken;
 
@@ -61,13 +64,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         inlineKeyboardMarkup = TgUtil.getSelectGameKeyboardMarkup();
                         break;
                     case "/join":
-                        //TODO
-                        // add somewhere ?
                         stateSaver.setStatus(senderId, UserStateSaver.Status.JOINREQUEST);
-
-//                        ibGameMaster.addPlayerIfNull(senderId, senderName);
-//                        ibGameMaster.changeStatus(senderId, Player.IBStatus.JOINREQUEST);
-//                        ibGameMaster.removeOldRoomIfExist(senderId);
                         responceString = "enter room number";
                         break;
                     case "/help":
@@ -102,7 +99,8 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                                     stateSaver.setPlayersGame(senderId, EGame.INGLORIOUS_BASTERDS);
                                     break;
                                 case SPYFALL:
-                                    // TODO
+                                    spyfallGameMaster.join(senderId, senderName, roomToJoin);
+                                    stateSaver.setPlayersGame(senderId, EGame.SPYFALL);
                                     break;
                             }
                         } catch (NumberFormatException e)
@@ -127,11 +125,11 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                                 {
                                     int adminRoomId = ibGameMaster.getAdminRoomId(senderId);
                                     responceString += ("\nSelect mode to start game for room " + adminRoomId);
-                                    inlineKeyboardMarkup = TgUtil.getStartGameKeyboardMarkup();
+                                    inlineKeyboardMarkup = TgUtil.getStartIBKeyboardMarkup();
                                 }
                                 break;
                             case SPYFALL:
-                                //TODO
+                                responceString = "waiting for game start";
                                 break;
                         }
                         stateSaver.setStatus(senderId, UserStateSaver.Status.READY);
@@ -157,20 +155,30 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                 {
                     case "start1":  // start ib game in classic mode
                         ibGameMaster.startGame(senderId, IBGameMaster.GameMode.CLASSIC);
-                        return;
+                        break;
                     case "start2":  // start ib in list mode
                         ibGameMaster.startGame(senderId, IBGameMaster.GameMode.LIST);
-                        return;
+                        break;
                     case "init_ib":
                         int room = ibGameMaster.initGame(senderId, senderName);
                         stateSaver.setPlayersGame(senderId, EGame.INGLORIOUS_BASTERDS);
                         stateSaver.setStatus(senderId, UserStateSaver.Status.JOINED);
                         sendMsg(senderId, "Room " + room + " created!\nEnter character");
-                        return;
+                        break;
                     case "init_spyfall":
-                        // TODO init spyfall
+                        System.out.println("init spyfall");
+                        room = spyfallGameMaster.initGame(senderId, senderName);
+                        stateSaver.setPlayersGame(senderId, EGame.SPYFALL);
+                        stateSaver.setStatus(senderId, UserStateSaver.Status.JOINED);
+                        String message = "Room " + room + " created!\nWait for party and press start button to start";
+                        InlineKeyboardMarkup inlineKeyboardMarkup = TgUtil.getStartSpyfallKeyboardMarkup();
+                        sendMsg(senderId, message, inlineKeyboardMarkup);
+                        break;
+                    case "start_spyfall":
+                        //TODO start spyfall
+                        break;
                     default:
-                        System.out.println("default switch");
+                        System.out.println("default switch, smth wrong");
                         break;
 
                 }
