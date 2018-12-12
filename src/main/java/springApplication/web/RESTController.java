@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import util.AppUtil;
+import util.Convertor;
 import util.Randomizer;
 
 import java.util.HashMap;
@@ -31,14 +32,14 @@ public class RESTController
     {
 //        IBGameMaster gameMaster = IBGameMaster.getInstance();
         List<Player> players = gameMaster.getRoom(id);
-        return AppUtil.toJson(players);
+        return Convertor.toJson(players);
     }
 
     /**test*/
     @RequestMapping("players")
     public String getPlayers()
     {
-        return AppUtil.toJson(gameMaster.getPlayers());
+        return Convertor.toJson(gameMaster.getPlayers());
     }
 
 
@@ -69,7 +70,7 @@ public class RESTController
 
         HashMap<String, Integer> resp = new HashMap<>();
         resp.put("id", playerId);
-        return new ResponseEntity<>(AppUtil.toJson(resp),HttpStatus.OK);
+        return new ResponseEntity<>(Convertor.toJson(resp),HttpStatus.OK);
     }
 
     @CrossOrigin

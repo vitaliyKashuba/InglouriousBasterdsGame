@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import springApplication.game.BasicGameMaster;
 import springApplication.game.Player;
 import util.AppUtil;
+import util.Convertor;
 import util.Randomizer;
 
 import java.io.*;
@@ -51,7 +52,7 @@ public class SpyfallGameMaster extends BasicGameMaster
 
         for (Player p : players)    // TODO send img with location ?
         {
-            messageSender.sendMesageToUser(p, AppUtil.toJson(locationsAndRoles.keySet()));
+            messageSender.sendMesageToUser(p, Convertor.convertLocationsForTelegram(locationsAndRoles.keySet()));
             if (p.equals(spy))
             {
                 messageSender.sendMesageToUser(p, "SPY");

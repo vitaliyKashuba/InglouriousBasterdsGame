@@ -117,7 +117,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                             break;
                         }
                         break;
-                    case JOINED:    // TODO get game type from room keeper
+                    case JOINED:
                         switch(stateSaver.getPlayersGame(senderId))
                         {
                             case INGLORIOUS_BASTERDS:
@@ -131,6 +131,10 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                                 }
                                 break;
                             case SPYFALL:
+                                if (spyfallGameMaster.isAdmin(senderId))
+                                {
+                                    // TODO delimit rooms
+                                }
                                 responceString = "waiting for game start";
                                 break;
                         }
@@ -172,7 +176,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         room = spyfallGameMaster.initGame(senderId, senderName);
                         stateSaver.setPlayersGame(senderId, EGame.SPYFALL);
                         stateSaver.setStatus(senderId, UserStateSaver.Status.JOINED);
-                        String message = "Room " + room + " created!\nWait for party and press start button to start";
+                        String message = "Room " + room + " created!\nWait for party and press start button to start\n you can delimit locations by entering number";
                         InlineKeyboardMarkup inlineKeyboardMarkup = TgUtil.getStartSpyfallKeyboardMarkup();
                         sendMsg(senderId, message, inlineKeyboardMarkup);
                         break;

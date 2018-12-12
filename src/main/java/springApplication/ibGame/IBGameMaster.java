@@ -5,6 +5,7 @@ import springApplication.game.BasicGameMaster;
 import springApplication.game.EGame;
 import springApplication.game.Player;
 import util.AppUtil;
+import util.Convertor;
 import util.GoogleSearchAPIUtil;
 
 import java.util.*;
@@ -99,12 +100,12 @@ public class IBGameMaster extends BasicGameMaster
                     switch(p.getClientType())
                     {
                         case TELEGRAM:
-                            String resp = AppUtil.convertTeammatesForTelegram(teammates);
+                            String resp = Convertor.convertTeammatesForTelegram(teammates);
                             messageSender.sendMesageToUser(p, resp);
                             break;
                         case WEB:
-                            List<Teammate> tm = AppUtil.convertTeammatesForWebApi(teammates);
-                            messageSender.sendMesageToUser(p, AppUtil.toJson(tm));
+                            List<Teammate> tm = Convertor.convertTeammatesForWebApi(teammates);
+                            messageSender.sendMesageToUser(p, Convertor.toJson(tm));
                             break;
                     }
                 }
