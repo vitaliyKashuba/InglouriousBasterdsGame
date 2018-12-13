@@ -35,6 +35,8 @@ public class SpyfallGameMaster extends BasicGameMaster
         } catch (FileNotFoundException e)
         {
             System.out.println("smth wrong with file"); //TODO add some error message if can't init ?
+            System.out.println("classpath:");
+            AppUtil.printClasspath();
             e.printStackTrace();
         } catch (IOException e)
         {
