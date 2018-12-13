@@ -1,16 +1,16 @@
 package springApplication.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import springApplication.game.IBGameMaster;
-import springApplication.game.IBPlayer;
+import springApplication.game.Player;
+import springApplication.ibGame.IBGameMaster;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import util.AppUtil;
+import util.Convertor;
 import util.Randomizer;
 
-import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 
@@ -30,15 +30,15 @@ public class RESTController
     public String getRoom(@PathVariable int id)
     {
 //        IBGameMaster gameMaster = IBGameMaster.getInstance();
-        List<IBPlayer> players = gameMaster.getRoom(id);
-        return AppUtil.toJson(players);
+        List<Player> players = gameMaster.getRoom(id);
+        return Convertor.toJson(players);
     }
 
     /**test*/
     @RequestMapping("players")
     public String getPlayers()
     {
-        return AppUtil.toJson(gameMaster.getPlayers());
+        return Convertor.toJson(gameMaster.getPlayers());
     }
 
 
@@ -51,7 +51,7 @@ public class RESTController
         int playerId = Randomizer.getRandomPlayerId();
 
         System.out.println(playerId + " " + playerName);
-        gameMaster.addPlayer(new IBPlayer(playerId, playerName, IBPlayer.ClientType.WEB));
+        gameMaster.addPlayer(new Player(playerId, playerName, Player.ClientType.WEB));   // TODO get game type from room keeper
 
 //        gameMaster.changeStatus(playerId, IBPlayer.Status.JOINREQUEST);                                               // useless in springApplication.web api ?
 //        gameMaster.removeOldRoomIfExist(playerId);                                                                    // useless in springApplication.web api ?
@@ -69,7 +69,7 @@ public class RESTController
 
         HashMap<String, Integer> resp = new HashMap<>();
         resp.put("id", playerId);
-        return new ResponseEntity<>(AppUtil.toJson(resp),HttpStatus.OK);
+        return new ResponseEntity<>(Convertor.toJson(resp),HttpStatus.OK);
     }
 
     @CrossOrigin

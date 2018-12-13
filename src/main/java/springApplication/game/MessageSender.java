@@ -5,6 +5,9 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import springApplication.bot.IngloriousBastardBot;
 
+/**
+ * used to send messages to players without holding on their client
+ */
 @Service
 public class MessageSender
 {
@@ -14,12 +17,15 @@ public class MessageSender
     @Autowired
     private SimpMessagingTemplate template;
 
+    /**
+     * send broadcast message to web api client players
+     */
     public void sendBroadcast(String message, int roomId)
     {
         template.convertAndSend("/topic/reply/" + roomId, message);
     }
 
-    public void sendMesageToUser(IBPlayer reciever, String message)
+    public void sendMesageToUser(Player reciever, String message)
     {
         switch(reciever.getClientType())
         {
@@ -29,6 +35,18 @@ public class MessageSender
             case WEB:
                 template.convertAndSendToUser(reciever.getWebPrincipal(), "/topic/reply", "teammates"+message);
                 break;
+        }
+    }
+
+    public void sendImageFromUrl(Player reciever, String imgUrl, String msg)
+    {
+        switch(reciever.getClientType())
+        {
+            case TELEGRAM:
+                bot.sendImageFromUrl(reciever.getId(), imgUrl, msg);
+                break;
+            case WEB:
+                break;//TODO should be sent to web users?
         }
     }
 

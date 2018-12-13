@@ -1,19 +1,18 @@
 package util;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import springApplication.game.Teammate;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Map;
 
 public class AppUtil
 {
-    private static Map<String, String> env;
+    private final static Map<String, String> env;
 
     static
     {
@@ -30,36 +29,34 @@ public class AppUtil
         return variable;
     }
 
-    @SneakyThrows   // probably impossible to catch JsonProcessingException while converting to json
-    public static String toJson(Object o)
+    @NotNull
+    @Contract("_ -> new")
+    public static File loadFileFromResources(String path) throws FileNotFoundException
     {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.writeValueAsString(o);
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        URL url = classLoader.getResource(path);
+        if(url == null)
+        {
+            throw new FileNotFoundException("file not found");
+        }
+        return new File(url.getFile());
+    }
+
+    /**for debug*/
+    public static void printClasspath()
+    {
+        ClassLoader cl = ClassLoader.getSystemClassLoader();
+
+        URL[] urls = ((URLClassLoader)cl).getURLs();
+
+        for(URL url: urls){
+            System.out.println(url.getFile());
+        }
     }
 
     public static ResponseEntity responce200OK()
     {
         return new ResponseEntity(HttpStatus.OK);
-    }
-
-    public static List<Teammate> convertTeammatesForWebApi(Map<String, String> teammates)
-    {
-        List<Teammate> tm = new ArrayList<>();
-        for(String name : teammates.keySet())
-        {
-            tm.add(new Teammate(name, teammates.get(name)));
-        }
-        return tm;
-    }
-
-    public static String convertTeammatesForTelegram(Map<String, String> teammates)
-    {
-        StringBuilder sb = new StringBuilder();
-        for(String name : teammates.keySet())
-        {
-            sb.append(name).append(" - ").append(teammates.get(name)).append("\n");
-        }
-        return sb.toString();
     }
 
 }

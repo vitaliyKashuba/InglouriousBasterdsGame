@@ -1,15 +1,14 @@
 package util;
 
 import com.github.javafaker.Faker;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Randomizer
 {
-    private static Random random;
-    private static Faker faker;
+    private static final Random random;
+    private static final Faker faker;
 
     static {
         random = new Random();
@@ -26,12 +25,24 @@ public class Randomizer
         return random.nextInt(upperBound);
     }
 
-    public static String getRandomElement(List<String> list)
+    @NotNull
+    public static <T> T getRandomElement(@NotNull Collection<T> list)
     {
-        return list.get(getRandomIndex(list.size()));
+        return list.stream().skip(getRandomIndex(list.size())).findFirst().get();
     }
 
-    public static String getRandomCharacter()
+    public static <T> void shuffle(@NotNull Collection<T> list)
+    {
+        for(int i = 0; i < list.size() * 2; i++)
+        {
+            T el = list.stream().skip(getRandomIndex(list.size())).findFirst().get();
+            list.remove(el);
+            list.add(el);
+        }
+    }
+
+    @NotNull
+    public static String getRandomIBCharacter()
     {
         ArrayList<String> ch = new ArrayList<>();
         ch.add(faker.lordOfTheRings().character() + " (LOTR)");
