@@ -1,7 +1,6 @@
 package springApplication.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import springApplication.game.EGame;
 import springApplication.game.Player;
 import springApplication.ibGame.IBGameMaster;
 import org.json.JSONObject;

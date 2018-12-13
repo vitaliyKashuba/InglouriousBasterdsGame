@@ -1,5 +1,6 @@
 package springApplication.bot;
 
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -32,18 +33,18 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
     @Autowired
     private SpyfallGameMaster spyfallGameMaster;
 
-    private String botToken;
+    private final String botToken;
 
     IngloriousBastardBot()
     {
         botToken = AppUtil.getEnvironmentVariable("TOKEN");
     }
 
-    //TODO check nulls, user data. refactor
+    //TODO try to refactor?
     @Override
     public void onUpdateReceived(Update update)
     {
-        if (update.hasMessage() && update.getMessage().hasText())
+        if (update.hasMessage() && update.getMessage().hasText())                                                       // text message handling
         {
             String receivedMessage = update.getMessage().getText();
 
@@ -54,9 +55,9 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
             int senderId = sender.getId();
             String senderName = sender.getFirstName() + " " + sender.getLastName();
 
-            if (receivedMessage.startsWith("/"))
+            if (receivedMessage.startsWith("/"))                                                                        // slash-started commands parsing
             {
-                switch(receivedMessage) //TODO add /stats command
+                switch(receivedMessage)
                 {
                     case "/start":
                         responceString = "welcome!";
@@ -81,46 +82,46 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         break;
                 }
 
-            } else
-            {
+            } else                                                                                                      // end of slash-started commands parsing
+            {                                                                                                           // plain text parsing
                 switch (stateSaver.getStatus(senderId))
                 {
                     case NEW_PLAYER:
                         responceString = "use commands /";
                         break;
-                    case JOINREQUEST:
+                    case JOINREQUEST:                                                                                   // after '/join' command plain text goes here
                         try
                         {
                             int roomToJoin = Integer.parseInt(receivedMessage);
                             switch(roomsKeeper.getGameByRoomId(roomToJoin))
                             {
-                                case INGLORIOUS_BASTERDS:
+                                case INGLORIOUS_BASTERDS:                                                               // join into IB game
                                     ibGameMaster.join(senderId, senderName, roomToJoin);
                                     stateSaver.setPlayersGame(senderId, EGame.INGLORIOUS_BASTERDS);
                                     stateSaver.setStatus(senderId, UserStateSaver.Status.JOINED);
                                     responceString = "enter character";
                                     break;
-                                case SPYFALL:
+                                case SPYFALL:                                                                           // join into Spyfall
                                     spyfallGameMaster.join(senderId, senderName, roomToJoin);
                                     stateSaver.setPlayersGame(senderId, EGame.SPYFALL);
                                     stateSaver.setStatus(senderId, UserStateSaver.Status.JOINED);
                                     responceString = "waiting for game start";
                                     break;
                             }
-                        } catch (NumberFormatException e)
+                        } catch (NumberFormatException e)                                                               // user send text to room number request
                         {
                             responceString = "Enter valid room number";
                             break;
-                        } catch (IllegalArgumentException e)
+                        } catch (IllegalArgumentException e)                                                            // can't enter room. threw by BasicGameMaster.enterRoom method
                         {
                             responceString = "Room not exist";
                             break;
                         }
                         break;
-                    case JOINED:
+                    case JOINED:                                                                                        // after player enter room number and sucessfully joined game plain text goes here
                         switch(stateSaver.getPlayersGame(senderId))
                         {
-                            case INGLORIOUS_BASTERDS:
+                            case INGLORIOUS_BASTERDS:                                                                   // setting IB character
                                 ibGameMaster.setCharacter(senderId, receivedMessage);
                                 responceString = "waiting for party ready";
                                 if (ibGameMaster.isAdmin(senderId))
@@ -132,7 +133,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                                 break;
                             case SPYFALL:
                                 if (spyfallGameMaster.isAdmin(senderId))
-                                {
+                                {                                                                                       // admin can set locations limit of spyfall here
                                     try
                                     {
                                         int limit = Integer.parseInt(receivedMessage);
@@ -156,15 +157,15 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         stateSaver.setStatus(senderId, UserStateSaver.Status.READY);
                         break;
                 }
-            }
+            }                                                                                                           // end of plain text parsing
 
             if (responceString.length() > 0)
             {
                 sendMsg(update.getMessage().getChatId(), responceString, inlineKeyboardMarkup);
             }
 
-        } else {
-            if (update.hasCallbackQuery())
+        } else {                                                                                                        // end of text message handling
+            if (update.hasCallbackQuery())                                                                              // calback handling
             {
                 User sender = update.getCallbackQuery().getFrom();
                 int senderId = sender.getId();
@@ -174,10 +175,10 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
 
                 switch(callback)
                 {
-                    case "start1":  // start ib game in classic mode
+                    case "start1":                                                                                      // start ib game in classic mode
                         ibGameMaster.startGame(senderId, IBGameMaster.GameMode.CLASSIC);
                         break;
-                    case "start2":  // start ib in list mode
+                    case "start2":                                                                                      // start ib in list mode
                         ibGameMaster.startGame(senderId, IBGameMaster.GameMode.LIST);
                         break;
                     case "init_ib":
@@ -206,15 +207,15 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
 
                 }
             }
-        }
-    }
+        }                                                                                                               // end of calback handling
+    }                                                                                                                   // end of onUpdatesRecieved method
 
     public void sendMsg(long chatId, String msg)
     {
         sendMsg(chatId, msg, null);
     }
 
-    public void sendMsg(long chatId, String msg, InlineKeyboardMarkup mk)
+    public void sendMsg(long chatId, String msg, @Nullable InlineKeyboardMarkup mk)
     {
         SendMessage message = new SendMessage()
                 .setChatId(chatId)
@@ -239,7 +240,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
         sendImageFromUrl(chatId, url, null);
     }
 
-    public void sendImageFromUrl(int chatId, String url, String caption) {
+    public void sendImageFromUrl(int chatId, String url, @Nullable String caption) {
         SendPhoto sendPhotoRequest = new SendPhoto()
                 .setChatId(String.valueOf(chatId))
                 .setPhoto(url);

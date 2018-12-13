@@ -5,6 +5,9 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import springApplication.bot.IngloriousBastardBot;
 
+/**
+ * used to send messages to players without holding on their client
+ */
 @Service
 public class MessageSender
 {
@@ -14,6 +17,9 @@ public class MessageSender
     @Autowired
     private SimpMessagingTemplate template;
 
+    /**
+     * send broadcast message to web api client players
+     */
     public void sendBroadcast(String message, int roomId)
     {
         template.convertAndSend("/topic/reply/" + roomId, message);

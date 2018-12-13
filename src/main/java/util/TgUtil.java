@@ -1,6 +1,7 @@
 package util;
 
 
+import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
@@ -14,7 +15,7 @@ public class TgUtil
      *                    map - button text: callback
      * @return markup
      */
-    private static InlineKeyboardMarkup buildKeyboardMarkup(List<Map<String,String>> buttonsRows)
+    private static InlineKeyboardMarkup buildKeyboardMarkup(@NotNull List<Map<String,String>> buttonsRows)
     {
         InlineKeyboardMarkup inlineKeyboardMarkup =new InlineKeyboardMarkup();
 

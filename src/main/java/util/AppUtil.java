@@ -1,22 +1,18 @@
 package util;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import springApplication.ibGame.Teammate;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public class AppUtil
 {
-    private static Map<String, String> env;
+    private final static Map<String, String> env;
 
     static
     {
@@ -33,6 +29,8 @@ public class AppUtil
         return variable;
     }
 
+    @NotNull
+    @Contract("_ -> new")
     public static File loadFileFromResources(String path) throws FileNotFoundException
     {
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();

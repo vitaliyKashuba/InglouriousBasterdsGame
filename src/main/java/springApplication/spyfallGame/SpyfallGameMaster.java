@@ -14,8 +14,8 @@ import java.util.*;
 @Component
 public class SpyfallGameMaster extends BasicGameMaster
 {
-    private Map<String, List<String>> locationsAndRoles;   // key - location, value - roles
-    private Map<Integer, Integer> roomLocationsLimit;// key - room id, value - limit
+    private Map<String, List<String>> locationsAndRoles;    // key - location, value - roles
+    private Map<Integer, Integer> roomLocationsLimit;       // key - room id, value - limit
 
     private SpyfallGameMaster()
     {
@@ -25,16 +25,19 @@ public class SpyfallGameMaster extends BasicGameMaster
 
         rooms.put(2,new ArrayList<>()); // for tests
 
-        try {
+        try
+        {
             File file = AppUtil.loadFileFromResources("spyfall.json");
 
             InputStream resourceInputStream = new FileInputStream(file);
             ObjectMapper mapper = new ObjectMapper();
             locationsAndRoles = mapper.readValue(resourceInputStream, Map.class);
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e)
+        {
             System.out.println("smth wrong with file"); //TODO add some error message if can't init ?
             e.printStackTrace();
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             System.out.println("Jackson error");
             e.printStackTrace();
         }
@@ -52,7 +55,7 @@ public class SpyfallGameMaster extends BasicGameMaster
         String location;
         if (roomLocationsLimit.containsKey(roomId))
         {
-            Randomizer.shufle(locations);
+            Randomizer.shuffle(locations);
             List<String> l = new ArrayList<>(locations);
             locations = l.subList(0, roomLocationsLimit.get(roomId));
             location = Randomizer.getRandomElement(l);
@@ -62,7 +65,7 @@ public class SpyfallGameMaster extends BasicGameMaster
         }
 
         List<String> rls = locationsAndRoles.get(location);
-        Randomizer.shufle(rls);
+        Randomizer.shuffle(rls);
         Stack<String> roles = new Stack<>();
         roles.addAll(rls);
 

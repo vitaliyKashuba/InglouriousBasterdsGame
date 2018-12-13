@@ -6,6 +6,10 @@ import springApplication.game.EGame;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * save telegram user state
+ * need to realize telegram scenarios
+ */
 @Component
 public class UserStateSaver
 {
@@ -15,7 +19,7 @@ public class UserStateSaver
     }
 
     private Map<Integer, Status> statuses;
-    private Map<Integer, EGame> gamers; // TODO move this somwhere else ?
+    private Map<Integer, EGame> gamers;
 
     UserStateSaver()
     {

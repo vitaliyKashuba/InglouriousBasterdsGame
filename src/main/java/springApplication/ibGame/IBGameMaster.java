@@ -2,9 +2,7 @@ package springApplication.ibGame;
 
 import org.springframework.stereotype.Component;
 import springApplication.game.BasicGameMaster;
-import springApplication.game.EGame;
 import springApplication.game.Player;
-import util.AppUtil;
 import util.Convertor;
 import util.GoogleSearchAPIUtil;
 

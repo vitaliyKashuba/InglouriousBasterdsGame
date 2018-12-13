@@ -26,7 +26,7 @@ public class GoogleSearchAPIUtil
         return HttpRequest.get(API_URL, true, 'q', query).body();
     }
 
-    @SneakyThrows   //TODO handle exception ?
+    @SneakyThrows
     private static List<String> getImagesFromResponse(String json)
     {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -49,7 +49,6 @@ public class GoogleSearchAPIUtil
     public static String findImage(String request)
     {
         List<String> images = getImagesFromResponse(makeRequest(request));
-//        return images.get(Randomizer.getRandomIndex(images.size()));
         return Randomizer.getRandomElement(images);
     }
 }

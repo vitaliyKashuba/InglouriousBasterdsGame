@@ -7,8 +7,8 @@ import java.util.*;
 
 public class Randomizer
 {
-    private static Random random;
-    private static Faker faker;
+    private static final Random random;
+    private static final Faker faker;
 
     static {
         random = new Random();
@@ -25,12 +25,13 @@ public class Randomizer
         return random.nextInt(upperBound);
     }
 
+    @NotNull
     public static <T> T getRandomElement(@NotNull Collection<T> list)
     {
         return list.stream().skip(getRandomIndex(list.size())).findFirst().get();
     }
 
-    public static <T> void shufle(@NotNull Collection<T> list)
+    public static <T> void shuffle(@NotNull Collection<T> list)
     {
         for(int i = 0; i < list.size() * 2; i++)
         {
@@ -38,9 +39,9 @@ public class Randomizer
             list.remove(el);
             list.add(el);
         }
-//        return l;
     }
 
+    @NotNull
     public static String getRandomIBCharacter()
     {
         ArrayList<String> ch = new ArrayList<>();

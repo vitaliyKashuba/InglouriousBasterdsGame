@@ -2,6 +2,7 @@ package util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import org.jetbrains.annotations.NotNull;
 import springApplication.ibGame.Teammate;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public class Convertor
         return mapper.writeValueAsString(o);
     }
 
-    public static List<Teammate> convertTeammatesForWebApi(Map<String, String> teammates)
+    public static List<Teammate> convertTeammatesForWebApi(@NotNull Map<String, String> teammates)
     {
         List<Teammate> tm = new ArrayList<>();
         for(String name : teammates.keySet())
@@ -28,7 +29,8 @@ public class Convertor
         return tm;
     }
 
-    public static String convertTeammatesForTelegram(Map<String, String> teammates)
+    @NotNull
+    public static String convertTeammatesForTelegram(@NotNull Map<String, String> teammates)
     {
         StringBuilder sb = new StringBuilder();
         for(String name : teammates.keySet())
@@ -38,7 +40,8 @@ public class Convertor
         return sb.toString();
     }
 
-    public static String convertLocationsForTelegram(Collection<String> locations)
+    @NotNull
+    public static String convertLocationsForTelegram(@NotNull Collection<String> locations)
     {
         StringBuilder sb = new StringBuilder();
         sb.append("Locations:\n");

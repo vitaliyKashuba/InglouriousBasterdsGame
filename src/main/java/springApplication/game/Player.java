@@ -3,7 +3,11 @@ package springApplication.game;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.jetbrains.annotations.Nullable;
 
+/**
+ * can't split to IBPlayer, SpyfallPlayer etc, because need to cast everywhere in game masters then
+ */
 @ToString
 @Getter
 public class Player
@@ -14,12 +18,13 @@ public class Player
     }
 
     private int id;
-    @Setter
-    private String webPrincipal;
+    @Setter @Nullable
+    private String webPrincipal;    // only for web api players
     private String name;
     private ClientType clientType;
 
-    @Setter private String ibCharacter;
+    @Setter @Nullable
+    private String ibCharacter;
 
     public Player(int id, String name, ClientType clientType)
     {

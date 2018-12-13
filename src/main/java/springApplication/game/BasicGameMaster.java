@@ -1,9 +1,9 @@
 package springApplication.game;
 
 import org.apache.commons.lang3.NotImplementedException;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import springApplication.ibGame.IBGameMaster;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -82,7 +82,7 @@ public abstract class BasicGameMaster {
      *
      * it possible if players avoid calling /start method
      */
-    public void addPlayerIfNull(int id, String name)
+    private void addPlayerIfNull(int id, String name)
     {
         Player p = players.get(id);
         if (p == null)
@@ -105,7 +105,7 @@ public abstract class BasicGameMaster {
      *
      * @param playerId id of new rood admin
      */
-    public void removeOldRoomIfExist(int playerId)
+    private void removeOldRoomIfExist(int playerId)
     {
         if (roomCreators.containsKey(playerId))
         {
@@ -114,7 +114,7 @@ public abstract class BasicGameMaster {
         }
     }
 
-    public void addPlayer(Player p)
+    public void addPlayer(@NotNull  Player p)
     {
         players.put(p.getId(), p);
     }
@@ -146,7 +146,6 @@ public abstract class BasicGameMaster {
 
     /**
      * start game for admin's room
-     * @param adminId
      */
     public abstract void startGame(int adminId);
 }

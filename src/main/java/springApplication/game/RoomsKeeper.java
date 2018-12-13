@@ -1,11 +1,7 @@
 package springApplication.game;
 
-import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import springApplication.ibGame.IBGameMaster;
 import util.Randomizer;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,10 +13,6 @@ import java.util.Map;
 @Component
 public class RoomsKeeper
 {
-
-    @Autowired
-    private IBGameMaster ibGameMaster;
-
     private Map<Integer, EGame> rooms;  // key - room id, value - game
 
     RoomsKeeper()
@@ -31,6 +23,11 @@ public class RoomsKeeper
         rooms.put(2, EGame.SPYFALL);                //for tests and debug
     }
 
+    /**
+     * NOT creating room, but only keep room id and game type of this room
+     *
+     * room creation is on GameMasters components
+     */
     public int newRoom(EGame game)
     {
         int roomNumber;
