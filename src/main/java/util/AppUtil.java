@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.Charset;
 import java.util.Map;
 
 public class AppUtil
@@ -35,13 +36,14 @@ public class AppUtil
     @Contract("_ -> new")
     public static File loadFileFromResources(String path) throws FileNotFoundException
     {
-//        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-//        URL url = classLoader.getResource(path);
-//        if(url == null)
-//        {
-//            throw new FileNotFoundException("file not found");
-//        }
-        return new File("BOOT-INF/classes/" + path);
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        URL url = classLoader.getResource(path);
+        if(url == null)
+        {
+            throw new FileNotFoundException("file not found");
+        }
+//        return new File("BOOT-INF/classes/" + path);
+        return new File(url.getFile());
     }
 
     public static void loadFromResources()
@@ -55,6 +57,20 @@ public class AppUtil
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
+
+        try {
+            Resources.toString(Resources.getResource("BOOT-INF/classes/spyfall.json"), Charset.defaultCharset());
+        } catch (Exception e) {
+            System.out.println("full fail");
+            e.printStackTrace();
+        }
+
+        try {
+            Resources.toString(Resources.getResource("spyfall.json"), Charset.defaultCharset());
+        } catch (Exception e) {
+            System.out.println("short fail");
+            e.printStackTrace();
+        }
 
     }
 
