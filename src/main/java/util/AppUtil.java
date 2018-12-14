@@ -1,5 +1,6 @@
 package util;
 
+import com.google.common.io.Resources;
 import com.google.common.reflect.ClassPath;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -34,29 +35,27 @@ public class AppUtil
     @Contract("_ -> new")
     public static File loadFileFromResources(String path) throws FileNotFoundException
     {
-        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        URL url = classLoader.getResource(path);
-        if(url == null)
-        {
-            throw new FileNotFoundException("file not found");
-        }
-        return new File(url.getFile());
+//        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+//        URL url = classLoader.getResource(path);
+//        if(url == null)
+//        {
+//            throw new FileNotFoundException("file not found");
+//        }
+        return new File("BOOT-INF/classes/" + path);
     }
 
     public static void loadFromResources()
     {
-//        InputStream in = AppUtil.class.getResourceAsStream("/spyfall.json");
-//        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-//        reader.lines();
-        try {
-            ClassPath classpath = ClassPath.from(ClassLoader.getSystemClassLoader());
-            for(ClassPath.ResourceInfo r : classpath.getResources())
-            {
-                System.out.println(r);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            ClassPath classpath = ClassPath.from(ClassLoader.getSystemClassLoader());
+//            for(ClassPath.ResourceInfo r : classpath.getResources())
+//            {
+//                System.out.println(r.getResourceName());
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
     }
 
     /**for debug*/
