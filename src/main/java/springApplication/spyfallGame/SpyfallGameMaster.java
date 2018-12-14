@@ -27,18 +27,19 @@ public class SpyfallGameMaster extends BasicGameMaster
 
         try
         {
-            File file = AppUtil.loadFileFromResources("spyfall.json");
+            String s = AppUtil.readFromResources("spyfall.json");
 
-            InputStream resourceInputStream = new FileInputStream(file);
             ObjectMapper mapper = new ObjectMapper();
-            locationsAndRoles = mapper.readValue(resourceInputStream, Map.class);
+            locationsAndRoles = mapper.readValue(s, Map.class);
         } catch (FileNotFoundException e)
         {
             System.out.println("smth wrong with file"); //TODO add some error message if can't init ?
+            System.out.println("classpath:");
+            AppUtil.printClasspath();
             e.printStackTrace();
         } catch (IOException e)
         {
-            System.out.println("Jackson error");
+            System.out.println("probably Jackson error");
             e.printStackTrace();
         }
     }
@@ -55,7 +56,7 @@ public class SpyfallGameMaster extends BasicGameMaster
         String location;
         if (roomLocationsLimit.containsKey(roomId))
         {
-            Randomizer.shuffle(locations);
+            Collections.shuffle(locations);
             List<String> l = new ArrayList<>(locations);
             locations = l.subList(0, roomLocationsLimit.get(roomId));
             location = Randomizer.getRandomElement(l);
@@ -65,7 +66,7 @@ public class SpyfallGameMaster extends BasicGameMaster
         }
 
         List<String> rls = locationsAndRoles.get(location);
-        Randomizer.shuffle(rls);
+        Collections.shuffle(rls);
         Stack<String> roles = new Stack<>();
         roles.addAll(rls);
 

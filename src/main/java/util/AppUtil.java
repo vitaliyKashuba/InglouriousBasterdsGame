@@ -1,13 +1,16 @@
 package util;
 
+import com.google.common.io.Resources;
+import com.google.common.reflect.ClassPath;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import java.io.File;
-import java.io.FileNotFoundException;
+
+import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.Charset;
 import java.util.Map;
 
 public class AppUtil
@@ -29,8 +32,11 @@ public class AppUtil
         return variable;
     }
 
-    @NotNull
-    @Contract("_ -> new")
+    /**
+     *  deprecated as not working on heroku, because can't read from jar.
+     *      can be useful only when debug smth requires file
+     */
+    @Deprecated
     public static File loadFileFromResources(String path) throws FileNotFoundException
     {
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
@@ -40,6 +46,16 @@ public class AppUtil
             throw new FileNotFoundException("file not found");
         }
         return new File(url.getFile());
+    }
+
+    /**
+     * read text file from resources and return content as string
+     */
+    public static String readFromResources(@NotNull String resourceName) throws IOException
+    {
+        String fileContent;
+        fileContent = Resources.toString(Resources.getResource(resourceName), Charset.defaultCharset());
+        return fileContent;
     }
 
     /**for debug*/
