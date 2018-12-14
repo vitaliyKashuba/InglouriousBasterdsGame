@@ -32,8 +32,11 @@ public class AppUtil
         return variable;
     }
 
-    @NotNull
-    @Contract("_ -> new")
+    /**
+     *  deprecated as not working on heroku, because can't read from jar.
+     *      can be useful only when debug smth requires file
+     */
+    @Deprecated
     public static File loadFileFromResources(String path) throws FileNotFoundException
     {
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
@@ -42,38 +45,17 @@ public class AppUtil
         {
             throw new FileNotFoundException("file not found");
         }
-//        return new File("BOOT-INF/classes/" + path);
         return new File(url.getFile());
     }
 
-    public static void loadFromResources()
+    /**
+     * read text file from resources and return content as string
+     */
+    public static String readFromResources(@NotNull String resourceName) throws IOException
     {
-//        try {
-//            ClassPath classpath = ClassPath.from(ClassLoader.getSystemClassLoader());
-//            for(ClassPath.ResourceInfo r : classpath.getResources())
-//            {
-//                System.out.println(r.getResourceName());
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-        try {
-            String s = Resources.toString(Resources.getResource("BOOT-INF/classes/spyfall.json"), Charset.defaultCharset());
-            System.out.println(s);
-        } catch (Exception e) {
-            System.out.println("full fail");
-            e.printStackTrace();
-        }
-
-        try {
-            String s = Resources.toString(Resources.getResource("spyfall.json"), Charset.defaultCharset());
-            System.out.println(s);
-        } catch (Exception e) {
-            System.out.println("short fail");
-            e.printStackTrace();
-        }
-
+        String fileContent;
+        fileContent = Resources.toString(Resources.getResource(resourceName), Charset.defaultCharset());
+        return fileContent;
     }
 
     /**for debug*/

@@ -25,15 +25,12 @@ public class SpyfallGameMaster extends BasicGameMaster
 
         rooms.put(2,new ArrayList<>()); // for tests
 
-        AppUtil.loadFromResources();
-
         try
         {
-            File file = AppUtil.loadFileFromResources("spyfall.json");
+            String s = AppUtil.readFromResources("spyfall.json");
 
-            InputStream resourceInputStream = new FileInputStream(file);
             ObjectMapper mapper = new ObjectMapper();
-            locationsAndRoles = mapper.readValue(resourceInputStream, Map.class);
+            locationsAndRoles = mapper.readValue(s, Map.class);
         } catch (FileNotFoundException e)
         {
             System.out.println("smth wrong with file"); //TODO add some error message if can't init ?
@@ -42,7 +39,7 @@ public class SpyfallGameMaster extends BasicGameMaster
             e.printStackTrace();
         } catch (IOException e)
         {
-            System.out.println("Jackson error");
+            System.out.println("probably Jackson error");
             e.printStackTrace();
         }
     }
