@@ -59,14 +59,16 @@ public class AppUtil
 //        }
 
         try {
-            Resources.toString(Resources.getResource("BOOT-INF/classes/spyfall.json"), Charset.defaultCharset());
+            String s = Resources.toString(Resources.getResource("BOOT-INF/classes/spyfall.json"), Charset.defaultCharset());
+            System.out.println(s);
         } catch (Exception e) {
             System.out.println("full fail");
             e.printStackTrace();
         }
 
         try {
-            Resources.toString(Resources.getResource("spyfall.json"), Charset.defaultCharset());
+            String s = Resources.toString(Resources.getResource("spyfall.json"), Charset.defaultCharset());
+            System.out.println(s);
         } catch (Exception e) {
             System.out.println("short fail");
             e.printStackTrace();
