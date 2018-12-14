@@ -25,6 +25,8 @@ public class SpyfallGameMaster extends BasicGameMaster
 
         rooms.put(2,new ArrayList<>()); // for tests
 
+        AppUtil.loadFromResources();
+
         try
         {
             File file = AppUtil.loadFileFromResources("spyfall.json");
@@ -57,7 +59,7 @@ public class SpyfallGameMaster extends BasicGameMaster
         String location;
         if (roomLocationsLimit.containsKey(roomId))
         {
-            Randomizer.shuffle(locations);
+            Collections.shuffle(locations);
             List<String> l = new ArrayList<>(locations);
             locations = l.subList(0, roomLocationsLimit.get(roomId));
             location = Randomizer.getRandomElement(l);
@@ -67,7 +69,7 @@ public class SpyfallGameMaster extends BasicGameMaster
         }
 
         List<String> rls = locationsAndRoles.get(location);
-        Randomizer.shuffle(rls);
+        Collections.shuffle(rls);
         Stack<String> roles = new Stack<>();
         roles.addAll(rls);
 

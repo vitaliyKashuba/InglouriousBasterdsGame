@@ -1,11 +1,12 @@
 package util;
 
+import com.google.common.reflect.ClassPath;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import java.io.File;
-import java.io.FileNotFoundException;
+
+import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Map;
@@ -40,6 +41,22 @@ public class AppUtil
             throw new FileNotFoundException("file not found");
         }
         return new File(url.getFile());
+    }
+
+    public static void loadFromResources()
+    {
+//        InputStream in = AppUtil.class.getResourceAsStream("/spyfall.json");
+//        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+//        reader.lines();
+        try {
+            ClassPath classpath = ClassPath.from(ClassLoader.getSystemClassLoader());
+            for(ClassPath.ResourceInfo r : classpath.getResources())
+            {
+                System.out.println(r);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**for debug*/
