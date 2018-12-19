@@ -1,1 +1,1 @@
-worker: sh target/bin/telegramBot
+web: java -jar target/InglouriousBasterdsGame-1.0.jar
