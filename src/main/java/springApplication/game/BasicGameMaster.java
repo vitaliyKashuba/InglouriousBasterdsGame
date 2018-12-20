@@ -47,6 +47,11 @@ public abstract class BasicGameMaster {
         return roomCreators.get(adminId);
     }
 
+    protected List<Player> getRoomByRoomId(int roomId)
+    {
+        return rooms.get(roomId);
+    }
+
     /**
      * create new room and add initiator in it
      *
@@ -64,11 +69,14 @@ public abstract class BasicGameMaster {
             case "SpyfallGameMaster":
                 roomNumber = newRoom(EGame.SPYFALL);
                 break;
+            case "MafiaGameMaster":
+                roomNumber = newRoom(EGame.MAFIA);
+                break;
             default:
                 throw new NotImplementedException("implement it!");
         }
 
-        addPlayerIfNull(initiatorId, initiatorName);          // TODO check if possible to init game with player is null ? remove useless addIfNull method call
+        addPlayerIfNull(initiatorId, initiatorName);
         enterRoom(initiatorId, roomNumber);
 
         removeOldRoomIfExist(initiatorId);
@@ -127,14 +135,6 @@ public abstract class BasicGameMaster {
     public boolean isAdmin(int id)
     {
         return roomCreators.containsKey(id);
-    }
-
-    /**
-     * @return id of current room created by user
-     */
-    public int getAdminRoomId(int adminId)
-    {
-        return roomCreators.get(adminId);
     }
 
     public void join(int playerId, String playerName, int roomId)

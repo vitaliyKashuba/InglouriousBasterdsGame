@@ -4,11 +4,21 @@ package util;
 import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import springApplication.mafiaGame.MafiaGameMaster;
 
+import javax.management.relation.Role;
 import java.util.*;
 
 public class TgUtil
 {
+    public static final String ADD_MAFIA_ROLE_CALLBACK_PREFIX = "mafia_add";
+
+    /** not enum because of don't want to use Enum.getValue() methods, just keep constants*/
+    public class Callbacks
+    {
+        public static final String START_MAFIA = "mafia_start";
+    }
+
     /**
      * markup builder
      * @param buttonsRows list - rows of keyboard markup
@@ -86,6 +96,57 @@ public class TgUtil
         }});
 
         return buildKeyboardMarkup(lines);
+    }
+
+    public static InlineKeyboardMarkup getSetRolesForMafiaKeyboardMarkup()
+    {
+        return buildKeyboardMarkup(new TreeMap<String, String>()
+        {{
+            put("SET ROLES", "set_mafia_roles");
+            put("AUTO", "autoset_mafia_roles");
+        }});
+    }
+
+    public static InlineKeyboardMarkup getAllRolesButtonsForMafiaKeyboardMarkup()
+    {
+        List<MafiaGameMaster.Roles> roles = MafiaGameMaster.getAllRoles();
+
+        Map<String, String> buttons = new TreeMap<>();
+
+        for (MafiaGameMaster.Roles r : roles)
+        {
+            buttons.put(r.name(), ADD_MAFIA_ROLE_CALLBACK_PREFIX + r.name());
+        }
+
+        List<Map<String,String>> buttonsGrid = convertToMultiline(buttons, 3);
+        buttonsGrid.add(new TreeMap<String, String>()
+        {{
+            put("START", Callbacks.START_MAFIA);
+        }});
+
+        return buildKeyboardMarkup(buttonsGrid);
+    }
+
+    private static List<Map<String,String>> convertToMultiline(Map<String, String> buttons, int buttonsInLine)
+    {
+        List<Map<String,String>> lines = new ArrayList<>();
+
+        Map<String, String> buttonsRow = new TreeMap<>();
+        for(String key: buttons.keySet())
+        {
+            if (buttonsRow.size() < buttonsInLine)
+            {
+                buttonsRow.put(key, buttons.get(key));
+            }
+            else
+            {
+                lines.add(buttonsRow);
+                buttonsRow = new TreeMap<>();
+                buttonsRow.put(key, buttons.get(key));
+            }
+        }
+        lines.add(buttonsRow);
+        return lines;
     }
 
     public static InlineKeyboardMarkup getRandomCharacterButtonKeyboardMarkup()

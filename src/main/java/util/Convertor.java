@@ -19,6 +19,16 @@ public class Convertor
         return mapper.writeValueAsString(o);
     }
 
+    public static <E extends Enum<E>> List<String> stringifyEnumList(List<E> enums)
+    {
+        List<String> strings = new ArrayList<>();
+        for (E e : enums)
+        {
+            strings.add(e.name());
+        }
+        return strings;
+    }
+
     public static List<Teammate> convertTeammatesForWebApi(@NotNull Map<String, String> teammates)
     {
         List<Teammate> tm = new ArrayList<>();

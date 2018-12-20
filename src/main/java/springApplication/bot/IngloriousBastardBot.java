@@ -13,6 +13,7 @@ import springApplication.game.EGame;
 import springApplication.game.RoomsKeeper;
 import springApplication.ibGame.IBGameMaster;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import springApplication.mafiaGame.MafiaGameMaster;
 import springApplication.spyfallGame.SpyfallGameMaster;
 import util.AppUtil;
 import util.GoogleSearchAPIUtil;
@@ -32,6 +33,9 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
 
     @Autowired
     private SpyfallGameMaster spyfallGameMaster;
+
+    @Autowired
+    private MafiaGameMaster mafiaGameMaster;
 
     private final String botToken;
 
@@ -75,7 +79,9 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         break;
                     case "/debug":
                         System.out.println("/debug");
-                        sendImageFromUrl(senderId, GoogleSearchAPIUtil.findImage("darth vader"));
+                        responceString = "111";
+                        inlineKeyboardMarkup = TgUtil.getAllRolesButtonsForMafiaKeyboardMarkup();
+//                        sendImageFromUrl(senderId, GoogleSearchAPIUtil.findImage("darth vader"));
                         break;
                     default:
                         responceString = "unrecognized command";
@@ -97,14 +103,16 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                             {
                                 case INGLORIOUS_BASTERDS:                                                               // join into IB game
                                     ibGameMaster.join(senderId, senderName, roomToJoin);
-                                    stateSaver.setPlayersGame(senderId, EGame.INGLORIOUS_BASTERDS);
-                                    stateSaver.setStatus(senderId, UserStateSaver.Status.JOINED);
+                                    setJoined(senderId, EGame.INGLORIOUS_BASTERDS);
+//                                    stateSaver.setPlayersGame(senderId, EGame.INGLORIOUS_BASTERDS);
+//                                    stateSaver.setStatus(senderId, UserStateSaver.Status.JOINED);
                                     responceString = "enter character";
                                     break;
                                 case SPYFALL:                                                                           // join into Spyfall
                                     spyfallGameMaster.join(senderId, senderName, roomToJoin);
-                                    stateSaver.setPlayersGame(senderId, EGame.SPYFALL);
-                                    stateSaver.setStatus(senderId, UserStateSaver.Status.JOINED);
+                                    setJoined(senderId, EGame.SPYFALL);
+//                                    stateSaver.setPlayersGame(senderId, EGame.SPYFALL);
+//                                    stateSaver.setStatus(senderId, UserStateSaver.Status.JOINED);
                                     responceString = "waiting for game start";
                                     break;
                             }
@@ -164,7 +172,8 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                 sendMsg(update.getMessage().getChatId(), responceString, inlineKeyboardMarkup);
             }
 
-        } else {                                                                                                        // end of text message handling
+        } else
+        {                                                                                                               // end of text message handling
             if (update.hasCallbackQuery())                                                                              // calback handling
             {
                 User sender = update.getCallbackQuery().getFrom();
@@ -183,15 +192,16 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         break;
                     case "init_ib":
                         int room = ibGameMaster.initGame(senderId, senderName);
-                        stateSaver.setPlayersGame(senderId, EGame.INGLORIOUS_BASTERDS);
-                        stateSaver.setStatus(senderId, UserStateSaver.Status.JOINED);
+                        setJoined(senderId, EGame.INGLORIOUS_BASTERDS);
+//                        stateSaver.setPlayersGame(senderId, EGame.INGLORIOUS_BASTERDS);
+//                        stateSaver.setStatus(senderId, UserStateSaver.Status.JOINED);
                         sendMsg(senderId, "Room " + room + " created!\nEnter character");
                         break;
                     case "init_spyfall":
-                        System.out.println("init spyfall");
                         room = spyfallGameMaster.initGame(senderId, senderName);
-                        stateSaver.setPlayersGame(senderId, EGame.SPYFALL);
-                        stateSaver.setStatus(senderId, UserStateSaver.Status.JOINED);
+                        setJoined(senderId, EGame.SPYFALL);
+//                        stateSaver.setPlayersGame(senderId, EGame.SPYFALL);
+//                        stateSaver.setStatus(senderId, UserStateSaver.Status.JOINED);
                         String message = "Room " + room + " created!\n" +
                                 "Wait for party and press start button to start\n" +
                                 "You can delimit locations by entering number";
@@ -201,14 +211,51 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                     case "start_spyfall":
                         spyfallGameMaster.startGame(senderId);
                         break;
-                    default:
-                        System.out.println("default switch, smth wrong");
+                    case "init_mafia":
+                        room = mafiaGameMaster.initGame(senderId, senderName);
+                        setJoined(senderId, EGame.MAFIA);
+                        message = "Room " + room + " created!\n" +
+                                "Wait for party and press button to set roles";
+                        inlineKeyboardMarkup = TgUtil.getSetRolesForMafiaKeyboardMarkup();
+                        sendMsg(senderId, message, inlineKeyboardMarkup);
                         break;
-
+                    case "autoset_mafia_roles":
+                        sendMsg(senderId, "not implemented yet");//TODO implement
+                        break;
+                    case "set_mafia_roles":
+                        inlineKeyboardMarkup = TgUtil.getAllRolesButtonsForMafiaKeyboardMarkup();
+                        int roomSize = mafiaGameMaster.getPlayersCount(senderId);
+                        message = roomSize + " players joined the room. Add roles, then press start.\n" +
+                                "You can type any addictive role";
+                        sendMsg(senderId, message, inlineKeyboardMarkup);
+                        // set some status here ?
+                        break;
+                    case TgUtil.Callbacks.START_MAFIA:
+                        //start mafia here
+                    default:
+                        if (callback.startsWith(TgUtil.ADD_MAFIA_ROLE_CALLBACK_PREFIX))
+                        {
+                            System.out.println(callback);
+                            // add role
+                        } else
+                        {
+                            System.out.println("default switch, smth wrong");
+                        }
+                        break;
                 }
             }
         }                                                                                                               // end of calback handling
     }                                                                                                                   // end of onUpdatesRecieved method
+
+    /**
+     * should call if after player joined game
+     * need to realize bot scenarios
+     */
+    private void setJoined(int playerId, EGame game)
+    {
+        stateSaver.setPlayersGame(playerId, game);
+        stateSaver.setStatus(playerId, UserStateSaver.Status.JOINED);
+    }
 
     public void sendMsg(long chatId, String msg)
     {
