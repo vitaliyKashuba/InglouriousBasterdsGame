@@ -3,8 +3,11 @@ package springApplication.bot;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -16,8 +19,11 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import springApplication.mafiaGame.MafiaGameMaster;
 import springApplication.spyfallGame.SpyfallGameMaster;
 import util.AppUtil;
+import util.Convertor;
 import util.GoogleSearchAPIUtil;
 import util.TgUtil;
+
+import java.util.List;
 
 @Component
 public class IngloriousBastardBot extends TelegramLongPollingBot
@@ -235,11 +241,15 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                     default:
                         if (callback.startsWith(TgUtil.ADD_MAFIA_ROLE_CALLBACK_PREFIX))
                         {
-                            System.out.println(callback);
-                            // add role
+                            mafiaGameMaster.addRole(senderId, callback.substring(TgUtil.ADD_MAFIA_ROLE_CALLBACK_PREFIX.length()));
+                            int messageId = update.getCallbackQuery().getMessage().getMessageId();
+                            int playersCount = mafiaGameMaster.getPlayersCount(senderId);
+                            List<String> roles = mafiaGameMaster.getRoles(senderId);
+                            message = playersCount + " players joined. Roles:\n" + Convertor.convertListForTelegram(roles);
+                            editMessage(senderId, messageId, message, TgUtil.getAllRolesButtonsForMafiaKeyboardMarkup());
                         } else
                         {
-                            System.out.println("default switch, smth wrong");
+                            System.out.println(callback + "\ndefault switch, smth wrong");
                         }
                         break;
                 }
@@ -273,13 +283,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
             message.setReplyMarkup(mk);
         }
 
-        try
-        {
-            execute(message);
-        } catch (TelegramApiException e)
-        {
-            e.printStackTrace();
-        }
+        tryToExecuteApiMethod(message);
     }
 
     public void sendImageFromUrl(int chatId, String url)
@@ -295,10 +299,45 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
         {
             sendPhotoRequest.setCaption(caption);
         }
+
         try
         {
             execute(sendPhotoRequest);
-        } catch (TelegramApiException e)
+        } catch (TelegramApiException e)    // never catched this, no idea about of conditions of this exception
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public void editMessage(int chatId, int messageId, String message, @Nullable InlineKeyboardMarkup mk)
+    {
+        EditMessageText editMessage = new EditMessageText()
+                .setChatId(new Long(chatId))
+                .setMessageId(messageId)
+                .setText(message);
+
+        if (mk != null)
+        {
+            editMessage.setReplyMarkup(mk);
+        }
+
+        tryToExecuteApiMethod(editMessage);
+    }
+
+    /**
+     * execute call for telegram api messages
+     * used to avoid try-catch calling in send\edit methods
+     *
+     * ! can't move @Nullable fields check here, because they declared in child classes (SendMessage, EditMessageText etc)
+     *
+     * @param method
+     */
+    private void tryToExecuteApiMethod(BotApiMethod method)
+    {
+        try
+        {
+            execute(method);
+        } catch (TelegramApiException e)    // never catched this, no idea about of conditions of this exception
         {
             e.printStackTrace();
         }

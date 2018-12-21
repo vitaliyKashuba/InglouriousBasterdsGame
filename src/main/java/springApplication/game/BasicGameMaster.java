@@ -19,6 +19,7 @@ public abstract class BasicGameMaster {
     @Autowired
     protected MessageSender messageSender;
 
+    // TODO rewrite with guava ?
     protected Map<Integer, List<Player>> rooms; //room id - key, list of players - value
     protected Map<Integer, Player> players;     //player id - key, player obj - value
     protected Map<Integer, Integer> roomCreators; //admin id - key, room id - value

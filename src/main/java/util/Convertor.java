@@ -51,13 +51,26 @@ public class Convertor
     }
 
     @NotNull
-    public static String convertLocationsForTelegram(@NotNull Collection<String> locations)
+    public static String convertLocationsForTelegram(@NotNull List<String> locations)
     {
         StringBuilder sb = new StringBuilder();
         sb.append("Locations:\n");
         for (String l: locations)
         {
             sb.append(l);
+            sb.append("\n");
+        }
+
+        return sb.toString();
+    }
+
+    @NotNull
+    public static String convertListForTelegram(@NotNull List<String> list)
+    {
+        StringBuilder sb = new StringBuilder();
+        for (String s: list)
+        {
+            sb.append(s);
             sb.append("\n");
         }
 
