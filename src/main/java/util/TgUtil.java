@@ -1,6 +1,7 @@
 package util;
 
 
+import jdk.nashorn.internal.codegen.CompilerConstants;
 import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -14,9 +15,17 @@ public class TgUtil
     public static final String ADD_MAFIA_ROLE_CALLBACK_PREFIX = "mafia_add";
 
     /** not enum because of don't want to use Enum.getValue() methods, just keep constants*/
-    public class Callbacks
+    public static class Callbacks
     {
         public static final String START_MAFIA = "mafia_start";
+        public static final String START_IB_CLASSIC = "start_ib_classic";
+        public static final String START_IB_LIST = "start_ib_list";
+        public static final String START_SPYFALL = "start_spyfall";
+        public static final String INIT_IB = "init_ib";
+        public static final String INIT_SPYFALL = "init_spyfall";
+        public static final String INIT_MAFIA = "init_mafia";
+        public static final String MAFIA_SET_ROLES = "mafia_set";
+        public static final String MAFIA_AUTOSET_ROLES = "mafia_autoset";
     }
 
     /**
@@ -63,8 +72,8 @@ public class TgUtil
     {
         return buildKeyboardMarkup(new TreeMap<String, String>()
         {{
-            put("CLASSIC MODE", "start1");
-            put("LIST MODE", "start2");
+            put("CLASSIC MODE", Callbacks.START_IB_CLASSIC);
+            put("LIST MODE", Callbacks.START_IB_LIST);
         }});
     }
 
@@ -75,7 +84,7 @@ public class TgUtil
     {
         return buildKeyboardMarkup(new TreeMap<String, String>()
         {{
-            put("START", "start_spyfall");
+            put("START", Callbacks.START_SPYFALL);
         }});
     }
 
@@ -87,12 +96,12 @@ public class TgUtil
         List<Map<String,String>> lines = new ArrayList<>();
         lines.add(new TreeMap<String, String>()
         {{
-            put("Inglorious basterds", "init_ib");
+            put("Inglorious basterds", Callbacks.INIT_IB);
         }});
         lines.add(new TreeMap<String, String>()
         {{
-            put("Spyfall", "init_spyfall");
-            put("Mafia", "init_mafia");
+            put("Spyfall", Callbacks.INIT_SPYFALL);
+            put("Mafia", Callbacks.INIT_MAFIA);
         }});
 
         return buildKeyboardMarkup(lines);
@@ -102,8 +111,8 @@ public class TgUtil
     {
         return buildKeyboardMarkup(new TreeMap<String, String>()
         {{
-            put("SET ROLES", "set_mafia_roles");
-            put("AUTO", "autoset_mafia_roles");
+            put("SET ROLES", Callbacks.MAFIA_SET_ROLES);
+            put("AUTO", Callbacks.MAFIA_AUTOSET_ROLES);
         }});
     }
 

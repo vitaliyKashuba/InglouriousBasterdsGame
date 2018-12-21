@@ -13,9 +13,13 @@ import java.util.Map;
 @Component
 public class UserStateSaver
 {
+    /**
+     * need to realize bot scenarios
+     * statuses, started with 'GAME_NAME' only for 'GAME_NAME' use
+     */
     enum Status
     {
-        NEW_PLAYER, JOINREQUEST, JOINED, READY
+        NEW_PLAYER, JOINREQUEST, JOINED, READY, MAFIA_SET_ROLES
     }
 
     private Map<Integer, Status> statuses;

@@ -1,6 +1,8 @@
 package springApplication.bot;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Marker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
@@ -22,9 +24,11 @@ import util.AppUtil;
 import util.Convertor;
 import util.GoogleSearchAPIUtil;
 import util.TgUtil;
-
 import java.util.List;
 
+import static util.TgUtil.Callbacks;
+
+@Slf4j
 @Component
 public class IngloriousBastardBot extends TelegramLongPollingBot
 {
@@ -110,16 +114,20 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                                 case INGLORIOUS_BASTERDS:                                                               // join into IB game
                                     ibGameMaster.join(senderId, senderName, roomToJoin);
                                     setJoined(senderId, EGame.INGLORIOUS_BASTERDS);
-//                                    stateSaver.setPlayersGame(senderId, EGame.INGLORIOUS_BASTERDS);
-//                                    stateSaver.setStatus(senderId, UserStateSaver.Status.JOINED);
                                     responceString = "enter character";
                                     break;
                                 case SPYFALL:                                                                           // join into Spyfall
                                     spyfallGameMaster.join(senderId, senderName, roomToJoin);
                                     setJoined(senderId, EGame.SPYFALL);
-//                                    stateSaver.setPlayersGame(senderId, EGame.SPYFALL);
-//                                    stateSaver.setStatus(senderId, UserStateSaver.Status.JOINED);
                                     responceString = "waiting for game start";
+                                    break;
+                                case MAFIA:                                                                             // join into mafia
+                                    mafiaGameMaster.join(senderId, senderName, roomToJoin);
+                                    setJoined(senderId, EGame.MAFIA);
+                                    responceString = "waiting for game start";
+                                    break;
+                                default:
+                                    log.error("default switch while entering room");
                                     break;
                             }
                         } catch (NumberFormatException e)                                                               // user send text to room number request
@@ -170,6 +178,16 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         }
                         stateSaver.setStatus(senderId, UserStateSaver.Status.READY);
                         break;
+                    case MAFIA_SET_ROLES:                                                                               // admin add new non-standart role
+                        mafiaGameMaster.addRole(senderId, receivedMessage);
+                        String message = mafiaGameMaster.getPlayersCount(senderId) +
+                                " players joined. Roles:\n" +
+                                Convertor.convertListForTelegram(mafiaGameMaster.getRoles(senderId));
+                        sendMsg(senderId, message, TgUtil.getAllRolesButtonsForMafiaKeyboardMarkup());
+                        break;
+                    default:
+                        log.error("default switch in message parsing, suppose it's error here");
+                        break;
                 }
             }                                                                                                           // end of plain text parsing
 
@@ -190,34 +208,30 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
 
                 switch(callback)
                 {
-                    case "start1":                                                                                      // start ib game in classic mode
+                    case Callbacks.START_IB_CLASSIC:
                         ibGameMaster.startGame(senderId, IBGameMaster.GameMode.CLASSIC);
                         break;
-                    case "start2":                                                                                      // start ib in list mode
+                    case Callbacks.START_IB_LIST:
                         ibGameMaster.startGame(senderId, IBGameMaster.GameMode.LIST);
                         break;
-                    case "init_ib":
+                    case Callbacks.INIT_IB:
                         int room = ibGameMaster.initGame(senderId, senderName);
                         setJoined(senderId, EGame.INGLORIOUS_BASTERDS);
-//                        stateSaver.setPlayersGame(senderId, EGame.INGLORIOUS_BASTERDS);
-//                        stateSaver.setStatus(senderId, UserStateSaver.Status.JOINED);
                         sendMsg(senderId, "Room " + room + " created!\nEnter character");
                         break;
-                    case "init_spyfall":
+                    case Callbacks.INIT_SPYFALL:
                         room = spyfallGameMaster.initGame(senderId, senderName);
                         setJoined(senderId, EGame.SPYFALL);
-//                        stateSaver.setPlayersGame(senderId, EGame.SPYFALL);
-//                        stateSaver.setStatus(senderId, UserStateSaver.Status.JOINED);
                         String message = "Room " + room + " created!\n" +
                                 "Wait for party and press start button to start\n" +
                                 "You can delimit locations by entering number";
                         InlineKeyboardMarkup inlineKeyboardMarkup = TgUtil.getStartSpyfallKeyboardMarkup();
                         sendMsg(senderId, message, inlineKeyboardMarkup);
                         break;
-                    case "start_spyfall":
+                    case Callbacks.START_SPYFALL:
                         spyfallGameMaster.startGame(senderId);
                         break;
-                    case "init_mafia":
+                    case Callbacks.INIT_MAFIA:
                         room = mafiaGameMaster.initGame(senderId, senderName);
                         setJoined(senderId, EGame.MAFIA);
                         message = "Room " + room + " created!\n" +
@@ -225,21 +239,21 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         inlineKeyboardMarkup = TgUtil.getSetRolesForMafiaKeyboardMarkup();
                         sendMsg(senderId, message, inlineKeyboardMarkup);
                         break;
-                    case "autoset_mafia_roles":
+                    case Callbacks.MAFIA_AUTOSET_ROLES:
                         sendMsg(senderId, "not implemented yet");//TODO implement
                         break;
-                    case "set_mafia_roles":
+                    case Callbacks.MAFIA_SET_ROLES:                                                                     // show keyboard with all default mafia roles to fill in room
                         inlineKeyboardMarkup = TgUtil.getAllRolesButtonsForMafiaKeyboardMarkup();
                         int roomSize = mafiaGameMaster.getPlayersCount(senderId);
                         message = roomSize + " players joined the room. Add roles, then press start.\n" +
                                 "You can type any addictive role";
                         sendMsg(senderId, message, inlineKeyboardMarkup);
-                        // set some status here ?
+                        stateSaver.setStatus(senderId, UserStateSaver.Status.MAFIA_SET_ROLES);
                         break;
                     case TgUtil.Callbacks.START_MAFIA:
-                        //start mafia here
+                        //TODO start mafia here
                     default:
-                        if (callback.startsWith(TgUtil.ADD_MAFIA_ROLE_CALLBACK_PREFIX))
+                        if (callback.startsWith(TgUtil.ADD_MAFIA_ROLE_CALLBACK_PREFIX))                                 // add role and update previous message with room stats
                         {
                             mafiaGameMaster.addRole(senderId, callback.substring(TgUtil.ADD_MAFIA_ROLE_CALLBACK_PREFIX.length()));
                             int messageId = update.getCallbackQuery().getMessage().getMessageId();
@@ -249,7 +263,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                             editMessage(senderId, messageId, message, TgUtil.getAllRolesButtonsForMafiaKeyboardMarkup());
                         } else
                         {
-                            System.out.println(callback + "\ndefault switch, smth wrong");
+                            log.error(callback + "\ndefault calback switch, smth wrong");
                         }
                         break;
                 }
