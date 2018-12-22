@@ -15,6 +15,13 @@
         <relativePath/>
     </parent>
 
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -87,6 +94,13 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>27.0.1-jre</version>
+        </dependency>
+
+        <!-- QR code genertor -->
+        <dependency>
+            <groupId>com.github.kenglxn.qrgen</groupId>
+            <artifactId>javase</artifactId>
+            <version>2.5.0</version>
         </dependency>
 
     </dependencies>

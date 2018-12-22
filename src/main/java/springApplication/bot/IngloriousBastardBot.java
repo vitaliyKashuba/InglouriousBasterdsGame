@@ -1,6 +1,7 @@
 package springApplication.bot;
 
 import lombok.extern.slf4j.Slf4j;
+import net.glxn.qrgen.javase.QRCode;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Marker;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +25,13 @@ import util.AppUtil;
 import util.Convertor;
 import util.GoogleSearchAPIUtil;
 import util.TgUtil;
+
+import java.io.File;
 import java.util.List;
 
 import static util.TgUtil.Callbacks;
 
+//TODO add qr bot invite
 @Slf4j
 @Component
 public class IngloriousBastardBot extends TelegramLongPollingBot
@@ -89,8 +93,9 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         break;
                     case "/debug":
                         System.out.println("/debug");
-                        responceString = "111";
-                        inlineKeyboardMarkup = TgUtil.getAllRolesButtonsForMafiaKeyboardMarkup();
+                        responceString = "debug";
+                        sendImageUploadingAFile(senderId);
+//                        QRCode.from("Hello World");
 //                        sendImageFromUrl(senderId, GoogleSearchAPIUtil.findImage("darth vader"));
                         break;
                     default:
@@ -319,6 +324,18 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
             execute(sendPhotoRequest);
         } catch (TelegramApiException e)    // never catched this, no idea about of conditions of this exception
         {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendImageUploadingAFile(long chatId) {
+        SendPhoto sendPhotoRequest = new SendPhoto();
+        sendPhotoRequest.setChatId(chatId);
+        sendPhotoRequest.setPhoto(QRCode.from("Hello World").file());
+        try
+        {
+            execute(sendPhotoRequest);
+        } catch (TelegramApiException e) {
             e.printStackTrace();
         }
     }

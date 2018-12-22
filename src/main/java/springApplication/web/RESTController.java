@@ -1,6 +1,9 @@
 package springApplication.web;
 
+import net.glxn.qrgen.javase.QRCode;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import springApplication.game.Player;
 import springApplication.ibGame.IBGameMaster;
 import org.json.JSONObject;
@@ -11,6 +14,8 @@ import util.AppUtil;
 import util.Convertor;
 import util.Randomizer;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -86,5 +91,12 @@ public class RESTController
 //        gameMaster.changeStatus(playerId, IBPlayer.Status.READY);                                               // useless in web api ?
 
         return AppUtil.responce200OK();
+    }
+
+    @RequestMapping("debug")
+    public void debug(HttpServletResponse response) throws IOException
+    {
+        response.setContentType(MediaType.IMAGE_JPEG_VALUE);
+        QRCode.from("Hello World").stream().writeTo(response.getOutputStream());
     }
 }
