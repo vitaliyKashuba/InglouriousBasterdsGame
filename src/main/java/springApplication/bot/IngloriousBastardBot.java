@@ -91,12 +91,13 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                     case "/help":
                         responceString = "help";
                         break;
+                    case "/qr":
+                        sendImageUploadingAFile(senderId, AppUtil.getBotInviteQR());
+                        break;
                     case "/debug":
                         System.out.println("/debug");
-                        responceString = "debug";
-                        sendImageUploadingAFile(senderId);
-//                        QRCode.from("Hello World");
-//                        sendImageFromUrl(senderId, GoogleSearchAPIUtil.findImage("darth vader"));
+//                        responceString = "debug";
+                        sendImageUploadingAFile(senderId, AppUtil.getBotInviteQR());
                         break;
                     default:
                         responceString = "unrecognized command";
@@ -319,25 +320,15 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
             sendPhotoRequest.setCaption(caption);
         }
 
-        try
-        {
-            execute(sendPhotoRequest);
-        } catch (TelegramApiException e)    // never catched this, no idea about of conditions of this exception
-        {
-            e.printStackTrace();
-        }
+        tryToExecuteApiMethod(sendPhotoRequest);
     }
 
-    public void sendImageUploadingAFile(long chatId) {
-        SendPhoto sendPhotoRequest = new SendPhoto();
-        sendPhotoRequest.setChatId(chatId);
-        sendPhotoRequest.setPhoto(QRCode.from("Hello World").file());
-        try
-        {
-            execute(sendPhotoRequest);
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
+    public void sendImageUploadingAFile(int chatId, File file) {
+        SendPhoto sendPhotoRequest = new SendPhoto()
+                .setChatId(String.valueOf(chatId))
+                .setPhoto(file);
+
+        tryToExecuteApiMethod(sendPhotoRequest);
     }
 
     public void editMessage(int chatId, int messageId, String message, @Nullable InlineKeyboardMarkup mk)
@@ -374,10 +365,25 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
         }
     }
 
+    /**
+     * can't merge with tryToExecuteApiMethod(BotApiMethod method) because of type exception
+     * @param method
+     */
+    private void tryToExecuteApiMethod(SendPhoto method)
+    {
+        try
+        {
+            execute(method);
+        } catch (TelegramApiException e)    // never catched this, no idea about of conditions of this exception
+        {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public String getBotUsername()
     {
-        return "IngloriousBasterdsBot";
+        return AppUtil.BOT_NAME;
     }
 
     @Override

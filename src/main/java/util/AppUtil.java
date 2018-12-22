@@ -2,6 +2,7 @@ package util;
 
 import com.google.common.io.Resources;
 import com.google.common.reflect.ClassPath;
+import net.glxn.qrgen.javase.QRCode;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,8 @@ import java.util.Map;
 
 public class AppUtil
 {
-    private final static Map<String, String> env;
+    public static final String BOT_NAME = "IngloriousBasterdsBot";
+    private static final Map<String, String> env;
 
     static
     {
@@ -69,6 +71,11 @@ public class AppUtil
         for(URL url: urls){
             System.out.println(url.getFile());
         }
+    }
+
+    public static File getBotInviteQR()
+    {
+        return QRCode.from("tg://resolve?domain=" + BOT_NAME).file();
     }
 
     public static ResponseEntity responce200OK()
