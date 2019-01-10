@@ -123,6 +123,7 @@ public abstract class BasicGameMaster {
         }
     }
 
+    // TODO private?
     public void addPlayer(@NotNull  Player p)
     {
         players.put(p.getId(), p);

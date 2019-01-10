@@ -24,7 +24,7 @@ public class Player
     private ClientType clientType;
 
     @Setter @Nullable
-    private String ibCharacter;
+    private String character;       // character for IB, role for mafia
 
     public Player(int id, String name, ClientType clientType)
     {

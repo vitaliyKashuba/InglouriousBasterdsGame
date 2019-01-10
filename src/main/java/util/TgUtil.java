@@ -116,7 +116,7 @@ public class TgUtil
         }});
     }
 
-    public static InlineKeyboardMarkup getAllRolesButtonsForMafiaKeyboardMarkup()
+    public static InlineKeyboardMarkup getAllRolesButtonsForMafiaKeyboardMarkup()       // TODO make static keyboard to avoid re-initing at every call ?
     {
         List<MafiaGameMaster.Roles> roles = MafiaGameMaster.getAllRoles();
 

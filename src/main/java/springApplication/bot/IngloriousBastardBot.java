@@ -181,6 +181,9 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                                     responceString = "waiting for game start";
                                 }
                                 break;
+                            default :
+                                log.error("default switch while parsing joined players msg");
+                                break;
                         }
                         stateSaver.setStatus(senderId, UserStateSaver.Status.READY);
                         break;
@@ -265,7 +268,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                             int messageId = update.getCallbackQuery().getMessage().getMessageId();
                             int playersCount = mafiaGameMaster.getPlayersCount(senderId);
                             List<String> roles = mafiaGameMaster.getRoles(senderId);
-                            message = playersCount + " players joined. Roles:\n" + Convertor.convertListForTelegram(roles);
+                            message = playersCount + " players joined. " + roles.size() + " Roles:\n" + Convertor.convertListForTelegram(roles);
                             editMessage(senderId, messageId, message, TgUtil.getAllRolesButtonsForMafiaKeyboardMarkup());
                         } else
                         {
@@ -273,8 +276,8 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         }
                         break;
                 }
-            }
-        }                                                                                                               // end of calback handling
+            }                                                                                                           // end of calback handling
+        }
     }                                                                                                                   // end of onUpdatesRecieved method
 
     /**

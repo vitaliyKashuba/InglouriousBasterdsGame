@@ -4,6 +4,7 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
 import org.springframework.stereotype.Component;
 import springApplication.game.BasicGameMaster;
+import springApplication.game.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,7 +17,7 @@ public class MafiaGameMaster extends BasicGameMaster        // TODO add master's
 
     public enum Roles
     {
-        MAFIA, CITIZEN, COMISSAR, SHERIFF, MANIAK, WHORE
+        MAFIA, CITIZEN, COMMISSAR, SHERIFF, MANIAC, WHORE
     }
 
     private ListMultimap<Integer, String> roomsAndRoles;    // key - room id, values - roles. String, but not enums because of user defined roles and using of IB methods with string characters
@@ -36,7 +37,34 @@ public class MafiaGameMaster extends BasicGameMaster        // TODO add master's
     @Override
     public void startGame(int adminId)
     {
+        int roomId = getRoomIdByAdminId(adminId);
 
+        List<Player> players = rooms.get(roomId);
+        List<String> roles = roomsAndRoles.get(roomId);
+
+        players.remove(0);  // firs element - admin(master), no need to set character to master
+
+        if (roles.size() <= players.size())
+        {
+            int i = 0;
+            for(; i < roles.size(); i++)
+            {
+                players.get(i).setCharacter(roles.get(i));
+            }
+
+            while(i < players.size())
+            {
+                players.get(i).setCharacter(Roles.CITIZEN.name());
+                i++;
+            }
+        } else
+        {
+            System.out.println("too much roles");
+            // TODO send error, too much roles
+        }
+        // randomize roles
+        // send roles
+        // send all roles to admin (master)
     }
 
     /**
