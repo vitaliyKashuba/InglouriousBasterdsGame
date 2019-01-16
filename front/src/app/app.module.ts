@@ -10,7 +10,6 @@ import { MzTooltipModule } from 'ngx-materialize';
 import { MzIconModule, MzIconMdiModule } from 'ngx-materialize';
 
 import { AppComponent } from './app.component';
-import { MainComponent } from './components/main/main.component';
 import { WelcomeComponent } from './components/welcome/welcome.component';
 import { ChatComponent } from './components/chat/chat.component';
 import { CharactersComponent } from './components/characters/characters.component';
@@ -18,7 +17,6 @@ import { CharactersComponent } from './components/characters/characters.componen
 @NgModule({
   declarations: [
     AppComponent,
-    MainComponent,
     WelcomeComponent,
     ChatComponent,
     CharactersComponent

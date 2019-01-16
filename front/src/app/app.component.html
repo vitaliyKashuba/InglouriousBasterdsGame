@@ -1,3 +1,4 @@
+{{isMobile}}
 <div *ngIf="!room">
   <app-welcome (roomIdEmitter)="setRoomId($event)"
                (playerIdEmitter)="setPlayerId($event)">
@@ -5,15 +6,20 @@
 </div>
 
 <div class="row"  *ngIf="room">
-  <div class="col m4">
-    <app-characters [playerId]="playerId"
-                    [teammates]="teammates">
-    </app-characters>
+  <div *ngIf="isMobile">
+
   </div>
-  <div class="col m8">
-    <app-chat [roomId]="room"
-              [playerId]="playerId"
-              (setTeammatesEmitter)="setTeammates($event)">
-    </app-chat>
+  <div *ngIf="!isMobile">
+    <div class="col m4">
+      <app-characters [playerId]="playerId"
+                      [teammates]="teammates">
+      </app-characters>
+    </div>
+    <div class="col m8">
+      <app-chat [roomId]="room"
+                [playerId]="playerId"
+                (setTeammatesEmitter)="setTeammates($event)">
+      </app-chat>
+    </div>
   </div>
 </div>

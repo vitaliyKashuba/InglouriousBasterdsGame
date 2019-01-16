@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import {log} from 'util';
 import {Teammate} from './model/teammate';
+import device from 'current-device';
 
 @Component({
   selector: 'app-root',
@@ -10,6 +11,7 @@ import {Teammate} from './model/teammate';
 export class AppComponent {
   room: number;
   playerId: number;
+  isMobile = device.mobile();
 
   teammates: Teammate[];
 
