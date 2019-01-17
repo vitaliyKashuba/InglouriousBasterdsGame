@@ -1,10 +1,3 @@
-<div *ngIf="!roomId">
-  <app-welcome (roomIdEmitter)="setRoomId($event)"
-               (joinEmitter)="playerJoined($event)"
-               (requestSentEmitter)="showSpinner()">
-  </app-welcome>
-</div>
-
 <div *ngIf="isShowSpinner"
      class="center"
      id="loading-spinner">
@@ -15,19 +8,31 @@
   <p>{{loadingText}}</p>
 </div>
 
+<div *ngIf="isShowWelcomeComponent">
+  <app-welcome (joinEmitter)="playerJoined($event)"
+               (requestSentEmitter)="showSpinner()">
+  </app-welcome>
+</div>
+
 <div *ngIf="isShowCharacterInput">
   <app-ib-character-input [playerId]="playerId"
                           (onCharacterSet)="ibCharacterSetHandler()">
   </app-ib-character-input>
 </div>
 
-<div class="row"  *ngIf="roomId">
-  <div *ngIf="isMobile">
-    <app-mobile-view>
-    </app-mobile-view>
-  </div>
-  <div *ngIf="!isMobile">
-    <app-desktop-view>
-    </app-desktop-view>
-  </div>
+<div *ngIf="isShowGameComponent">
+  <app-game [gameType]="game"
+            [gameData]="gameData">
+  </app-game>
 </div>
+
+<!--<div class="row"  *ngIf="isShowGameComponent">-->
+  <!--<div *ngIf="isMobile">-->
+    <!--<app-mobile-view>-->
+    <!--</app-mobile-view>-->
+  <!--</div>-->
+  <!--<div *ngIf="!isMobile">-->
+    <!--<app-desktop-view>-->
+    <!--</app-desktop-view>-->
+  <!--</div>-->
+<!--</div>-->

@@ -103,4 +103,10 @@ public class SpyfallGameMaster extends BasicGameMaster
         int roomId = getRoomIdByAdminId(adminId);
         roomLocationsLimit.put(roomId, limit);
     }
+
+    /** for test*/
+    public List<String> getAllLocations()
+    {
+        return new ArrayList<>(locationsAndRoles.keySet());
+    }
 }

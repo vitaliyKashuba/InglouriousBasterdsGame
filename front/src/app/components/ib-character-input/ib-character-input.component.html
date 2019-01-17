@@ -1,0 +1,19 @@
+<div class="container">
+  <div class="row">
+    <mz-input-container class="row col m9">
+      <input mz-input
+             [(ngModel)]="character"
+             [label]="'Character'"
+             id="character-input"
+             type="text">
+    </mz-input-container>
+    <button mz-button
+            class="row col m2"
+            id="send-character-button"
+            (click)="sendCharacter()">
+      <i mz-icon-mdi
+         [icon]="'send'">
+      </i>
+    </button>
+  </div>
+</div>

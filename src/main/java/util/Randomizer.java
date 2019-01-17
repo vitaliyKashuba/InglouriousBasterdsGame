@@ -2,6 +2,7 @@ package util;
 
 import com.github.javafaker.Faker;
 import org.jetbrains.annotations.NotNull;
+import springApplication.ibGame.Teammate;
 
 import java.util.*;
 
@@ -31,6 +32,8 @@ public class Randomizer
         return list.stream().skip(getRandomIndex(list.size())).findFirst().get();
     }
 
+    /**@deprecated use Collections.shuffle instead. code keept to remind about reinventing existing utils*/
+    @Deprecated
     public static <T> void shuffle(@NotNull Collection<T> list)
     {
         for(int i = 0; i < list.size() * 2; i++)
@@ -50,6 +53,12 @@ public class Randomizer
         ch.add(faker.lebowski().character() + " (Big Lebowski)");
 
         return getRandomElement(ch);
+    }
+
+    @NotNull
+    public static Teammate getRandomIbTreammate()
+    {
+        return new Teammate(faker.name().fullName(), getRandomIBCharacter());
     }
 
     /**

@@ -1,50 +1,66 @@
 package springApplication.web;
 
+import lombok.extern.slf4j.Slf4j;
 import net.glxn.qrgen.javase.QRCode;
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import springApplication.game.EGame;
 import springApplication.game.Player;
+import springApplication.game.RoomsKeeper;
 import springApplication.ibGame.IBGameMaster;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import springApplication.ibGame.Teammate;
+import springApplication.mafiaGame.MafiaGameMaster;
+import springApplication.spyfallGame.SpyfallGameMaster;
 import util.AppUtil;
 import util.Convertor;
 import util.Randomizer;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+@Slf4j
 @RestController
 public class RESTController
 {
     @Autowired
-    private IBGameMaster gameMaster; // = IBGameMaster.getInstance();
+    private IBGameMaster ibGameMaster; // = IBGameMaster.getInstance();
+
+    @Autowired
+    private SpyfallGameMaster spyfallGameMaster;
+
+    @Autowired
+    private MafiaGameMaster mafiaGameMaster;
+
+    @Autowired
+    private RoomsKeeper roomsKeeper;
 
     @RequestMapping("/")
     public String index() {
         return "hello world";
     }
 
-    /**test*/
-    @RequestMapping("room/{id}")
-    public String getRoom(@PathVariable int id)
-    {
-//        IBGameMaster gameMaster = IBGameMaster.getInstance();
-        List<Player> players = gameMaster.getRoom(id);
-        return Convertor.toJson(players);
-    }
-
-    /**test*/
-    @RequestMapping("players")
-    public String getPlayers()
-    {
-        return Convertor.toJson(gameMaster.getPlayers());
-    }
+//    /**test*/
+//    @RequestMapping("room/{id}")
+//    public String getRoom(@PathVariable int id)
+//    {
+////        IBGameMaster ibGameMaster = IBGameMaster.getInstance();
+//        List<Player> players = ibGameMaster.getRoom(id);
+//        return Convertor.toJson(players);
+//    }
+//
+//    /**test*/
+//    @RequestMapping("players")
+//    public String getPlayers()
+//    {
+//        return Convertor.toJson(ibGameMaster.getPlayers());
+//    }
 
 
     @CrossOrigin
@@ -56,14 +72,29 @@ public class RESTController
         int playerId = Randomizer.getRandomPlayerId();
 
         System.out.println(playerId + " " + playerName);
-        gameMaster.addPlayer(new Player(playerId, playerName, Player.ClientType.WEB));   // TODO get game type from room keeper
+        ibGameMaster.addPlayer(new Player(playerId, playerName, Player.ClientType.WEB));   // TODO get game type from room keeper
 
-//        gameMaster.changeStatus(playerId, IBPlayer.Status.JOINREQUEST);                                               // useless in springApplication.web api ?
-//        gameMaster.removeOldRoomIfExist(playerId);                                                                    // useless in springApplication.web api ?
+//        ibGameMaster.changeStatus(playerId, IBPlayer.Status.JOINREQUEST);                                               // useless in springApplication.web api ?
+//        ibGameMaster.removeOldRoomIfExist(playerId);                                                                    // useless in springApplication.web api ?
+
+        EGame game = roomsKeeper.getGameByRoomId(roomId);
 
         try
         {
-            gameMaster.enterRoom(playerId, roomId);
+            switch (game)                                   // TODO move to gneral master ?
+            {
+                case INGLORIOUS_BASTERDS:
+                    ibGameMaster.enterRoom(playerId, roomId);
+                    break;
+                case SPYFALL:
+                    spyfallGameMaster.enterRoom(playerId, roomId);
+                    break;
+                case MAFIA:
+                    mafiaGameMaster.enterRoom(playerId, roomId);
+                    break;
+                default:
+                    log.error("default switch in RESTController.join");
+            }
         } catch (NumberFormatException e)
         {
             return new ResponseEntity<>("Enter valid room number", HttpStatus.BAD_REQUEST);
@@ -74,6 +105,8 @@ public class RESTController
 
         HashMap<String, Integer> resp = new HashMap<>();
         resp.put("id", playerId);
+        resp.put("game", game.getCode());
+
         return new ResponseEntity<>(Convertor.toJson(resp),HttpStatus.OK);
     }
 
@@ -87,8 +120,8 @@ public class RESTController
 
         System.out.println(playerId + " " + character);
 
-        gameMaster.setCharacter(playerId, character);
-//        gameMaster.changeStatus(playerId, IBPlayer.Status.READY);                                               // useless in web api ?
+        ibGameMaster.setCharacter(playerId, character);
+//        ibGameMaster.changeStatus(playerId, IBPlayer.Status.READY);                                               // useless in web api ?
 
         return AppUtil.responce200OK();
     }
@@ -98,5 +131,26 @@ public class RESTController
     {
         response.setContentType(MediaType.IMAGE_JPEG_VALUE);
         QRCode.from("Hello World").stream().writeTo(response.getOutputStream());
+    }
+
+    /**test'n'debug*/
+    @CrossOrigin
+    @RequestMapping("getRandomIbTeammates")
+    public String getRandomIbTeammates()
+    {
+        List<Teammate> teammates = new ArrayList<>();
+        for (int i = 0; i < 10; i++)
+        {
+            teammates.add(Randomizer.getRandomIbTreammate());
+        }
+        return Convertor.toJson(teammates);
+    }
+
+    /**test'n'debug*/
+    @CrossOrigin
+    @RequestMapping("getRandomSpyfallLocations")
+    public String getRandomSpyfallLocations()
+    {
+        return Convertor.toJson(spyfallGameMaster.getAllLocations().subList(0, 15));
     }
 }
