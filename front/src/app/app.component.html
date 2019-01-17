@@ -1,25 +1,22 @@
 {{isMobile}}
-<div *ngIf="!room">
+{{showCHaracterInput}}
+<div *ngIf="!roomId">
   <app-welcome (roomIdEmitter)="setRoomId($event)"
-               (playerIdEmitter)="setPlayerId($event)">
+               (joinEmitter)="playerJoined($event)">
   </app-welcome>
 </div>
 
-<div class="row"  *ngIf="room">
-  <div *ngIf="isMobile">
+<!--<div *ngIf="game == egame.INGLORIOUS_BASTERDS">-->
+  <!--input here-->
+<!--</div>-->
 
+<div class="row"  *ngIf="roomId">
+  <div *ngIf="isMobile">
+    <app-mobile-view>
+    </app-mobile-view>
   </div>
   <div *ngIf="!isMobile">
-    <div class="col m4">
-      <app-characters [playerId]="playerId"
-                      [teammates]="teammates">
-      </app-characters>
-    </div>
-    <div class="col m8">
-      <app-chat [roomId]="room"
-                [playerId]="playerId"
-                (setTeammatesEmitter)="setTeammates($event)">
-      </app-chat>
-    </div>
+    <app-desktop-view>
+    </app-desktop-view>
   </div>
 </div>

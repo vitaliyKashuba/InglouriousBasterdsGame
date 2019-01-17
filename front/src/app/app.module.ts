@@ -11,15 +11,15 @@ import { MzIconModule, MzIconMdiModule } from 'ngx-materialize';
 
 import { AppComponent } from './app.component';
 import { WelcomeComponent } from './components/welcome/welcome.component';
-import { ChatComponent } from './components/chat/chat.component';
-import { CharactersComponent } from './components/characters/characters.component';
+import { DesktopViewComponent } from './components/desktop-view/desktop-view.component';
+import { MobileViewComponent } from './components/mobile-view/mobile-view.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     WelcomeComponent,
-    ChatComponent,
-    CharactersComponent
+    DesktopViewComponent,
+    MobileViewComponent
   ],
   imports: [
     BrowserModule,
