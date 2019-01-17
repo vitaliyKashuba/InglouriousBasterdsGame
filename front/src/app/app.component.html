@@ -1,14 +1,25 @@
-{{isMobile}}
-{{showCHaracterInput}}
 <div *ngIf="!roomId">
   <app-welcome (roomIdEmitter)="setRoomId($event)"
-               (joinEmitter)="playerJoined($event)">
+               (joinEmitter)="playerJoined($event)"
+               (requestSentEmitter)="showSpinner()">
   </app-welcome>
 </div>
 
-<!--<div *ngIf="game == egame.INGLORIOUS_BASTERDS">-->
-  <!--input here-->
-<!--</div>-->
+<div *ngIf="isShowSpinner"
+     class="center"
+     id="loading-spinner">
+  <mz-spinner
+    [color]="'blue'"
+    [size]="'big'">
+  </mz-spinner>
+  <p>{{loadingText}}</p>
+</div>
+
+<div *ngIf="isShowCharacterInput">
+  <app-ib-character-input [playerId]="playerId"
+                          (onCharacterSet)="ibCharacterSetHandler()">
+  </app-ib-character-input>
+</div>
 
 <div class="row"  *ngIf="roomId">
   <div *ngIf="isMobile">

@@ -14,7 +14,9 @@ import { environment } from '../environments/environment';
 export class AppComponent {
   isMobile = device.mobile();
 
-  showCharacterInput: boolean;
+  isShowCharacterInput: boolean;
+  isShowSpinner: boolean;
+  loadingText: string;
 
   roomId: number;
   playerId: number;
@@ -31,15 +33,15 @@ export class AppComponent {
   }
 
   playerJoined(data: any) {
+    this.hideSpinner();
     this.playerId = data.id;
     this.game = data.game;
-    this.showCharacterInput = this.game === 0;
+    this.isShowCharacterInput = this.game === 0;
   }
 
-  setTeammates(data: Teammate[]) {
-    this.teammates = data;
-    log('setted players!');
-    log(this.teammates);
+  ibCharacterSetHandler() {
+    this.isShowCharacterInput = false;
+    this.showSpinner('waiting till game start');
   }
 
   connect() {
@@ -117,5 +119,14 @@ export class AppComponent {
     //   console.log(key, value);
     // });
     // this.setTeammatesEmitter.emit(data as Teammate[]);
+  }
+
+  showSpinner(text?: string) {
+    this.loadingText = text ? text : '';
+    this.isShowSpinner = true;
+  }
+
+  hideSpinner() {
+    this.isShowSpinner = false;
   }
 }

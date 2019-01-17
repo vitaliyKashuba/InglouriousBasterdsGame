@@ -12,6 +12,7 @@ export class WelcomeComponent implements OnInit {
 
   @Output() roomIdEmitter = new EventEmitter<number>();
   @Output() joinEmitter = new EventEmitter<any>();
+  @Output() requestSentEmitter = new EventEmitter<any>();
 
   name: string;
   roomInput: number;
@@ -47,7 +48,8 @@ export class WelcomeComponent implements OnInit {
     this.jq.scaleIn(this.enterRoomId);
   }
 
-  onMakeJoinRequestClick() {  // TODO hanle responses, loading animations
+  onMakeJoinRequestClick() {
+    this.requestSentEmitter.emit(null);
     this.requester.joinRequest(this.roomInput, this.name).subscribe(
       data => this.successJoinHandler(data),
       error => this.errorHandler(error)
