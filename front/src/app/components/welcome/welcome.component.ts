@@ -2,6 +2,7 @@ import {Component, ElementRef, Input, OnInit, Output, ViewChild, EventEmitter} f
 import {log} from 'util';
 import {JqueryUtilService} from '../../services/jquery-util.service';
 import {HttpRequesterService} from '../../services/http-requester.service';
+import {MzToastService} from 'ngx-materialize';
 
 @Component({
   selector: 'app-welcome',
@@ -10,8 +11,8 @@ import {HttpRequesterService} from '../../services/http-requester.service';
 })
 export class WelcomeComponent implements OnInit {
 
-  @Output() roomIdEmitter = new EventEmitter<number>();
-  @Output() playerIdEmitter = new EventEmitter<number>();
+  @Output() joinEmitter = new EventEmitter<any>();
+  @Output() requestSentEmitter = new EventEmitter<any>();
 
   name: string;
   roomInput: number;
@@ -23,7 +24,8 @@ export class WelcomeComponent implements OnInit {
   enterRoomId = 'enterRoomId';
 
   constructor(private jq: JqueryUtilService,
-              private requester: HttpRequesterService) { }
+              private requester: HttpRequesterService,
+              private toastService: MzToastService) { }
 
   ngOnInit() {
   }
@@ -47,7 +49,8 @@ export class WelcomeComponent implements OnInit {
     this.jq.scaleIn(this.enterRoomId);
   }
 
-  onMakeJoinRequestClick() {  // TODO hanle responses, loading animations
+  onMakeJoinRequestClick() {
+    this.requestSentEmitter.emit(null);
     this.requester.joinRequest(this.roomInput, this.name).subscribe(
       data => this.successJoinHandler(data),
       error => this.errorHandler(error)
@@ -55,14 +58,13 @@ export class WelcomeComponent implements OnInit {
   }
 
   successJoinHandler(data: any) {
-    log('success');
-    log(data.id);
-    this.playerIdEmitter.emit(data.id);
-    this.roomIdEmitter.emit(this.roomInput);
+    data.roomId = this.roomInput;
+    this.joinEmitter.emit(data);
   }
 
   errorHandler(error: any) {
-    log('error ' + error);
+    const message = error.status === 500 ? 'enter valid room number' : 'unknown error';
+    this.toastService.show(message, 4000, 'red');
   }
 
 }

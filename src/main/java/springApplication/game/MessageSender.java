@@ -33,7 +33,7 @@ public class MessageSender
                 bot.sendMsg(reciever.getId(), message);
                 break;
             case WEB:
-                template.convertAndSendToUser(reciever.getWebPrincipal(), "/topic/reply", "teammates"+message);
+                template.convertAndSendToUser(reciever.getWebPrincipal(), "/topic/reply", message);
                 break;
         }
     }
