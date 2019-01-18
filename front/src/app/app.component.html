@@ -1,19 +1,38 @@
-<div *ngIf="!room">
-  <app-welcome (roomIdEmitter)="setRoomId($event)"
-               (playerIdEmitter)="setPlayerId($event)">
+<div *ngIf="isShowSpinner"
+     class="center"
+     id="loading-spinner">
+  <mz-spinner
+    [color]="'blue'"
+    [size]="'big'">
+  </mz-spinner>
+  <p>{{loadingText}}</p>
+</div>
+
+<div *ngIf="isShowWelcomeComponent">
+  <app-welcome (joinEmitter)="playerJoined($event)"
+               (requestSentEmitter)="showSpinner()">
   </app-welcome>
 </div>
 
-<div class="row"  *ngIf="room">
-  <div class="col m4">
-    <app-characters [playerId]="playerId"
-                    [teammates]="teammates">
-    </app-characters>
-  </div>
-  <div class="col m8">
-    <app-chat [roomId]="room"
-              [playerId]="playerId"
-              (setTeammatesEmitter)="setTeammates($event)">
-    </app-chat>
-  </div>
+<div *ngIf="isShowCharacterInput">
+  <app-ib-character-input [playerId]="playerId"
+                          (onCharacterSet)="ibCharacterSetHandler()">
+  </app-ib-character-input>
 </div>
+
+<div *ngIf="isShowGameComponent">
+  <app-game [gameType]="game"
+            [gameData]="gameData">
+  </app-game>
+</div>
+
+<!--<div class="row"  *ngIf="isShowGameComponent">-->
+  <!--<div *ngIf="isMobile">-->
+    <!--<app-mobile-view>-->
+    <!--</app-mobile-view>-->
+  <!--</div>-->
+  <!--<div *ngIf="!isMobile">-->
+    <!--<app-desktop-view>-->
+    <!--</app-desktop-view>-->
+  <!--</div>-->
+<!--</div>-->

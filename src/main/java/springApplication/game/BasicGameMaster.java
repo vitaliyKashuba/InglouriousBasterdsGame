@@ -19,6 +19,7 @@ public abstract class BasicGameMaster {
     @Autowired
     protected MessageSender messageSender;
 
+    // TODO rewrite with guava ?
     protected Map<Integer, List<Player>> rooms; //room id - key, list of players - value
     protected Map<Integer, Player> players;     //player id - key, player obj - value
     protected Map<Integer, Integer> roomCreators; //admin id - key, room id - value
@@ -47,6 +48,11 @@ public abstract class BasicGameMaster {
         return roomCreators.get(adminId);
     }
 
+    protected List<Player> getRoomByRoomId(int roomId)
+    {
+        return rooms.get(roomId);
+    }
+
     /**
      * create new room and add initiator in it
      *
@@ -64,11 +70,14 @@ public abstract class BasicGameMaster {
             case "SpyfallGameMaster":
                 roomNumber = newRoom(EGame.SPYFALL);
                 break;
+            case "MafiaGameMaster":
+                roomNumber = newRoom(EGame.MAFIA);
+                break;
             default:
                 throw new NotImplementedException("implement it!");
         }
 
-        addPlayerIfNull(initiatorId, initiatorName);          // TODO check if possible to init game with player is null ? remove useless addIfNull method call
+        addPlayerIfNull(initiatorId, initiatorName);
         enterRoom(initiatorId, roomNumber);
 
         removeOldRoomIfExist(initiatorId);
@@ -114,6 +123,7 @@ public abstract class BasicGameMaster {
         }
     }
 
+    // TODO private?
     public void addPlayer(@NotNull  Player p)
     {
         players.put(p.getId(), p);
@@ -129,14 +139,6 @@ public abstract class BasicGameMaster {
         return roomCreators.containsKey(id);
     }
 
-    /**
-     * @return id of current room created by user
-     */
-    public int getAdminRoomId(int adminId)
-    {
-        return roomCreators.get(adminId);
-    }
-
     public void join(int playerId, String playerName, int roomId)
     {
         addPlayerIfNull(playerId, playerName);
@@ -148,4 +150,9 @@ public abstract class BasicGameMaster {
      * start game for admin's room
      */
     public abstract void startGame(int adminId);
+
+    public boolean containsPlayer(int id)
+    {
+        return this.players.containsKey(id);
+    }
 }

@@ -8,20 +8,21 @@ import { MzInputModule } from 'ngx-materialize';
 import { MzButtonModule } from 'ngx-materialize';
 import { MzTooltipModule } from 'ngx-materialize';
 import { MzIconModule, MzIconMdiModule } from 'ngx-materialize';
+import { MzToastModule } from 'ngx-materialize';
+import { MzSpinnerModule } from 'ngx-materialize';
+import { MzCollectionModule } from 'ngx-materialize'
 
 import { AppComponent } from './app.component';
-import { MainComponent } from './components/main/main.component';
 import { WelcomeComponent } from './components/welcome/welcome.component';
-import { ChatComponent } from './components/chat/chat.component';
-import { CharactersComponent } from './components/characters/characters.component';
+import { IbCharacterInputComponent } from './components/ib-character-input/ib-character-input.component';
+import { GameComponent } from './components/game/game.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    MainComponent,
     WelcomeComponent,
-    ChatComponent,
-    CharactersComponent
+    IbCharacterInputComponent,
+    GameComponent
   ],
   imports: [
     BrowserModule,
@@ -32,7 +33,10 @@ import { CharactersComponent } from './components/characters/characters.componen
     MzButtonModule,
     MzTooltipModule,
     MzIconModule,
-    MzIconMdiModule
+    MzIconMdiModule,
+    MzToastModule,
+    MzSpinnerModule,
+    MzCollectionModule
   ],
   providers: [],
   bootstrap: [AppComponent]

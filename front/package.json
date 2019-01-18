@@ -22,6 +22,7 @@
     "@angular/router": "^6.0.2",
     "@mdi/font": "^2.8.94",
     "core-js": "^2.5.4",
+    "current-device": "^0.7.8",
     "jquery": "^3.3.1",
     "net": "1.0.2",
     "ngx-materialize": "^6.1.3",

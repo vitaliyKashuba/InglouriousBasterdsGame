@@ -38,7 +38,7 @@ public class IBGameMaster extends BasicGameMaster
 
     public void setCharacter(int playerId, String character)
     {
-        players.get(playerId).setIbCharacter(character);
+        players.get(playerId).setCharacter(character);
     }
 
     /**
@@ -52,12 +52,20 @@ public class IBGameMaster extends BasicGameMaster
         int roomId = roomCreators.get(roomAdminId);
         List<Player> players = rooms.get(roomId);
         int lastIndex = players.size()-1;
-        String firstCharacterBkp = players.get(0).getIbCharacter();
+        String firstCharacterBkp = players.get(0).getCharacter();
         for (int i = 0; i < lastIndex; i++)
         {
-            players.get(i).setIbCharacter(players.get(i+1).getIbCharacter());
+            players.get(i).setCharacter(players.get(i+1).getCharacter());
         }
-        players.get(lastIndex).setIbCharacter(firstCharacterBkp);
+        players.get(lastIndex).setCharacter(firstCharacterBkp);
+    }
+
+    /**
+     * @return id of current room created by user
+     */
+    public int getAdminRoomId(int adminId)
+    {
+        return getRoomIdByAdminId(adminId);
     }
 
     @Override
@@ -65,6 +73,7 @@ public class IBGameMaster extends BasicGameMaster
     {
         startGame(adminId, GameMode.LIST);
     }
+
     public void startGame(int adminId, GameMode mode)
     {
         // TODO remove not-ready players, because they may be disconnected
@@ -79,8 +88,8 @@ public class IBGameMaster extends BasicGameMaster
             case CLASSIC:
                 for (Player p : players)
                 {
-                    String ch = p.getIbCharacter();
-                    String img = GoogleSearchAPIUtil.findImage(p.getIbCharacter());
+                    String ch = p.getCharacter();
+                    String img = GoogleSearchAPIUtil.findImage(p.getCharacter());
                     messageSender.sendImageFromUrl(p, img, ch);
                 }
                 break;
@@ -92,7 +101,7 @@ public class IBGameMaster extends BasicGameMaster
                     {
                         if(pl.getId() != p.getId())
                         {
-                            teammates.put(pl.getName(), pl.getIbCharacter());
+                            teammates.put(pl.getName(), pl.getCharacter());
                         }
                     }
                     switch(p.getClientType())
@@ -103,7 +112,7 @@ public class IBGameMaster extends BasicGameMaster
                             break;
                         case WEB:
                             List<Teammate> tm = Convertor.convertTeammatesForWebApi(teammates);
-                            messageSender.sendMesageToUser(p, Convertor.toJson(tm));
+                            messageSender.sendMesageToUser(p, "teammates" + Convertor.toJson(tm));
                             break;
                     }
                 }
