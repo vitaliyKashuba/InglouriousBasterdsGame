@@ -112,7 +112,7 @@ public class IBGameMaster extends BasicGameMaster
                             break;
                         case WEB:
                             List<Teammate> tm = Convertor.convertTeammatesForWebApi(teammates);
-                            messageSender.sendMesageToUser(p, Convertor.toJson(tm));
+                            messageSender.sendMesageToUser(p, "teammates" + Convertor.toJson(tm));
                             break;
                     }
                 }

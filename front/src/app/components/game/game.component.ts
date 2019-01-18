@@ -23,12 +23,13 @@ export class GameComponent implements OnInit {
   constructor(private requester: HttpRequesterService) { }
 
   ngOnInit() {
+    this.collection = [];
     log(this.gameData);
     switch (this.gameType) {
       case 0: // ib
         const data = JSON.parse(this.gameData);
-        data.keys().forEach(key => this.collection.push(key + ' ' + data.get(key)));
-        log(data);
+        data.forEach(teammate => { this.collection.push(teammate.name + ' - ' + teammate.character); });
+        this.header = 'Teammates';
         break;
       case 1: // spyfall
         break;
