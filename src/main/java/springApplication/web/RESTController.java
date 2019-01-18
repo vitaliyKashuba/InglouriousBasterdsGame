@@ -47,23 +47,6 @@ public class RESTController
         return "hello world";
     }
 
-//    /**test*/
-//    @RequestMapping("room/{id}")
-//    public String getRoom(@PathVariable int id)
-//    {
-////        IBGameMaster ibGameMaster = IBGameMaster.getInstance();
-//        List<Player> players = ibGameMaster.getRoom(id);
-//        return Convertor.toJson(players);
-//    }
-//
-//    /**test*/
-//    @RequestMapping("players")
-//    public String getPlayers()
-//    {
-//        return Convertor.toJson(ibGameMaster.getPlayers());
-//    }
-
-
     @CrossOrigin
     @RequestMapping(value = "join/{roomId}", method = RequestMethod.POST)
     public ResponseEntity join(@PathVariable int roomId, @RequestBody String data)
@@ -71,8 +54,6 @@ public class RESTController
         JSONObject jsonObject = new JSONObject(data);
         String playerName = jsonObject.getString("name");
         int playerId = Randomizer.getRandomPlayerId();
-
-//        System.out.println(playerId + " " + playerName);
 
 //        ibGameMaster.changeStatus(playerId, IBPlayer.Status.JOINREQUEST);                                               // useless in springApplication.web api ?
 //        ibGameMaster.removeOldRoomIfExist(playerId);                                                                    // useless in springApplication.web api ?
@@ -86,15 +67,12 @@ public class RESTController
             {
                 case INGLORIOUS_BASTERDS:
                     master = ibGameMaster;
-//                    ibGameMaster.enterRoom(playerId, roomId);
                     break;
                 case SPYFALL:
                     master = spyfallGameMaster;
-//                    spyfallGameMaster.enterRoom(playerId, roomId);
                     break;
                 case MAFIA:
                     master = mafiaGameMaster;
-//                    mafiaGameMaster.enterRoom(playerId, roomId);
                     break;
                 default:
                     log.error("default switch in RESTController.join");

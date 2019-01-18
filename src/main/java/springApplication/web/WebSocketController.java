@@ -29,21 +29,12 @@ public class WebSocketController
     private SpyfallGameMaster spyfallGameMaster;
 
     @Autowired
-    private RoomsKeeper roomsKeeper;
-
-    @Autowired
     private SimpMessagingTemplate template;
 
     @MessageMapping("/message/{id}")
     @SendTo("/topic/reply/{id}")
     public String processMessageBroadcas(Principal principal, @Payload String message, @DestinationVariable int id)
     {
-//        String name = new Gson().fromJson(message, Map.class).get("name").toString();
-//        System.out.println(sha);
-//        System.out.println(sha.getSessionId());
-//        System.out.println(sha.getSessionAttributes());
-//        System.out.println(principal.getName());
-//        System.out.println("/message" + message + " " + id);
         template.convertAndSendToUser(principal.getName(), "/topic/reply", "this shit with send to user works");
         return message;
     }
@@ -55,7 +46,6 @@ public class WebSocketController
         if (message.startsWith("setPrincipal"))                                                                         // TODO try to refactor ?
         {
             int playerId = Integer.parseInt(message.split(":")[1]);
-//            System.out.println("set principal to " + playerId);
             if (ibGameMaster.containsPlayer(playerId))
             {
                 ibGameMaster.getPlayer(playerId).setWebPrincipal(principal.getName());
