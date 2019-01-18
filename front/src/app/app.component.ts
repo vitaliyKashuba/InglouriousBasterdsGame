@@ -24,7 +24,7 @@ export class AppComponent {
   roomId: number;
   playerId: number;
   game: number; //  0 for ib
-  gameData: any; // server response with ib players, spyfall locations or role. need to be parsed
+  gameData: any = {}; // server response with ib players, spyfall locations or role. need to be parsed
 
   ws: any;
   // disabled: boolean;
@@ -87,12 +87,18 @@ export class AppComponent {
     });
   }
 
-  handleWebsocketDirectMessage(message) {
+  handleWebsocketDirectMessage(message) {       // TODO ty to refactor this shit
     if (message.body.startsWith('teammates')) {
       this.startIbGame(message.body.substring(9));
-      // const data = JSON.parse(message.body.substring(9));
-      // this.setPlayers(message.body.substring(9));
-    }             // TODO parse all message prefixes to start games
+    } else {
+      if (message.body.startsWith('spyfallLocations')) {
+        this.addSpyfallLocations(message.body.substring(16));
+      } else {
+        if (message.body.startsWith('spyfallRole')) {
+          this.addSpyfallRole(message.body.substring(11));
+        }
+      }
+    }
   }
 
   handleWebsocketBroadcastMessage(message) {
@@ -105,6 +111,24 @@ export class AppComponent {
 
   startIbGame(data: string) {
     this.gameData = data;
+    this.startGame();
+  }
+
+  addSpyfallLocations(data: string) {
+    this.gameData.locations = data;
+    if (this.gameData.role) {
+      this.startGame();
+    }
+  }
+
+  addSpyfallRole(data: string) {
+    this.gameData.role = data;
+    if (this.gameData.locations) {
+      this.startGame();
+    }
+  }
+
+  startGame() {
     this.isShowSpinner = false;
     this.isShowGameComponent = true;
   }

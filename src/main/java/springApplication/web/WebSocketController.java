@@ -8,8 +8,10 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
+import springApplication.game.RoomsKeeper;
 import springApplication.ibGame.IBGameMaster;
 import springApplication.game.MessageSender;
+import springApplication.spyfallGame.SpyfallGameMaster;
 
 import java.security.Principal;
 
@@ -21,7 +23,13 @@ public class WebSocketController
     MessageSender ms;
 
     @Autowired
-    IBGameMaster gameMaster;
+    private IBGameMaster ibGameMaster;
+
+    @Autowired
+    private SpyfallGameMaster spyfallGameMaster;
+
+    @Autowired
+    private RoomsKeeper roomsKeeper;
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -44,18 +52,17 @@ public class WebSocketController
     @SendToUser("/topic/reply")
     public String processMessagePrivate(Principal principal, @Payload String message)
     {
-//        System.out.println(principal.getName());
-//        String name = new Gson().fromJson(message, Map.class).get("name").toString();
-//        System.out.println("private" + message);
-//        template.convertAndSend("/topic/reply", "broadcast part");
-//        template.convertAndSendToUser(principal.getName(), "/topic/reply", "this shit with send to user works in private msgs");
-        /////////////////////////////// tests
-
-        if (message.startsWith("setPrincipal"))
+        if (message.startsWith("setPrincipal"))                                                                         // TODO try to refactor ?
         {
             int playerId = Integer.parseInt(message.split(":")[1]);
-            System.out.println("set principal to " + playerId);
-            gameMaster.getPlayer(playerId).setWebPrincipal(principal.getName());
+//            System.out.println("set principal to " + playerId);
+            if (ibGameMaster.containsPlayer(playerId))
+            {
+                ibGameMaster.getPlayer(playerId).setWebPrincipal(principal.getName());
+            } else if (spyfallGameMaster.containsPlayer(playerId))
+            {
+                spyfallGameMaster.getPlayer(playerId).setWebPrincipal(principal.getName());
+            }
             return "principal setted!";
         }
 

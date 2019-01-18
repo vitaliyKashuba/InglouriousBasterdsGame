@@ -2,6 +2,7 @@ import {Component, ElementRef, Input, OnInit, Output, ViewChild, EventEmitter} f
 import {log} from 'util';
 import {JqueryUtilService} from '../../services/jquery-util.service';
 import {HttpRequesterService} from '../../services/http-requester.service';
+import {MzToastService} from 'ngx-materialize';
 
 @Component({
   selector: 'app-welcome',
@@ -23,7 +24,8 @@ export class WelcomeComponent implements OnInit {
   enterRoomId = 'enterRoomId';
 
   constructor(private jq: JqueryUtilService,
-              private requester: HttpRequesterService) { }
+              private requester: HttpRequesterService,
+              private toastService: MzToastService) { }
 
   ngOnInit() {
   }
@@ -61,7 +63,8 @@ export class WelcomeComponent implements OnInit {
   }
 
   errorHandler(error: any) {
-    log('error ' + error);
+    const message = error.status === 500 ? 'enter valid room number' : 'unknown error';
+    this.toastService.show(message, 4000, 'red');
   }
 
 }

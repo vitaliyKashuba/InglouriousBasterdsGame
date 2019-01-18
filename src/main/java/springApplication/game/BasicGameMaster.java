@@ -150,4 +150,9 @@ public abstract class BasicGameMaster {
      * start game for admin's room
      */
     public abstract void startGame(int adminId);
+
+    public boolean containsPlayer(int id)
+    {
+        return this.players.containsKey(id);
+    }
 }

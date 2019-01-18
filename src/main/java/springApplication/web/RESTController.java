@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.glxn.qrgen.javase.QRCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import springApplication.game.BasicGameMaster;
 import springApplication.game.EGame;
 import springApplication.game.Player;
 import springApplication.game.RoomsKeeper;
@@ -71,12 +72,12 @@ public class RESTController
         String playerName = jsonObject.getString("name");
         int playerId = Randomizer.getRandomPlayerId();
 
-        System.out.println(playerId + " " + playerName);
-        ibGameMaster.addPlayer(new Player(playerId, playerName, Player.ClientType.WEB));   // TODO get game type from room keeper
+//        System.out.println(playerId + " " + playerName);
 
 //        ibGameMaster.changeStatus(playerId, IBPlayer.Status.JOINREQUEST);                                               // useless in springApplication.web api ?
 //        ibGameMaster.removeOldRoomIfExist(playerId);                                                                    // useless in springApplication.web api ?
 
+        BasicGameMaster master;
         EGame game = roomsKeeper.getGameByRoomId(roomId);
 
         try
@@ -84,17 +85,23 @@ public class RESTController
             switch (game)                                   // TODO move to gneral master ?
             {
                 case INGLORIOUS_BASTERDS:
-                    ibGameMaster.enterRoom(playerId, roomId);
+                    master = ibGameMaster;
+//                    ibGameMaster.enterRoom(playerId, roomId);
                     break;
                 case SPYFALL:
-                    spyfallGameMaster.enterRoom(playerId, roomId);
+                    master = spyfallGameMaster;
+//                    spyfallGameMaster.enterRoom(playerId, roomId);
                     break;
                 case MAFIA:
-                    mafiaGameMaster.enterRoom(playerId, roomId);
+                    master = mafiaGameMaster;
+//                    mafiaGameMaster.enterRoom(playerId, roomId);
                     break;
                 default:
                     log.error("default switch in RESTController.join");
+                    return new ResponseEntity(HttpStatus.BAD_REQUEST);
             }
+            master.addPlayer(new Player(playerId, playerName, Player.ClientType.WEB));
+            master.enterRoom(playerId, roomId);
         } catch (NumberFormatException e)
         {
             return new ResponseEntity<>("Enter valid room number", HttpStatus.BAD_REQUEST);
@@ -153,4 +160,5 @@ public class RESTController
     {
         return Convertor.toJson(spyfallGameMaster.getAllLocations().subList(0, 15));
     }
+
 }

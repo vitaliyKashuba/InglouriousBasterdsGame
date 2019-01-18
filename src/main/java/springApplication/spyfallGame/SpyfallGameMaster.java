@@ -1,6 +1,7 @@
 package springApplication.spyfallGame;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import springApplication.game.BasicGameMaster;
 import springApplication.game.Player;
@@ -11,6 +12,7 @@ import util.Randomizer;
 import java.io.*;
 import java.util.*;
 
+@Slf4j
 @Component
 public class SpyfallGameMaster extends BasicGameMaster
 {
@@ -72,19 +74,40 @@ public class SpyfallGameMaster extends BasicGameMaster
 
         for (Player p : players)    // TODO send img with location ?
         {
-            messageSender.sendMesageToUser(p, Convertor.convertLocationsForTelegram(locations));
+            StringBuilder sbRoleMessage = new StringBuilder();
+
             if (p.equals(spy))
             {
-                messageSender.sendMesageToUser(p, "SPY");
+                sbRoleMessage.append("SPY");
             } else
             {
-                messageSender.sendMesageToUser(p, "Location:" + location);
+                sbRoleMessage.append("Location: ").append(location);
 
                 if (!roles.empty())
                 {
-                    messageSender.sendMesageToUser(p, "Role:" + roles.pop());
+                    sbRoleMessage.append("\nRole: ").append(roles.pop());
                 }
             }
+
+            String locationsMessage;
+            String roleMessage;
+            switch(p.getClientType())       // TODO move conversion logic to another component ?
+            {
+                case TELEGRAM:
+                    locationsMessage = Convertor.convertLocationsForTelegram(locations);
+                    roleMessage = sbRoleMessage.toString();
+                    break;
+                case WEB:
+                    locationsMessage = "spyfallLocations" + Convertor.toJson(locations);
+                    roleMessage = "spyfallRole" + sbRoleMessage.toString();
+                    break;
+                default:
+                    log.error("default switch while getting client type in spyfall start " + p.getClientType());
+                    return;
+            }
+
+            messageSender.sendMesageToUser(p, locationsMessage);
+            messageSender.sendMesageToUser(p, roleMessage);
         }
     }
 
