@@ -249,12 +249,13 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                     case Callbacks.MAFIA_SET_ROLES:                                                                     // show keyboard with all default mafia roles to fill in room
                         inlineKeyboardMarkup = TgUtil.getAllRolesButtonsForMafiaKeyboardMarkup();
                         int roomSize = mafiaGameMaster.getPlayersCount(senderId);
-                        message = roomSize + " players joined the room. Add roles, then press start.\n" +
+                        message = (roomSize - 1) + " players joined the room. Add roles, then press start.\n" +
                                 "You can type any addictive role";
                         sendMsg(senderId, message, inlineKeyboardMarkup);
                         stateSaver.setStatus(senderId, UserStateSaver.Status.MAFIA_SET_ROLES);
                         break;
                     case TgUtil.Callbacks.START_MAFIA:
+                        mafiaGameMaster.startGame(senderId);
                         //TODO start mafia here
                         break;
                     case Callbacks.QR_BOT:
@@ -270,7 +271,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                             int messageId = update.getCallbackQuery().getMessage().getMessageId();
                             int playersCount = mafiaGameMaster.getPlayersCount(senderId);
                             List<String> roles = mafiaGameMaster.getRoles(senderId);
-                            message = playersCount + " players joined. " + roles.size() + " Roles:\n" + Convertor.convertListForTelegram(roles);
+                            message = (playersCount - 1) + " players joined. " + roles.size() + " Roles:\n" + Convertor.convertListForTelegram(roles);
                             editMessage(senderId, messageId, message, TgUtil.getAllRolesButtonsForMafiaKeyboardMarkup());
                         } else
                         {

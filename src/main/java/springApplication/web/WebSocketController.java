@@ -1,5 +1,6 @@
 package springApplication.web;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -11,11 +12,12 @@ import org.springframework.stereotype.Controller;
 import springApplication.game.RoomsKeeper;
 import springApplication.ibGame.IBGameMaster;
 import springApplication.game.MessageSender;
+import springApplication.mafiaGame.MafiaGameMaster;
 import springApplication.spyfallGame.SpyfallGameMaster;
 
 import java.security.Principal;
 
-
+@Slf4j
 @Controller
 public class WebSocketController
 {
@@ -30,6 +32,9 @@ public class WebSocketController
 
     @Autowired
     private SimpMessagingTemplate template;
+
+    @Autowired
+    private MafiaGameMaster mafiaGameMaster;
 
     @MessageMapping("/message/{id}")
     @SendTo("/topic/reply/{id}")
@@ -52,6 +57,13 @@ public class WebSocketController
             } else if (spyfallGameMaster.containsPlayer(playerId))
             {
                 spyfallGameMaster.getPlayer(playerId).setWebPrincipal(principal.getName());
+            } else if (mafiaGameMaster.containsPlayer(playerId))
+            {
+                mafiaGameMaster.getPlayer(playerId).setWebPrincipal(principal.getName());
+            } else
+            {
+                log.error("smth going wrong while setting up principal to player");
+                return "error";
             }
             return "principal setted!";
         }

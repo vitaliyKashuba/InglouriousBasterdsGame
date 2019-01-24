@@ -42,10 +42,10 @@ public class RESTController
     @Autowired
     private RoomsKeeper roomsKeeper;
 
-    @RequestMapping("/")
-    public String index() {
-        return "hello world";
-    }
+//    @RequestMapping("/")
+//    public String index() {
+//        return "hello world";
+//    }
 
     @CrossOrigin
     @RequestMapping(value = "join/{roomId}", method = RequestMethod.POST)
