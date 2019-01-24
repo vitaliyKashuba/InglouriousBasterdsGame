@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { MainComponent } from './main.component';
+import { IbCharacterInputComponent } from './ib-character-input.component';
 
-describe('MainComponent', () => {
-  let component: MainComponent;
-  let fixture: ComponentFixture<MainComponent>;
+describe('IbCharacterInputComponent', () => {
+  let component: IbCharacterInputComponent;
+  let fixture: ComponentFixture<IbCharacterInputComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ MainComponent ]
+      declarations: [ IbCharacterInputComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(MainComponent);
+    fixture = TestBed.createComponent(IbCharacterInputComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

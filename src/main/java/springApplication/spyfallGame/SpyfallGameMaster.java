@@ -1,6 +1,7 @@
 package springApplication.spyfallGame;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import springApplication.game.BasicGameMaster;
 import springApplication.game.Player;
@@ -11,6 +12,7 @@ import util.Randomizer;
 import java.io.*;
 import java.util.*;
 
+@Slf4j
 @Component
 public class SpyfallGameMaster extends BasicGameMaster
 {
@@ -27,19 +29,19 @@ public class SpyfallGameMaster extends BasicGameMaster
 
         try
         {
-            String s = AppUtil.readFromResources("spyfall.json");
+            String s = AppUtil.readFromResources("spyfall.json");                                          // load locations and roles from resources
 
             ObjectMapper mapper = new ObjectMapper();
             locationsAndRoles = mapper.readValue(s, Map.class);
         } catch (FileNotFoundException e)
         {
-            System.out.println("smth wrong with file"); //TODO add some error message if can't init ?
-            System.out.println("classpath:");
+            log.error("smth wrong with file"); //TODO add some error message if can't init ?
+            log.info("classpath:");
             AppUtil.printClasspath();
             e.printStackTrace();
         } catch (IOException e)
         {
-            System.out.println("probably Jackson error");
+            log.error("probably Jackson error");
             e.printStackTrace();
         }
     }
@@ -49,12 +51,12 @@ public class SpyfallGameMaster extends BasicGameMaster
         int roomId = getRoomIdByAdminId(adminId);
         List<Player> players = rooms.get(roomId);
 
-        Player spy = Randomizer.getRandomElement(players);
+        Player spy = Randomizer.getRandomElement(players);                                                              // select spy
 
         List<String> locations = new ArrayList<>(locationsAndRoles.keySet());
 
         String location;
-        if (roomLocationsLimit.containsKey(roomId))
+        if (roomLocationsLimit.containsKey(roomId))                                                                     // select random location with limit
         {
             Collections.shuffle(locations);
             List<String> l = new ArrayList<>(locations);
@@ -65,26 +67,47 @@ public class SpyfallGameMaster extends BasicGameMaster
             location = Randomizer.getRandomElement(locations);
         }
 
-        List<String> rls = locationsAndRoles.get(location);
+        List<String> rls = locationsAndRoles.get(location);                                                             // get location roles
         Collections.shuffle(rls);
         Stack<String> roles = new Stack<>();
         roles.addAll(rls);
 
         for (Player p : players)    // TODO send img with location ?
         {
-            messageSender.sendMesageToUser(p, Convertor.convertLocationsForTelegram(locations));
-            if (p.equals(spy))
+            StringBuilder sbRoleMessage = new StringBuilder();
+
+            if (p.equals(spy))                                                                                          // build game data response (role/location)
             {
-                messageSender.sendMesageToUser(p, "SPY");
+                sbRoleMessage.append("SPY");
             } else
             {
-                messageSender.sendMesageToUser(p, "Location:" + location);
+                sbRoleMessage.append("Location: ").append(location);
 
                 if (!roles.empty())
                 {
-                    messageSender.sendMesageToUser(p, "Role:" + roles.pop());
+                    sbRoleMessage.append("\nRole: ").append(roles.pop());
                 }
             }
+
+            String locationsMessage;
+            String roleMessage;
+            switch(p.getClientType())                                                                                   // convert responses to web/tg format // TODO move conversion logic to another component ?
+            {
+                case TELEGRAM:
+                    locationsMessage = Convertor.convertLocationsForTelegram(locations);
+                    roleMessage = sbRoleMessage.toString();
+                    break;
+                case WEB:
+                    locationsMessage = "spyfallLocations" + Convertor.toJson(locations);
+                    roleMessage = "spyfallRole" + sbRoleMessage.toString();
+                    break;
+                default:
+                    log.error("default switch while getting client type in spyfall start " + p.getClientType());
+                    return;
+            }
+
+            messageSender.sendMesageToUser(p, locationsMessage);                                                        // send locations list
+            messageSender.sendMesageToUser(p, roleMessage);                                                             // send role
         }
     }
 
@@ -102,5 +125,11 @@ public class SpyfallGameMaster extends BasicGameMaster
 
         int roomId = getRoomIdByAdminId(adminId);
         roomLocationsLimit.put(roomId, limit);
+    }
+
+    /** for test*/
+    public List<String> getAllLocations()
+    {
+        return new ArrayList<>(locationsAndRoles.keySet());
     }
 }

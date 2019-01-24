@@ -26,6 +26,8 @@ public class TgUtil
         public static final String INIT_MAFIA = "init_mafia";
         public static final String MAFIA_SET_ROLES = "mafia_set";
         public static final String MAFIA_AUTOSET_ROLES = "mafia_autoset";
+        public static final String QR_BOT = "qr_bot";
+        public static final String QR_WEB = "qr_web";
     }
 
     /**
@@ -164,5 +166,17 @@ public class TgUtil
         {{
             put("Set random character\"", "random");
         }});
+    }
+
+    public static InlineKeyboardMarkup getMainMenuKeyboardMarkup()
+    {
+        List<Map<String,String>> lines = new ArrayList<>();
+        lines.add(new TreeMap<String, String>()
+        {{
+            put("Bot QR", Callbacks.QR_BOT);
+            put("Web QR", Callbacks.QR_WEB);
+        }});
+
+        return buildKeyboardMarkup(lines);
     }
 }

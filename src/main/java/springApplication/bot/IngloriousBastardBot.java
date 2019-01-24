@@ -31,7 +31,6 @@ import java.util.List;
 
 import static util.TgUtil.Callbacks;
 
-//TODO add qr bot invite
 @Slf4j
 @Component
 public class IngloriousBastardBot extends TelegramLongPollingBot
@@ -88,16 +87,12 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         stateSaver.setStatus(senderId, UserStateSaver.Status.JOINREQUEST);
                         responceString = "enter room number";
                         break;
-                    case "/help":
-                        responceString = "help";
-                        break;
-                    case "/qr":
-                        sendImageUploadingAFile(senderId, AppUtil.getBotInviteQR());
+                    case "/menu":
+                        sendMsg(senderId, "menu", TgUtil.getMainMenuKeyboardMarkup());
                         break;
                     case "/debug":
                         System.out.println("/debug");
-//                        responceString = "debug";
-                        sendImageUploadingAFile(senderId, AppUtil.getBotInviteQR());
+                        sendMsg(senderId, "Menu", TgUtil.getMainMenuKeyboardMarkup());
                         break;
                     default:
                         responceString = "unrecognized command";
@@ -261,6 +256,13 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         break;
                     case TgUtil.Callbacks.START_MAFIA:
                         //TODO start mafia here
+                        break;
+                    case Callbacks.QR_BOT:
+                        sendImageUploadingAFile(senderId, AppUtil.getBotInviteQR());
+                        break;
+                    case Callbacks.QR_WEB:
+                        sendImageUploadingAFile(senderId, AppUtil.getWebUrlQR());
+                        break;
                     default:
                         if (callback.startsWith(TgUtil.ADD_MAFIA_ROLE_CALLBACK_PREFIX))                                 // add role and update previous message with room stats
                         {

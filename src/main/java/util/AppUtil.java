@@ -78,6 +78,11 @@ public class AppUtil
         return QRCode.from("tg://resolve?domain=" + BOT_NAME).file();
     }
 
+    public static File getWebUrlQR()
+    {
+        return QRCode.from("https://inglorious-basterds-bot.herokuapp.com/").file();
+    }
+
     public static ResponseEntity responce200OK()
     {
         return new ResponseEntity(HttpStatus.OK);
