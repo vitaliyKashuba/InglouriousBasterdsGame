@@ -38,6 +38,19 @@ public class MessageSender
         }
     }
 
+    /**
+     *  can be used only with TG users, so separated from sendMessageToUser
+     */
+    public int sendLobbyMessage(int userId, String message) // TODO move somewhere ?
+    {
+        return bot.sendMsg(userId, message);
+    }
+
+    public void updateLobbyMessage(int chatId, int messageId, String message)   // TODO move somhere ?
+    {
+        bot.editMessage(chatId, messageId, message, null);
+    }
+
     public void sendImageFromUrl(Player reciever, String imgUrl, String msg)
     {
         switch(reciever.getClientType())

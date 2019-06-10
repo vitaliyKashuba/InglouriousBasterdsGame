@@ -1,6 +1,7 @@
 package springApplication.bot;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.var;
 import net.glxn.qrgen.javase.QRCode;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Marker;
@@ -11,6 +12,7 @@ import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -27,6 +29,7 @@ import util.GoogleSearchAPIUtil;
 import util.TgUtil;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.List;
 
 import static util.TgUtil.Callbacks;
@@ -56,6 +59,8 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
     {
         botToken = AppUtil.getEnvironmentVariable("TOKEN");
     }
+
+    int msgId;
 
     //TODO try to refactor?
     @Override
@@ -92,7 +97,11 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         break;
                     case "/debug":
                         System.out.println("/debug");
-                        sendMsg(senderId, "Menu", TgUtil.getMainMenuKeyboardMarkup());
+                        sendMsg(senderId, "test edit message");
+                        break;
+                    case "/debug2":
+                        System.out.println("/debug2");
+                        editMessage(senderId, msgId, "1234", null);
                         break;
                     default:
                         responceString = "unrecognized command";
@@ -293,12 +302,12 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
         stateSaver.setStatus(playerId, UserStateSaver.Status.JOINED);
     }
 
-    public void sendMsg(long chatId, String msg)
+    public int sendMsg(long chatId, String msg)
     {
-        sendMsg(chatId, msg, null);
+        return sendMsg(chatId, msg, null);
     }
 
-    public void sendMsg(long chatId, String msg, @Nullable InlineKeyboardMarkup mk)
+    public int sendMsg(long chatId, String msg, @Nullable InlineKeyboardMarkup mk)
     {
         SendMessage message = new SendMessage()
                 .setChatId(chatId)
@@ -309,7 +318,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
             message.setReplyMarkup(mk);
         }
 
-        tryToExecuteApiMethod(message);
+        return tryToExecuteApiMethod(message);
     }
 
     public void sendImageFromUrl(int chatId, String url)
@@ -358,17 +367,20 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
      *
      * ! can't move @Nullable fields check here, because they declared in child classes (SendMessage, EditMessageText etc)
      *
-     * @param method
+     * @return id of sended messages. can used it to update message
      */
-    private void tryToExecuteApiMethod(BotApiMethod method)
+    private int tryToExecuteApiMethod(BotApiMethod method)
     {
+        int msgId = 0;  // no sense, but need init it. probably impossible to catch exception below
         try
         {
-            execute(method);
+            var x = execute(method);
+            msgId = ((Message)x).getMessageId();
         } catch (TelegramApiException e)    // never catched this, no idea about of conditions of this exception
         {
             e.printStackTrace();
         }
+        return msgId;
     }
 
     /**
