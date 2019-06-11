@@ -79,7 +79,6 @@ export class AppComponent {
       that.ws.subscribe('/user/topic/reply', function(message) {        // user messages
         that.handleWebsocketDirectMessage(message);
       });
-      // that.disabled = true;
 
       that.sendPrivate('setPrincipal:' + that.playerId);    // used to be able send direct messages to players
     }, function(error) {
@@ -88,16 +87,20 @@ export class AppComponent {
   }
 
   handleWebsocketDirectMessage(message) {       // TODO ty to refactor this shit
-    if (message.body.startsWith('teammates')) {
-      this.startIbGame(message.body.substring(9));
+    const msg = message.body;
+    if (msg.startsWith('teammates')) {
+      this.startIbGame(msg.substring(9));
+    } else if (msg.startsWith('spyfallLocations')) {
+      this.addSpyfallLocations(msg.substring(16));
+    } else if (msg.startsWith('spyfallRole')) {
+      this.addSpyfallRole(msg.substring(11));
+    } else if (msg.startsWith('mafiaRole')) {
+      this.startMafia(msg.substring(9));
+    } else if (msg.startsWith('principal')) {
+      // all ok, principal setted
     } else {
-      if (message.body.startsWith('spyfallLocations')) {
-        this.addSpyfallLocations(message.body.substring(16));
-      } else {
-        if (message.body.startsWith('spyfallRole')) {
-          this.addSpyfallRole(message.body.substring(11));
-        }
-      }
+      log('¯\\_(ツ)_/¯ shit happens');
+      log(msg);
     }
   }
 
@@ -126,6 +129,11 @@ export class AppComponent {
     if (this.gameData.locations) {
       this.startGame();
     }
+  }
+
+  startMafia(data: string) {
+    this.gameData = data;
+    this.startGame();
   }
 
   startGame() {
@@ -158,26 +166,6 @@ export class AppComponent {
   sendPrivate(message: string) {
     this.ws.send('/app/private_message', {}, message);
   }
-
-  // setPlayers(players: string) {
-  //   log('setting players');
-  //   const m = new Map<string, string>();
-  //   m.set('wer', 'rwrew');
-  //   const data = JSON.parse(players);
-  //
-  //   log(data);
-  //   // log(m);
-  //   // log(data.constructor.name);
-  //   //
-  //   // let shit = Object.entries(data);
-  //   //
-  //   // log(shit.keys());
-  //
-  //   // data.forEach((value: string, key: string) => {
-  //   //   console.log(key, value);
-  //   // });
-  //   // this.setTeammatesEmitter.emit(data as Teammate[]);
-  // }
 
   showSpinner(text?: string) {
     this.loadingText = text ? text : '';

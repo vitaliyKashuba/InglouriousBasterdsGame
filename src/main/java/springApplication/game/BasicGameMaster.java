@@ -1,5 +1,7 @@
 package springApplication.game;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,16 +21,18 @@ public abstract class BasicGameMaster {
     @Autowired
     protected MessageSender messageSender;
 
-    // TODO rewrite with guava ?
+    @Autowired
+    protected LobbyMaster lobbyMaster;
+
     protected Map<Integer, List<Player>> rooms; //room id - key, list of players - value
     protected Map<Integer, Player> players;     //player id - key, player obj - value
-    protected Map<Integer, Integer> roomCreators; //admin id - key, room id - value
+    protected BiMap<Integer, Integer> roomCreators; //admin id - key, room id - value
 
     protected BasicGameMaster()
     {
         rooms = new HashMap<>();
         players = new HashMap<>();
-        roomCreators = new HashMap<>();
+        roomCreators = HashBiMap.create();
     }
 
     /**
@@ -51,6 +55,26 @@ public abstract class BasicGameMaster {
     protected List<Player> getRoomByRoomId(int roomId)
     {
         return rooms.get(roomId);
+    }
+
+    protected int getAdminIdByRoomId(int roomId)
+    {
+        return roomCreators.inverse().get(roomId);
+    }
+
+    /** looks like shit, but works!
+     *
+     * @throws IllegalArgumentException dont have idea in what conditions it can be thrown, but IDE says it possible
+     */
+    protected int gerRoomNumberByPlayerId(int id)
+    {
+        return rooms.keySet().stream()
+                .filter(room -> rooms.get(room)
+                        .stream()
+                        .filter(player -> player.getId() == id)
+                        .count() == 1)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("cant find room"));
     }
 
     /**
@@ -83,6 +107,8 @@ public abstract class BasicGameMaster {
         removeOldRoomIfExist(initiatorId);
         roomCreators.put(initiatorId, roomNumber);
 
+        lobbyMaster.initLobby(initiatorId, roomNumber);
+
         return roomNumber;
     }
 
@@ -91,16 +117,22 @@ public abstract class BasicGameMaster {
      *
      * it possible if players avoid calling /start method
      */
-    private void addPlayerIfNull(int id, String name)
+    private void addPlayerIfNull(int id, String name, Player.ClientType clientType)
     {
         Player p = players.get(id);
         if (p == null)
         {
-            addPlayer(new Player(id, name, Player.ClientType.TELEGRAM));
+            addPlayer(new Player(id, name, clientType));
         }
     }
 
-    public void enterRoom(int playerId, int roomId)
+    /** old signature, used only in telegram, so left with default client type param = TELEGRAM */
+    private void addPlayerIfNull(int id, String name)
+    {
+        addPlayerIfNull(id, name, Player.ClientType.TELEGRAM);
+    }
+
+    private void enterRoom(int playerId, int roomId)
     {
         if (!rooms.containsKey(roomId))
         {
@@ -124,7 +156,7 @@ public abstract class BasicGameMaster {
     }
 
     // TODO private?
-    public void addPlayer(@NotNull  Player p)
+    private void addPlayer(@NotNull  Player p)
     {
         players.put(p.getId(), p);
     }
@@ -139,11 +171,28 @@ public abstract class BasicGameMaster {
         return roomCreators.containsKey(id);
     }
 
+    /** old signature, used only in telegram, so left with default client type param = TELEGRAM */
     public void join(int playerId, String playerName, int roomId)
     {
-        addPlayerIfNull(playerId, playerName);
+        join(playerId, playerName, roomId, Player.ClientType.TELEGRAM);
+    }
+
+    public void join(int playerId, String playerName, int roomId, Player.ClientType clientType)
+    {
+        addPlayerIfNull(playerId, playerName, clientType);
         removeOldRoomIfExist(playerId);
         enterRoom(playerId, roomId);
+
+        updateLobby(roomId);
+    }
+
+    /**
+     * updates lobby
+     * override to customize message for each game
+     */
+    protected void updateLobby(int roomId)
+    {
+        lobbyMaster.updateLobby(getAdminIdByRoomId(roomId), roomId, "Joined " + getRoomByRoomId(roomId).size());
     }
 
     /**

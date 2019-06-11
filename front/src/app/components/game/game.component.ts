@@ -25,8 +25,6 @@ export class GameComponent implements OnInit {
   ngOnInit() {
     let data;
     this.collection = [];
-    // log('this data');
-    // log(this.gameData);
     switch (this.gameType) {
       case 0: // ib
         data = JSON.parse(this.gameData);
@@ -39,15 +37,11 @@ export class GameComponent implements OnInit {
         this.header = this.gameData.role;
         break;
       case 2: // mafia
+        this.header = this.gameData;
         break;
       default:
-        log('smth going wrong, unknown game tytpe' + this.gameType);
+        log('smth going wrong, unknown game type' + this.gameType);
     }
-
-    // this.requester.getRandomSpyfallLocations().subscribe(
-    //   data => this.collection = data as string[],
-    //   error => log(error)
-    // );
   }
 
 }

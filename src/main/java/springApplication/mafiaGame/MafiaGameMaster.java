@@ -5,11 +5,11 @@ import com.google.common.collect.MultimapBuilder;
 import org.springframework.stereotype.Component;
 import springApplication.game.BasicGameMaster;
 import springApplication.game.Player;
+import util.Convertor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static springApplication.game.Player.ClientType.WEB;
 
 @Component
 public class MafiaGameMaster extends BasicGameMaster        // TODO add master's helper? add secret voting ?
@@ -39,10 +39,12 @@ public class MafiaGameMaster extends BasicGameMaster        // TODO add master's
     {
         int roomId = getRoomIdByAdminId(adminId);
 
-        List<Player> players = rooms.get(roomId);
+        List<Player> players = new ArrayList<>(rooms.get(roomId));  // to copy values and be able to restart game
         List<String> roles = roomsAndRoles.get(roomId);
 
+        Player master = players.get(0);
         players.remove(0);  // firs element - admin(master), no need to set character to master
+        Collections.shuffle(roles);
 
         if (roles.size() <= players.size())
         {
@@ -60,11 +62,17 @@ public class MafiaGameMaster extends BasicGameMaster        // TODO add master's
         } else
         {
             System.out.println("too much roles");
-            // TODO send error, too much roles
+            messageSender.sendMesageToUser(master, "Too much roles or to few players");
+            return;
         }
-        // randomize roles
-        // send roles
-        // send all roles to admin (master)
+
+        messageSender.sendMesageToUser(master, Convertor.convertMafiaPlayersForTelegram(players));
+
+        for (Player p : players)
+        {
+            String ch = p.getCharacter();
+            messageSender.sendMesageToUser(p, p.getClientType() == WEB ? "mafiaRole" + ch : ch);
+        }
     }
 
     /**

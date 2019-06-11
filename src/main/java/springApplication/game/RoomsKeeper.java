@@ -1,5 +1,6 @@
 package springApplication.game;
 
+import lombok.Data;
 import org.springframework.stereotype.Component;
 import util.Randomizer;
 import java.util.HashMap;

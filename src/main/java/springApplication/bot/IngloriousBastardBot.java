@@ -1,6 +1,7 @@
 package springApplication.bot;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.var;
 import net.glxn.qrgen.javase.QRCode;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Marker;
@@ -8,14 +9,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.pinnedmessages.PinChatMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import springApplication.game.EGame;
+import springApplication.game.LobbyMaster;
 import springApplication.game.RoomsKeeper;
 import springApplication.ibGame.IBGameMaster;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -27,11 +31,11 @@ import util.GoogleSearchAPIUtil;
 import util.TgUtil;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.List;
 
 import static util.TgUtil.Callbacks;
 
-//TODO add qr bot invite
 @Slf4j
 @Component
 public class IngloriousBastardBot extends TelegramLongPollingBot
@@ -88,16 +92,15 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         stateSaver.setStatus(senderId, UserStateSaver.Status.JOINREQUEST);
                         responceString = "enter room number";
                         break;
-                    case "/help":
-                        responceString = "help";
-                        break;
-                    case "/qr":
-                        sendImageUploadingAFile(senderId, AppUtil.getBotInviteQR());
+                    case "/menu":
+                        sendMsg(senderId, "menu", TgUtil.getMainMenuKeyboardMarkup());
                         break;
                     case "/debug":
                         System.out.println("/debug");
-//                        responceString = "debug";
-                        sendImageUploadingAFile(senderId, AppUtil.getBotInviteQR());
+//                        pinMessage(senderId);
+                        break;
+                    case "/debug2":
+                        System.out.println("/debug2");
                         break;
                     default:
                         responceString = "unrecognized command";
@@ -155,7 +158,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                                 if (ibGameMaster.isAdmin(senderId))
                                 {
                                     int adminRoomId = ibGameMaster.getAdminRoomId(senderId);
-                                    responceString += ("\nSelect mode to start game for room " + adminRoomId);
+                                    responceString = "Select mode to start game for room " + adminRoomId;
                                     inlineKeyboardMarkup = TgUtil.getStartIBKeyboardMarkup();
                                 }
                                 break;
@@ -254,13 +257,21 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                     case Callbacks.MAFIA_SET_ROLES:                                                                     // show keyboard with all default mafia roles to fill in room
                         inlineKeyboardMarkup = TgUtil.getAllRolesButtonsForMafiaKeyboardMarkup();
                         int roomSize = mafiaGameMaster.getPlayersCount(senderId);
-                        message = roomSize + " players joined the room. Add roles, then press start.\n" +
+                        message = (roomSize - 1) + " players joined the room. Add roles, then press start.\n" +
                                 "You can type any addictive role";
                         sendMsg(senderId, message, inlineKeyboardMarkup);
                         stateSaver.setStatus(senderId, UserStateSaver.Status.MAFIA_SET_ROLES);
                         break;
                     case TgUtil.Callbacks.START_MAFIA:
+                        mafiaGameMaster.startGame(senderId);
                         //TODO start mafia here
+                        break;
+                    case Callbacks.QR_BOT:
+                        sendImageUploadingAFile(senderId, AppUtil.getBotInviteQR());
+                        break;
+                    case Callbacks.QR_WEB:
+                        sendImageUploadingAFile(senderId, AppUtil.getWebUrlQR());
+                        break;
                     default:
                         if (callback.startsWith(TgUtil.ADD_MAFIA_ROLE_CALLBACK_PREFIX))                                 // add role and update previous message with room stats
                         {
@@ -268,7 +279,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                             int messageId = update.getCallbackQuery().getMessage().getMessageId();
                             int playersCount = mafiaGameMaster.getPlayersCount(senderId);
                             List<String> roles = mafiaGameMaster.getRoles(senderId);
-                            message = playersCount + " players joined. " + roles.size() + " Roles:\n" + Convertor.convertListForTelegram(roles);
+                            message = (playersCount - 1) + " players joined. " + roles.size() + " Roles:\n" + Convertor.convertListForTelegram(roles);
                             editMessage(senderId, messageId, message, TgUtil.getAllRolesButtonsForMafiaKeyboardMarkup());
                         } else
                         {
@@ -290,12 +301,12 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
         stateSaver.setStatus(playerId, UserStateSaver.Status.JOINED);
     }
 
-    public void sendMsg(long chatId, String msg)
+    public int sendMsg(long chatId, String msg)
     {
-        sendMsg(chatId, msg, null);
+        return sendMsg(chatId, msg, null);
     }
 
-    public void sendMsg(long chatId, String msg, @Nullable InlineKeyboardMarkup mk)
+    public int sendMsg(long chatId, String msg, @Nullable InlineKeyboardMarkup mk)
     {
         SendMessage message = new SendMessage()
                 .setChatId(chatId)
@@ -306,7 +317,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
             message.setReplyMarkup(mk);
         }
 
-        tryToExecuteApiMethod(message);
+        return tryToExecuteApiMethod(message);
     }
 
     public void sendImageFromUrl(int chatId, String url)
@@ -334,6 +345,11 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
         tryToExecuteApiMethod(sendPhotoRequest);
     }
 
+    public void editMessage(int chatId, int messageId, String message)
+    {
+        editMessage(chatId, messageId, message, null);
+    }
+
     public void editMessage(int chatId, int messageId, String message, @Nullable InlineKeyboardMarkup mk)
     {
         EditMessageText editMessage = new EditMessageText()
@@ -355,22 +371,24 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
      *
      * ! can't move @Nullable fields check here, because they declared in child classes (SendMessage, EditMessageText etc)
      *
-     * @param method
+     * @return id of sended messages. can used it to update message
      */
-    private void tryToExecuteApiMethod(BotApiMethod method)
+    private int tryToExecuteApiMethod(BotApiMethod method)
     {
+        int msgId = 0;  // no sense, but need init it. probably impossible to catch exception below
         try
         {
-            execute(method);
+            var x = execute(method);
+            msgId = ((Message)x).getMessageId();
         } catch (TelegramApiException e)    // never catched this, no idea about of conditions of this exception
         {
             e.printStackTrace();
         }
+        return msgId;
     }
 
     /**
      * can't merge with tryToExecuteApiMethod(BotApiMethod method) because of type exception
-     * @param method
      */
     private void tryToExecuteApiMethod(SendPhoto method)
     {

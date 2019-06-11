@@ -39,6 +39,7 @@ public class IBGameMaster extends BasicGameMaster
     public void setCharacter(int playerId, String character)
     {
         players.get(playerId).setCharacter(character);
+        updateLobby(gerRoomNumberByPlayerId(playerId));
     }
 
     /**
@@ -120,6 +121,13 @@ public class IBGameMaster extends BasicGameMaster
         }
 
         messageSender.sendBroadcast("game started!!!", roomId);
+    }
+
+    @Override
+    protected void updateLobby(int roomId)
+    {
+        int readyCount = (int) getRoomByRoomId(roomId).stream().filter(player -> player.getCharacter() != null).count();
+        lobbyMaster.updateLobby(getAdminIdByRoomId(roomId), roomId, "Joined " + getRoomByRoomId(roomId).size() + "\nReady " + readyCount);
     }
 
     /**test for web api*/

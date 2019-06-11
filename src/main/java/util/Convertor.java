@@ -3,6 +3,7 @@ package util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
+import springApplication.game.Player;
 import springApplication.ibGame.Teammate;
 
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class Convertor
         return strings;
     }
 
-    public static List<Teammate> convertTeammatesForWebApi(@NotNull Map<String, String> teammates)
+    public static List<Teammate> convertTeammatesForWebApi(@NotNull Map<String, String> teammates)  // TODO can be simplified by passing not map, but list of players
     {
         List<Teammate> tm = new ArrayList<>();
         for(String name : teammates.keySet())
@@ -40,7 +41,7 @@ public class Convertor
     }
 
     @NotNull
-    public static String convertTeammatesForTelegram(@NotNull Map<String, String> teammates)
+    public static String convertTeammatesForTelegram(@NotNull Map<String, String> teammates)    // TODO can be simplified by passing not map, but list of players
     {
         StringBuilder sb = new StringBuilder();
         for(String name : teammates.keySet())
@@ -53,15 +54,7 @@ public class Convertor
     @NotNull
     public static String convertLocationsForTelegram(@NotNull List<String> locations)
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Locations:\n");
-        for (String l: locations)
-        {
-            sb.append(l);
-            sb.append("\n");
-        }
-
-        return sb.toString();
+        return "Locations:\n" + convertListForTelegram(locations);
     }
 
     @NotNull
@@ -74,6 +67,19 @@ public class Convertor
             sb.append("\n");
         }
 
+        return sb.toString();
+    }
+
+    @NotNull
+    public static String convertMafiaPlayersForTelegram(@NotNull List<Player> players)
+    {
+        StringBuilder sb = new StringBuilder();
+        players.forEach(
+                p -> sb.append(p.getName())
+                        .append(" - ")
+                        .append(p.getCharacter())
+                        .append("\n")
+        );
         return sb.toString();
     }
 }
