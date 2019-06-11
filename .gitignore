@@ -39,4 +39,5 @@ InglouriousBasterdsGame.iml
 IngloriousBasterdsBot
 .idea/
 /front/node_modules/
+node_modules
 
