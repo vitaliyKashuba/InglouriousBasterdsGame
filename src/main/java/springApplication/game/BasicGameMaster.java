@@ -21,7 +21,9 @@ public abstract class BasicGameMaster {
     @Autowired
     protected MessageSender messageSender;
 
-    // TODO rewrite with guava ?
+    @Autowired
+    protected LobbyMaster lobbyMaster;
+
     protected Map<Integer, List<Player>> rooms; //room id - key, list of players - value
     protected Map<Integer, Player> players;     //player id - key, player obj - value
     protected BiMap<Integer, Integer> roomCreators; //admin id - key, room id - value
@@ -30,7 +32,6 @@ public abstract class BasicGameMaster {
     {
         rooms = new HashMap<>();
         players = new HashMap<>();
-//        roomCreators = new HashMap<>();
         roomCreators = HashBiMap.create();
     }
 
@@ -59,6 +60,21 @@ public abstract class BasicGameMaster {
     protected int getAdminIdByRoomId(int roomId)
     {
         return roomCreators.inverse().get(roomId);
+    }
+
+    /** looks like shit, but works!
+     *
+     * @throws IllegalArgumentException dont have idea in what conditions it can be thrown, but IDE says it possible
+     */
+    protected int gerRoomNumberByPlayerId(int id)
+    {
+        return rooms.keySet().stream()
+                .filter(room -> rooms.get(room)
+                        .stream()
+                        .filter(player -> player.getId() == id)
+                        .count() == 1)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("cant find room"));
     }
 
     /**
@@ -91,8 +107,7 @@ public abstract class BasicGameMaster {
         removeOldRoomIfExist(initiatorId);
         roomCreators.put(initiatorId, roomNumber);
 
-        int lobbyMessageId = messageSender.sendLobbyMessage(initiatorId, "lobby message");
-        roomsKeeper.storeLobbyMessageId(roomNumber, lobbyMessageId);
+        lobbyMaster.initLobby(initiatorId, roomNumber);
 
         return roomNumber;
     }
@@ -168,8 +183,16 @@ public abstract class BasicGameMaster {
         removeOldRoomIfExist(playerId);
         enterRoom(playerId, roomId);
 
-        System.out.println(playerId + " " + playerId);
-        messageSender.updateLobbyMessage(getAdminIdByRoomId(roomId), roomsKeeper.getLobbyMessageId(roomId), "Joined " + getRoomByRoomId(roomId).size()); // get admin by room here
+        updateLobby(roomId);
+    }
+
+    /**
+     * updates lobby
+     * override to customize message for each game
+     */
+    protected void updateLobby(int roomId)
+    {
+        lobbyMaster.updateLobby(getAdminIdByRoomId(roomId), roomId, "Joined " + getRoomByRoomId(roomId).size());
     }
 
     /**

@@ -15,12 +15,10 @@ import java.util.Map;
 public class RoomsKeeper
 {
     private Map<Integer, EGame> rooms;  // key - room id, value - game
-    private Map<Integer, Integer> lobbyMessageIds; // key - room id, value - messageId
 
     RoomsKeeper()
     {
         rooms = new HashMap<>();
-        lobbyMessageIds = new HashMap<>();
 
         rooms.put(1, EGame.INGLORIOUS_BASTERDS);    //for tests and debug
         rooms.put(2, EGame.SPYFALL);                //for tests and debug
@@ -50,15 +48,5 @@ public class RoomsKeeper
             throw new IllegalArgumentException("no such room");
         }
         return rooms.get(roomId);
-    }
-
-    public void storeLobbyMessageId(int roomId, int messageId)
-    {
-        lobbyMessageIds.put(roomId, messageId);
-    }
-
-    public int getLobbyMessageId(int roomId)
-    {
-        return lobbyMessageIds.get(roomId);
     }
 }

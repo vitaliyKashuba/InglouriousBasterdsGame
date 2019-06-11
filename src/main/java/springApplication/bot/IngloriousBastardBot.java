@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.pinnedmessages.PinChatMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
@@ -18,6 +19,7 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import springApplication.game.EGame;
+import springApplication.game.LobbyMaster;
 import springApplication.game.RoomsKeeper;
 import springApplication.ibGame.IBGameMaster;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -60,8 +62,6 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
         botToken = AppUtil.getEnvironmentVariable("TOKEN");
     }
 
-    int msgId;
-
     //TODO try to refactor?
     @Override
     public void onUpdateReceived(Update update)
@@ -97,11 +97,10 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         break;
                     case "/debug":
                         System.out.println("/debug");
-                        sendMsg(senderId, "test edit message");
+//                        pinMessage(senderId);
                         break;
                     case "/debug2":
                         System.out.println("/debug2");
-                        editMessage(senderId, msgId, "1234", null);
                         break;
                     default:
                         responceString = "unrecognized command";
@@ -159,7 +158,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                                 if (ibGameMaster.isAdmin(senderId))
                                 {
                                     int adminRoomId = ibGameMaster.getAdminRoomId(senderId);
-                                    responceString += ("\nSelect mode to start game for room " + adminRoomId);
+                                    responceString = "Select mode to start game for room " + adminRoomId;
                                     inlineKeyboardMarkup = TgUtil.getStartIBKeyboardMarkup();
                                 }
                                 break;
@@ -346,6 +345,11 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
         tryToExecuteApiMethod(sendPhotoRequest);
     }
 
+    public void editMessage(int chatId, int messageId, String message)
+    {
+        editMessage(chatId, messageId, message, null);
+    }
+
     public void editMessage(int chatId, int messageId, String message, @Nullable InlineKeyboardMarkup mk)
     {
         EditMessageText editMessage = new EditMessageText()
@@ -385,7 +389,6 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
 
     /**
      * can't merge with tryToExecuteApiMethod(BotApiMethod method) because of type exception
-     * @param method
      */
     private void tryToExecuteApiMethod(SendPhoto method)
     {
