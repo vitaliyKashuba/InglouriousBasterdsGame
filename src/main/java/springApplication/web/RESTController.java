@@ -76,9 +76,6 @@ public class RESTController
                     return new ResponseEntity(HttpStatus.BAD_REQUEST);
             }
 
-//            master.addPlayer(new Player(playerId, playerName, Player.ClientType.WEB));
-//            master.enterRoom(playerId, roomId);
-
             master.join(playerId, playerName, roomId, Player.ClientType.WEB);
         } catch (NumberFormatException e)
         {

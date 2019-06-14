@@ -11,6 +11,8 @@ import {MzToastService} from 'ngx-materialize';
 })
 export class WelcomeComponent implements OnInit {
 
+  MIN_NAME_LENGTH = 3;
+
   @Output() joinEmitter = new EventEmitter<any>();
   @Output() requestSentEmitter = new EventEmitter<any>();
 
@@ -28,11 +30,18 @@ export class WelcomeComponent implements OnInit {
               private toastService: MzToastService) { }
 
   ngOnInit() {
+    this.name = localStorage.getItem('name');
+  }
+
+  ngAfterViewInit() {
+    if (this.name){
+      this.jq.scaleIn(this.nameInputButtonId);
+    }
   }
 
   onInputKeyUp() {
     this.nameEntered = false;
-    if (this.name.length < 3) {
+    if (this.name.length < this.MIN_NAME_LENGTH) {
       this.jq.scaleOut(this.nameInputButtonId);
     } else {
       this.jq.scaleIn(this.nameInputButtonId);
@@ -41,6 +50,8 @@ export class WelcomeComponent implements OnInit {
 
   onNameInputButtonClick() {
     this.nameEntered = true;
+    localStorage.setItem('name', this.name);
+
     this.jq.scaleOut(this.nameInputButtonId);
     this.jq.scaleIn(this.startButtonsRowId);
   }
