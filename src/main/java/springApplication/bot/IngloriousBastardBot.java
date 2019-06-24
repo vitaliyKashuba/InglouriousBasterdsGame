@@ -92,7 +92,7 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         stateSaver.setStatus(senderId, UserStateSaver.Status.JOINREQUEST);
                         responceString = "enter room number";
                         break;
-                    case "/menu":
+                    case "/qr":
                         sendMsg(senderId, "menu", TgUtil.getMainMenuKeyboardMarkup());
                         break;
                     case "/debug":

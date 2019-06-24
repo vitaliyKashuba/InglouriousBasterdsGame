@@ -2,6 +2,7 @@ package springApplication.game;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Component
 public abstract class BasicGameMaster {
 
@@ -192,7 +194,14 @@ public abstract class BasicGameMaster {
      */
     protected void updateLobby(int roomId)
     {
-        lobbyMaster.updateLobby(getAdminIdByRoomId(roomId), roomId, "Joined " + getRoomByRoomId(roomId).size());
+        try //TODO hotfixed, find out and fix cause of null pointer
+        {
+            lobbyMaster.updateLobby(getAdminIdByRoomId(roomId), roomId, "Joined " + getRoomByRoomId(roomId).size());
+        } catch (Exception e)
+        {
+            log.error("Error while try to update lobby", e);
+            e.printStackTrace();
+        }
     }
 
     /**
