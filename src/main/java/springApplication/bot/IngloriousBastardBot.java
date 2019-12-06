@@ -18,6 +18,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import springApplication.db.service.DbLoggerService;
 import springApplication.game.EGame;
 import springApplication.game.LobbyMaster;
 import springApplication.game.RoomsKeeper;
@@ -54,6 +55,9 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
 
     @Autowired
     private MafiaGameMaster mafiaGameMaster;
+
+    @Autowired
+    private DbLoggerService dbLogger;
 
     private final String botToken;
 
@@ -139,13 +143,16 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                                     log.error("default switch while entering room");
                                     break;
                             }
+                            dbLogger.log(senderName + " joined room " + roomToJoin, "INFO", "onUpdateReceived");
                         } catch (NumberFormatException e)                                                               // user send text to room number request
                         {
                             responceString = "Enter valid room number";
+                            dbLogger.log(senderName + " enters unparseble room number ", "WARN");
                             break;
                         } catch (IllegalArgumentException e)                                                            // can't enter room. threw by BasicGameMaster.enterRoom method
                         {
                             responceString = "Room not exist";
+                            dbLogger.log(senderName + " enters unexisting room number ", "WARN");
                             break;
                         }
                         break;
@@ -186,6 +193,9 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                                 break;
                             default :
                                 log.error("default switch while parsing joined players msg");
+                                dbLogger.log("default switch while parsing joined players msg",
+                                             "ERROR",
+                                             "onUpdateReceived");
                                 break;
                         }
                         stateSaver.setStatus(senderId, UserStateSaver.Status.READY);
