@@ -20,7 +20,7 @@ import java.security.Principal;
 @Controller
 public class WebSocketController {
     @Autowired
-    MessageSender ms;
+    private MessageSender ms;
 
     @Autowired
     private IBGameMaster ibGameMaster;

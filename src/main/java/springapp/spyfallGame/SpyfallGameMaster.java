@@ -19,7 +19,7 @@ public class SpyfallGameMaster extends BasicGameMaster {
     private Map<Integer, Integer> roomLocationsLimit;       // key - room id, value - limit
     private final static int MINIMUM_LOCATIONS_LIMIT = 5;
 
-    private SpyfallGameMaster() {
+    SpyfallGameMaster() {
         super();
 
         roomLocationsLimit = new HashMap<>();

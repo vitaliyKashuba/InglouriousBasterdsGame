@@ -32,7 +32,7 @@ public class IBGameMaster extends BasicGameMaster {
         CLASSIC, LIST   // TODO change to more obvious enum ?
     }
 
-    private IBGameMaster() {
+    IBGameMaster() {
         super();
 
         rooms.put(1, new ArrayList<>()); // for tests

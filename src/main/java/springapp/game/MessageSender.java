@@ -35,6 +35,7 @@ public class MessageSender {
                 break;
             default:
                 log.error("Default case in sendMessageToUser() !");
+                break;
         }
     }
 
@@ -45,6 +46,9 @@ public class MessageSender {
                 break;
             case WEB:
                 break;//TODO should be sent to web users?
+            default:
+                log.error("Default case in sendMessageToUser() !");
+                break;
         }
     }
 

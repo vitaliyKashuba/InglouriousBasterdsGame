@@ -14,7 +14,7 @@ import javax.annotation.PostConstruct;
 @SpringBootApplication
 @EnableScheduling
 @EnableJpaRepositories(basePackages = "springapp.db.repository")
-@EntityScan(basePackages = {"springApplication.db.model"})
+@EntityScan(basePackages = {"springapp.db.model"})
 public class Main {
     @Autowired
     private DbLoggerService dbLoggerService;
