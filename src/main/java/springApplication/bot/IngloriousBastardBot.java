@@ -1,15 +1,10 @@
 package springApplication.bot;
 
 import lombok.extern.slf4j.Slf4j;
-import lombok.var;
-import net.glxn.qrgen.javase.QRCode;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Marker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.pinnedmessages.PinChatMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
@@ -21,7 +16,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import springApplication.db.service.CharacterStatsService;
 import springApplication.db.service.DbLoggerService;
 import springApplication.game.EGame;
-import springApplication.game.LobbyMaster;
 import springApplication.game.RoomsKeeper;
 import springApplication.ibGame.IBGameMaster;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -29,11 +23,9 @@ import springApplication.mafiaGame.MafiaGameMaster;
 import springApplication.spyfallGame.SpyfallGameMaster;
 import util.AppUtil;
 import util.Convertor;
-import util.GoogleSearchAPIUtil;
 import util.TgUtil;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.List;
 
 import static util.TgUtil.Callbacks;
