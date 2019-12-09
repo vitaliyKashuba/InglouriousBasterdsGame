@@ -18,6 +18,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import springApplication.db.service.CharacterStatsService;
 import springApplication.db.service.DbLoggerService;
 import springApplication.game.EGame;
 import springApplication.game.LobbyMaster;
@@ -58,6 +59,9 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
 
     @Autowired
     private DbLoggerService dbLogger;
+
+    @Autowired
+    CharacterStatsService statsService;
 
     private final String botToken;
 
@@ -103,8 +107,8 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         System.out.println("/debug");
 //                        pinMessage(senderId);
                         break;
-                    case "/debug2":
-                        System.out.println("/debug2");
+                    case "/stats":
+                        responceString = statsService.getStatsInTgReadebleFormat();
                         break;
                     default:
                         responceString = "unrecognized command";

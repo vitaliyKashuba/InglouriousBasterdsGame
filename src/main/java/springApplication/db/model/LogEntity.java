@@ -1,5 +1,6 @@
 package springApplication.db.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import javax.persistence.Basic;
@@ -64,6 +65,7 @@ public class LogEntity {
 
     @Basic
     @Column(name = "datetime")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     public LocalDateTime getDateTime(){
         return dateTime;
     }

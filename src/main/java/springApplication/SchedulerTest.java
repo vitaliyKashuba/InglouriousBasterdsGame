@@ -10,6 +10,7 @@ import springApplication.db.service.CharacterStatsService;
 import springApplication.db.service.DbLoggerService;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class SchedulerTest {
@@ -23,12 +24,15 @@ public class SchedulerTest {
     @Autowired
     CharacterStatsService statService;
 
-    @Scheduled(fixedDelay = 100000)
+    @Scheduled(fixedDelay = 1000000)
     void scheduling() {
 //        dbLoggerService.log("qwrqweqw");
 //        System.out.println("start");
 //        List<LogEntity> logs = logRepository.findAll();
 //        System.out.println(logs);
-        statService.addOrUpdateCharacterStat("Darth Vader");
+//        statService.addOrUpdateCharacterStat("Darth Vader");
+//        Optional<String> opt = Optional.empty();
+//        System.out.println("empty opt " + opt.orElse("124"));
+//        System.out.println(statService.getStatsInTgReadebleFormat());
     }
 }

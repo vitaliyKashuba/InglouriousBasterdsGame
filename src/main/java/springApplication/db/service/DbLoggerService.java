@@ -6,6 +6,7 @@ import springApplication.db.model.LogEntity;
 import springApplication.db.repository.LogRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * because heroku logger add-ons keep logs only for 7 days for free
@@ -31,7 +32,10 @@ public class DbLoggerService {
         log.setSeverity(severity);
         log.setMessage(message);
         log.setDateTime(LocalDateTime.now());
-        System.out.println(log);
         logRepository.save(log);
+    }
+
+    public List<LogEntity> getAllLogs() {
+        return logRepository.findAllInReverseOrder(); // TODO add pageable
     }
 }
