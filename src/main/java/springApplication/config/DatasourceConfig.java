@@ -25,12 +25,14 @@ public class DatasourceConfig {
     @Bean
     public DataSource dataSource() throws URISyntaxException {
         URI dbUri = new URI(System.getenv("DATABASE_URL"));
+//        URI dbUri = new URI("postgres://root:123123@localhost:5001/ib");
 
-        log.debug(dbUri.toString());
+        System.out.println("DB URI " + dbUri.toString());
 
         String username = dbUri.getUserInfo().split(":")[0];
         String password = dbUri.getUserInfo().split(":")[1];
-        String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath() + "?sslmode=require";
+//        String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath() + "?sslmode=require";
+        String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath();
 
         DataSourceBuilder basicDataSource = DataSourceBuilder.create();;
         basicDataSource.url(dbUrl);
