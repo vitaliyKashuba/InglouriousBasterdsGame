@@ -1,1 +1,1 @@
-web: java -jar target/InglouriousBasterdsGame-1.0.jar
+web: java -jar target/InglouriousBasterdsGame-1.0.jar -Xmx384m -Xms384m -Xss512k -XX:+UseCompressedOops

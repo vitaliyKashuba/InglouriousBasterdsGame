@@ -1,15 +1,10 @@
 package springApplication.bot;
 
 import lombok.extern.slf4j.Slf4j;
-import lombok.var;
-import net.glxn.qrgen.javase.QRCode;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Marker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.pinnedmessages.PinChatMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
@@ -18,8 +13,9 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import springApplication.db.service.CharacterStatsService;
+import springApplication.db.service.DbLoggerService;
 import springApplication.game.EGame;
-import springApplication.game.LobbyMaster;
 import springApplication.game.RoomsKeeper;
 import springApplication.ibGame.IBGameMaster;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -27,11 +23,9 @@ import springApplication.mafiaGame.MafiaGameMaster;
 import springApplication.spyfallGame.SpyfallGameMaster;
 import util.AppUtil;
 import util.Convertor;
-import util.GoogleSearchAPIUtil;
 import util.TgUtil;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.List;
 
 import static util.TgUtil.Callbacks;
@@ -54,6 +48,12 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
 
     @Autowired
     private MafiaGameMaster mafiaGameMaster;
+
+    @Autowired
+    private DbLoggerService dbLogger;
+
+    @Autowired
+    CharacterStatsService statsService;
 
     private final String botToken;
 
@@ -92,15 +92,15 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                         stateSaver.setStatus(senderId, UserStateSaver.Status.JOINREQUEST);
                         responceString = "enter room number";
                         break;
-                    case "/menu":
+                    case "/qr":
                         sendMsg(senderId, "menu", TgUtil.getMainMenuKeyboardMarkup());
                         break;
                     case "/debug":
                         System.out.println("/debug");
 //                        pinMessage(senderId);
                         break;
-                    case "/debug2":
-                        System.out.println("/debug2");
+                    case "/stats":
+                        responceString = statsService.getStatsInTgReadebleFormat();
                         break;
                     default:
                         responceString = "unrecognized command";
@@ -139,13 +139,16 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                                     log.error("default switch while entering room");
                                     break;
                             }
+                            dbLogger.log(senderName + " joined room " + roomToJoin, "INFO", "onUpdateReceived");
                         } catch (NumberFormatException e)                                                               // user send text to room number request
                         {
                             responceString = "Enter valid room number";
+                            dbLogger.log(senderName + " enters unparseble room number ", "WARN");
                             break;
                         } catch (IllegalArgumentException e)                                                            // can't enter room. threw by BasicGameMaster.enterRoom method
                         {
                             responceString = "Room not exist";
+                            dbLogger.log(senderName + " enters unexisting room number ", "WARN");
                             break;
                         }
                         break;
@@ -186,6 +189,9 @@ public class IngloriousBastardBot extends TelegramLongPollingBot
                                 break;
                             default :
                                 log.error("default switch while parsing joined players msg");
+                                dbLogger.log("default switch while parsing joined players msg",
+                                             "ERROR",
+                                             "onUpdateReceived");
                                 break;
                         }
                         stateSaver.setStatus(senderId, UserStateSaver.Status.READY);

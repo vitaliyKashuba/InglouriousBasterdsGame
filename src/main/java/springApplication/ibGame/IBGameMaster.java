@@ -1,6 +1,8 @@
 package springApplication.ibGame;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import springApplication.db.service.CharacterStatsService;
 import springApplication.game.BasicGameMaster;
 import springApplication.game.Player;
 import util.Convertor;
@@ -19,6 +21,9 @@ import java.util.*;
 @Component
 public class IBGameMaster extends BasicGameMaster
 {
+    @Autowired
+    CharacterStatsService statsService;
+
     /**
      * classic mode - download picture of character, send to player his own character to recognize
      *
@@ -40,6 +45,7 @@ public class IBGameMaster extends BasicGameMaster
     {
         players.get(playerId).setCharacter(character);
         updateLobby(gerRoomNumberByPlayerId(playerId));
+        statsService.addOrUpdateCharacterStat(character);
     }
 
     /**

@@ -18,6 +18,7 @@ public class SpyfallGameMaster extends BasicGameMaster
 {
     private Map<String, List<String>> locationsAndRoles;    // key - location, value - roles
     private Map<Integer, Integer> roomLocationsLimit;       // key - room id, value - limit
+    private final static int MINIMUM_LOCATIONS_LIMIT = 5;
 
     private SpyfallGameMaster()
     {
@@ -59,9 +60,8 @@ public class SpyfallGameMaster extends BasicGameMaster
         if (roomLocationsLimit.containsKey(roomId))                                                                     // select random location with limit
         {
             Collections.shuffle(locations);
-            List<String> l = new ArrayList<>(locations);
-            locations = l.subList(0, roomLocationsLimit.get(roomId));
-            location = Randomizer.getRandomElement(l);
+            locations = locations.subList(0, roomLocationsLimit.get(roomId));
+            location = Randomizer.getRandomElement(locations);
         } else
         {
             location = Randomizer.getRandomElement(locations);
@@ -113,7 +113,7 @@ public class SpyfallGameMaster extends BasicGameMaster
 
     public void setLocationsLimit(int adminId, int limit)
     {
-        if(limit < 5)
+        if(limit < MINIMUM_LOCATIONS_LIMIT)
         {
             throw new IllegalArgumentException("too small limit");
         }

@@ -2,18 +2,25 @@ package springApplication.game;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import springApplication.db.service.DbLoggerService;
 
+import javax.print.attribute.standard.Severity;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Component
 public abstract class BasicGameMaster {
+
+    @Autowired
+    DbLoggerService dbLogger;
 
     @Autowired
     private RoomsKeeper roomsKeeper;
@@ -86,7 +93,9 @@ public abstract class BasicGameMaster {
     {
         int roomNumber;
 
-        switch(this.getClass().getSimpleName())     // can't make in in extension classes
+        String className = this.getClass().getSimpleName();
+
+        switch(className)     // can't make in in extension classes
         {
             case "IBGameMaster":
                 roomNumber = newRoom(EGame.INGLORIOUS_BASTERDS);
@@ -108,6 +117,9 @@ public abstract class BasicGameMaster {
         roomCreators.put(initiatorId, roomNumber);
 
         lobbyMaster.initLobby(initiatorId, roomNumber);
+
+        dbLogger.log("Start " + className.substring(0, className.length() - 10) + " for room " + roomNumber + " by " +
+                     initiatorName, "INFO");
 
         return roomNumber;
     }
@@ -192,7 +204,14 @@ public abstract class BasicGameMaster {
      */
     protected void updateLobby(int roomId)
     {
-        lobbyMaster.updateLobby(getAdminIdByRoomId(roomId), roomId, "Joined " + getRoomByRoomId(roomId).size());
+        try //TODO hotfixed, find out and fix cause of null pointer
+        {
+            lobbyMaster.updateLobby(getAdminIdByRoomId(roomId), roomId, "Joined " + getRoomByRoomId(roomId).size());
+        } catch (Exception e)
+        {
+            log.error("Error while try to update lobby", e);
+            e.printStackTrace();
+        }
     }
 
     /**
